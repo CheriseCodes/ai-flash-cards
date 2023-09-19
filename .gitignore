@@ -7,6 +7,9 @@
 
 # testing
 /coverage
+notes.txt
+sample_sentences_data.json
+test_import.txt
 
 # production
 /build

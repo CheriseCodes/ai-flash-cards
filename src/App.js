@@ -1,15 +1,20 @@
 import React, { useState } from 'react';
 import WordInput from './components/WordInput.js';
 import FlashCard from './components/FlashCard.js';
-import { v4 as uuidv4 } from 'uuid';
 import LanguageForm from './components/LanguageForm.js';
 import LanguageLevelForm from './components/LanguageLevelForm.js';
+
+import { v4 as uuidv4 } from 'uuid';
+import cloneDeep from 'lodash/cloneDeep.js';
 
 // TODO: Decide what data needs to persist between page refreshes
 // - allCardData
 // - selectedCards
 // - languageMode
 // - languageLevel
+
+// TODO: Globalize language modes and levels without using global variables
+// - https://www.w3.org/wiki/JavaScript_best_practices#Avoid_globals
 const App = () => {
   const [spinner, setSpinner] = useState(false);
   const [allCardData, setAllCardData ] = useState([]);
@@ -31,8 +36,8 @@ const App = () => {
         const imageJson = await imageResponse.json()
         cardData.id = uuidv4()
         cardData.img = imageJson.data[0].url
-        cardData = JSON.stringify(cardData)
-        console.log(`App.generateCard - cardData: ${cardData}`);
+        // cardData = 
+        console.log(`App.generateCard - cardData: ${JSON.stringify(cardData)}`);
         setAllCardData(curr => [...curr, ...[cardData]])
         setSpinner(false)
         console.log(`App.generateCard - allCardData: ${allCardData}`);
@@ -47,11 +52,17 @@ const App = () => {
     console.log()
  }
 
-  const replaceCard = (prevCardContent, newCardContent) => {
-    if (prevCardContent !== newCardContent) {
-      const index = allCardData.findIndex((item) => item === prevCardContent);
-      setAllCardData(curr => [...curr.slice(0,index), ...[newCardContent],...curr.slice(index+1)])
-    }
+  const replaceCard = (cardId, newCardData) => {
+    const newArray = cloneDeep(allCardData);
+
+    // Find and update the object in the cloned array
+    const updatedArray = newArray.map((item) => {
+      if (item.id === cardId) {
+        return { ...item, ...newCardData }; // Update the object with new values
+      }
+      return item; // Return unchanged objects
+    });
+    setAllCardData(updatedArray)
   }
 
  // TODO: Add tool tip for each button
@@ -62,7 +73,7 @@ const App = () => {
       <LanguageLevelForm languageMode={languageMode} languageLevel={languageLevel} setLanguageLevel={setLanguageLevel}/>
       <WordInput generateCard={generateCard} setAllCardData={setAllCardData} allCardData={allCardData} spinner={spinner}/>
       <form className='flash-card-form' onSubmit={handleSubmit}>
-        {allCardData ? allCardData.map((cardData) => <FlashCard key={JSON.parse(cardData).id} cardData={cardData} setAllCardData={setAllCardData} allCardData={allCardData} replaceCard={replaceCard} languageLevel={languageLevel} languageMode={languageMode}/>) : ''}
+        {allCardData ? allCardData.map((cardData) => <FlashCard key={cardData.id} cardData={cardData}setAllCardData={setAllCardData} allCardData={allCardData} replaceCard={replaceCard} languageLevel={languageLevel} languageMode={languageMode}/>) : ''}
         <button>Download</button>
       </form>
       {spinner && <p>Generating sentences...</p>}

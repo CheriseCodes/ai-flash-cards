@@ -1,11 +1,11 @@
 const appConfig = {
   languageModes: {
-    KOREAN: 'Korean',
+    KOREAN: "Korean",
     FRENCH: "French",
     SPANISH: "Spanish",
   },
   cferLanguageLevels: {
-    A1: 'A1',
+    A1: "A1",
     A2: "A2",
     B1: "B1",
     B2: "B2",
@@ -19,7 +19,7 @@ const appConfig = {
     TOPIK4: "TOPIK4",
     TOPIK5: "TOPIK5",
     TOPIK6: "TOPIK6",
-  }
+  },
 };
 
 export default appConfig;

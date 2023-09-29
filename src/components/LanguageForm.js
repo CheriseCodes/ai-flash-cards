@@ -1,5 +1,5 @@
 import React from "react";
-import PropTypes from 'prop-types';
+import PropTypes from "prop-types";
 
 const LanguageForm = ({ setLanguageMode, languageMode, setLanguageLevel }) => {
   const handleChange = (e) => {
@@ -24,7 +24,7 @@ const LanguageForm = ({ setLanguageMode, languageMode, setLanguageLevel }) => {
           id="kr"
           name="language_mode"
           value="Korean"
-          checked={languageMode === 'Korean'}
+          checked={languageMode === "Korean"}
           onChange={handleChange}
         ></input>
         <label htmlFor="kr">Korean</label>
@@ -33,7 +33,7 @@ const LanguageForm = ({ setLanguageMode, languageMode, setLanguageLevel }) => {
           id="fr"
           name="language_mode"
           value="French"
-          checked={languageMode === 'French'}
+          checked={languageMode === "French"}
           onChange={handleChange}
         ></input>
         <label htmlFor="fr">French</label>
@@ -42,7 +42,7 @@ const LanguageForm = ({ setLanguageMode, languageMode, setLanguageLevel }) => {
           id="es"
           name="language_mode"
           value="Spanish"
-          checked={languageMode === 'Spanish'}
+          checked={languageMode === "Spanish"}
           onChange={handleChange}
         ></input>
         <label htmlFor="es">Spanish</label>
@@ -54,7 +54,7 @@ const LanguageForm = ({ setLanguageMode, languageMode, setLanguageLevel }) => {
 LanguageForm.propTypes = {
   setLanguageMode: PropTypes.func,
   languageMode: PropTypes.string,
-  setLanguageLevel: PropTypes.func
+  setLanguageLevel: PropTypes.func,
 };
 
 export default LanguageForm;

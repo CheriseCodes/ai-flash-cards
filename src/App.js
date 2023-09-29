@@ -1,12 +1,12 @@
-import React, { useState } from 'react';
-import WordInput from './components/WordInput.js';
-import FlashCard from './components/FlashCard.js';
-import LanguageForm from './components/LanguageForm.js';
-import LanguageLevelForm from './components/LanguageLevelForm.js';
+import React, { useState } from "react";
+import WordInput from "./components/WordInput.js";
+import FlashCard from "./components/FlashCard.js";
+import LanguageForm from "./components/LanguageForm.js";
+import LanguageLevelForm from "./components/LanguageLevelForm.js";
 
-import { v4 as uuidv4 } from 'uuid';
+import { v4 as uuidv4 } from "uuid";
 
-import cloneDeep from 'lodash/cloneDeep.js';
+import cloneDeep from "lodash/cloneDeep.js";
 
 // TODO: Decide what data needs to persist between page refreshes
 // - allCardData
@@ -20,42 +20,42 @@ const App = () => {
   const [spinner, setSpinner] = useState(false);
   const [allCardData, setAllCardData] = useState([]);
   const [languageMode, setLanguageMode] = useState("Korean");
-  const [languageLevel, setLanguageLevel] = useState('TOPIK1');
+  const [languageLevel, setLanguageLevel] = useState("TOPIK1");
 
   const generateCard = async (word) => {
     console.log(`App.generateCard - word: ${word}`);
     try {
       if (word) {
-        setSpinner(true)
+        setSpinner(true);
         const response = await fetch(
-          `http://localhost:8000/openai/test/text?word=${word}&lang_mode=${languageMode}&lang_level=${languageLevel}`
+          `http://localhost:8000/openai/test/text?word=${word}&lang_mode=${languageMode}&lang_level=${languageLevel}`,
         );
-        const json = await response.json()
-        console.log(`generateCardImage response:${JSON.stringify(json)}`)
-        console.log(`generateCards response:${JSON.stringify(json)}`)
+        const json = await response.json();
+        console.log(`generateCardImage response:${JSON.stringify(json)}`);
+        console.log(`generateCards response:${JSON.stringify(json)}`);
         let cardData = json.choices[0].message.content; // stringified JSON
-        cardData = JSON.parse(cardData)
+        cardData = JSON.parse(cardData);
         const imageResponse = await fetch(
-          `http://localhost:8000/openai/test/imagine?sentence=${cardData.tr}`
+          `http://localhost:8000/openai/test/imagine?sentence=${cardData.tr}`,
         );
-        const imageJson = await imageResponse.json()
-        cardData.id = uuidv4()
-        cardData.img = imageJson.data[0].url
+        const imageJson = await imageResponse.json();
+        cardData.id = uuidv4();
+        cardData.img = imageJson.data[0].url;
         // cardData =
         console.log(`App.generateCard - cardData: ${JSON.stringify(cardData)}`);
-        setAllCardData((curr) => [...curr, ...[cardData]])
-        setSpinner(false)
+        setAllCardData((curr) => [...curr, ...[cardData]]);
+        setSpinner(false);
         console.log(`App.generateCard - allCardData: ${allCardData}`);
       }
     } catch (e) {
-      console.error(e)
+      console.error(e);
     }
-  }
+  };
 
   const handleSubmit = (e) => {
-    e.preventDefault()
-    console.log()
-  }
+    e.preventDefault();
+    console.log();
+  };
 
   const replaceCard = (cardId, newCardData) => {
     const newArray = cloneDeep(allCardData);
@@ -66,8 +66,8 @@ const App = () => {
         return { ...item, ...newCardData }; // Update the object with new values
       }
       return item; // Return unchanged objects
-    })
-    setAllCardData(updatedArray)
+    });
+    setAllCardData(updatedArray);
   };
 
   // TODO: Add tool tip for each button
@@ -102,8 +102,8 @@ const App = () => {
                 languageLevel={languageLevel}
                 languageMode={languageMode}
               />
-          ))
-          : ''}
+            ))
+          : ""}
         <button>Download</button>
       </form>
       {spinner && <p>Generating sentences...</p>}

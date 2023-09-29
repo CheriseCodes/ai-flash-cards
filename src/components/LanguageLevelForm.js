@@ -1,9 +1,9 @@
 import React from "react";
-import PropTypes from 'prop-types';
+import PropTypes from "prop-types";
 const LanguageLevelForm = ({
   languageMode,
   languageLevel,
-  setLanguageLevel
+  setLanguageLevel,
 }) => {
   const handleChange = (e) => {
     console.log(e);
@@ -14,14 +14,14 @@ const LanguageLevelForm = ({
   };
   return (
     <div className="language-form">
-      {languageMode === 'Korean' && (
+      {languageMode === "Korean" && (
         <form>
           <input
             type="radio"
             id="topik1"
             name="language_level"
             value="TOPIK1"
-            checked={languageLevel === 'TOPIK1'}
+            checked={languageLevel === "TOPIK1"}
             onChange={handleChange}
           ></input>
           <label htmlFor="topik1">TOPIK 1</label>
@@ -30,7 +30,7 @@ const LanguageLevelForm = ({
             id="topik2"
             name="language_level"
             value="TOPIK2"
-            checked={languageLevel === 'TOPIK2'}
+            checked={languageLevel === "TOPIK2"}
             onChange={handleChange}
           ></input>
           <label htmlFor="topik2">TOPIK 2</label>
@@ -39,7 +39,7 @@ const LanguageLevelForm = ({
             id="topik3"
             name="language_level"
             value="TOPIK3"
-            checked={languageLevel === 'TOPIK3'}
+            checked={languageLevel === "TOPIK3"}
             onChange={handleChange}
           ></input>
           <label htmlFor="topik3">TOPIK 3</label>
@@ -48,7 +48,7 @@ const LanguageLevelForm = ({
             id="topik4"
             name="language_level"
             value="TOPIK4"
-            checked={languageLevel === 'TOPIK4'}
+            checked={languageLevel === "TOPIK4"}
             onChange={handleChange}
           ></input>
           <label htmlFor="topik4">TOPIK 4</label>
@@ -57,7 +57,7 @@ const LanguageLevelForm = ({
             id="topik5"
             name="language_level"
             value="TOPIK5"
-            checked={languageLevel === 'TOPIK5'}
+            checked={languageLevel === "TOPIK5"}
             onChange={handleChange}
           ></input>
           <label htmlFor="topik5">TOPIK 5</label>
@@ -66,20 +66,20 @@ const LanguageLevelForm = ({
             id="topik6"
             name="language_level"
             value="TOPIK6"
-            checked={languageLevel === 'TOPIK6'}
+            checked={languageLevel === "TOPIK6"}
             onChange={handleChange}
           ></input>
           <label htmlFor="topik6">TOPIK 6</label>
         </form>
       )}
-      {(languageMode === 'French' || languageMode === 'Spanish') && (
+      {(languageMode === "French" || languageMode === "Spanish") && (
         <form>
           <input
             type="radio"
             id="a1"
             name="language_level"
             value="A1"
-            checked={languageLevel === 'A1'}
+            checked={languageLevel === "A1"}
             onChange={handleChange}
           ></input>
           <label htmlFor="a1">A1</label>
@@ -88,7 +88,7 @@ const LanguageLevelForm = ({
             id="a2"
             name="language_level"
             value="A2"
-            checked={languageLevel === 'A2'}
+            checked={languageLevel === "A2"}
             onChange={handleChange}
           ></input>
           <label htmlFor="a2">A2</label>
@@ -97,7 +97,7 @@ const LanguageLevelForm = ({
             id="b1"
             name="language_level"
             value="B1"
-            checked={languageLevel === 'B1'}
+            checked={languageLevel === "B1"}
             onChange={handleChange}
           ></input>
           <label htmlFor="b1">B1</label>
@@ -106,7 +106,7 @@ const LanguageLevelForm = ({
             id="b2"
             name="language_level"
             value="B2"
-            checked={languageLevel === 'B2'}
+            checked={languageLevel === "B2"}
             onChange={handleChange}
           ></input>
           <label htmlFor="b2">B2</label>
@@ -115,7 +115,7 @@ const LanguageLevelForm = ({
             id="c1"
             name="language_level"
             value="C1"
-            checked={languageLevel === 'C1'}
+            checked={languageLevel === "C1"}
             onChange={handleChange}
           ></input>
           <label htmlFor="c1">C1</label>
@@ -124,7 +124,7 @@ const LanguageLevelForm = ({
             id="c2"
             name="language_level"
             value="C2"
-            checked={languageLevel === 'C2'}
+            checked={languageLevel === "C2"}
             onChange={handleChange}
           ></input>
           <label htmlFor="c2">C2</label>
@@ -137,7 +137,7 @@ const LanguageLevelForm = ({
 LanguageLevelForm.propTypes = {
   languageMode: PropTypes.string,
   languageLevel: PropTypes.string,
-  setLanguageLevel: PropTypes.func
+  setLanguageLevel: PropTypes.func,
 };
 
 export default LanguageLevelForm;

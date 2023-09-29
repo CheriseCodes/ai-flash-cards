@@ -1,12 +1,12 @@
 import React, { useRef } from "react";
-import PropTypes from 'prop-types';
+import PropTypes from "prop-types";
 
 const WordInput = ({ generateCard, spinner }) => {
   const textAreaRef = useRef(null);
   const handleSubmit = (e) => {
     e.preventDefault();
-    const wordList = textAreaRef.current.value
-    for (const [index, word] of wordList.split(',').entries()) {
+    const wordList = textAreaRef.current.value;
+    for (const [index, word] of wordList.split(",").entries()) {
       console.log(
         `WordInput.handleSubmit - \${index}:\${word.trim()}: ${index}:${word.trim()}`,
       );
@@ -27,7 +27,7 @@ WordInput.propTypes = {
   generateCard: PropTypes.func,
   spinner: PropTypes.bool,
   setAllCardData: PropTypes.func,
-  allCardData: PropTypes.arrayOf(PropTypes.object)
+  allCardData: PropTypes.arrayOf(PropTypes.object),
 };
 
 export default WordInput;

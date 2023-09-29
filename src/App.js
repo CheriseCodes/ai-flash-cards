@@ -4,6 +4,7 @@ import FlashCard from "./components/FlashCard.js";
 import LanguageForm from "./components/LanguageForm.js";
 import LanguageLevelForm from "./components/LanguageLevelForm.js";
 
+import appConfig from "./config.js";
 import { v4 as uuidv4 } from "uuid";
 
 import cloneDeep from "lodash/cloneDeep.js";
@@ -19,8 +20,8 @@ import cloneDeep from "lodash/cloneDeep.js";
 const App = () => {
   const [spinner, setSpinner] = useState(false);
   const [allCardData, setAllCardData] = useState([]);
-  const [languageMode, setLanguageMode] = useState("Korean");
-  const [languageLevel, setLanguageLevel] = useState("TOPIK1");
+  const [languageMode, setLanguageMode] = useState(appConfig.languageModes.KOREAN);
+  const [languageLevel, setLanguageLevel] = useState(appConfig.koreanLanguageLevels.TOPIK1);
 
   const generateCard = async (word) => {
     console.log(`App.generateCard - word: ${word}`);

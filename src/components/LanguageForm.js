@@ -1,5 +1,6 @@
 import React from "react";
 import PropTypes from "prop-types";
+import appConfig from "../config";
 
 const LanguageForm = ({ setLanguageMode, languageMode, setLanguageLevel }) => {
   const handleChange = (e) => {
@@ -8,10 +9,10 @@ const LanguageForm = ({ setLanguageMode, languageMode, setLanguageLevel }) => {
     if (languageMode !== e.target.value) {
       console.log(`setting language mode to: ${e.target.value}`);
       setLanguageMode(e.target.value);
-      if (e.target.value === "Korean") {
-        setLanguageLevel("TOPIK1");
+      if (e.target.value === appConfig.languageModes.KOREAN) {
+        setLanguageLevel(appConfig.koreanLanguageLevels.TOPIK1);
       } else {
-        setLanguageLevel("A1");
+        setLanguageLevel(appConfig.cferLanguageLevels.A1);
       }
     }
     console.log(`LanguageForm.handleChange - ${languageMode}`);
@@ -23,29 +24,29 @@ const LanguageForm = ({ setLanguageMode, languageMode, setLanguageLevel }) => {
           type="radio"
           id="kr"
           name="language_mode"
-          value="Korean"
-          checked={languageMode === "Korean"}
+          value={appConfig.languageModes.KOREAN}
+          checked={languageMode === appConfig.languageModes.KOREAN}
           onChange={handleChange}
         ></input>
-        <label htmlFor="kr">Korean</label>
+        <label htmlFor="kr">{appConfig.languageModes.KOREAN}</label>
         <input
           type="radio"
           id="fr"
           name="language_mode"
-          value="French"
-          checked={languageMode === "French"}
+          value={appConfig.languageModes.FRENCH}
+          checked={languageMode === appConfig.languageModes.FRENCH}
           onChange={handleChange}
         ></input>
-        <label htmlFor="fr">French</label>
+        <label htmlFor="fr">{appConfig.languageModes.FRENCH}</label>
         <input
           type="radio"
           id="es"
           name="language_mode"
-          value="Spanish"
-          checked={languageMode === "Spanish"}
+          value={appConfig.languageModes.SPANISH}
+          checked={languageMode === appConfig.languageModes.SPANISH}
           onChange={handleChange}
         ></input>
-        <label htmlFor="es">Spanish</label>
+        <label htmlFor="es">{appConfig.languageModes.SPANISH}</label>
       </form>
     </div>
   );

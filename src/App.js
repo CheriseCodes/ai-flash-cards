@@ -20,8 +20,12 @@ import cloneDeep from "lodash/cloneDeep.js";
 const App = () => {
   const [spinner, setSpinner] = useState(false);
   const [allCardData, setAllCardData] = useState([]);
-  const [languageMode, setLanguageMode] = useState(appConfig.languageModes.KOREAN);
-  const [languageLevel, setLanguageLevel] = useState(appConfig.koreanLanguageLevels.TOPIK1);
+  const [languageMode, setLanguageMode] = useState(
+    appConfig.languageModes.KOREAN,
+  );
+  const [languageLevel, setLanguageLevel] = useState(
+    appConfig.koreanLanguageLevels.TOPIK1,
+  );
 
   const generateCard = async (word) => {
     console.log(`App.generateCard - word: ${word}`);

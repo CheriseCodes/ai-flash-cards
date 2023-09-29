@@ -1,6 +1,6 @@
 import React from "react";
 import PropTypes from "prop-types";
-import appConfig from "../config";
+import appConfig from "../config.js";
 
 const LanguageLevelForm = ({
   languageMode,
@@ -14,6 +14,7 @@ const LanguageLevelForm = ({
     }
     console.log(`LanguageLevelForm.handleChange - ${e.target.value}`);
   };
+  // TODO: Create component for input element
   return (
     <div className="language-form">
       {languageMode === appConfig.languageModes.KOREAN && (
@@ -26,7 +27,9 @@ const LanguageLevelForm = ({
             checked={languageLevel === appConfig.koreanLanguageLevels.TOPIK1}
             onChange={handleChange}
           ></input>
-          <label htmlFor={appConfig.koreanLanguageLevels.TOPIK1.toLowerCase()}>{appConfig.koreanLanguageLevels.TOPIK1}</label>
+          <label htmlFor={appConfig.koreanLanguageLevels.TOPIK1.toLowerCase()}>
+            {appConfig.koreanLanguageLevels.TOPIK1}
+          </label>
           <input
             type="radio"
             id={appConfig.koreanLanguageLevels.TOPIK2.toLowerCase()}
@@ -35,7 +38,9 @@ const LanguageLevelForm = ({
             checked={languageLevel === appConfig.koreanLanguageLevels.TOPIK2}
             onChange={handleChange}
           ></input>
-          <label htmlFor={appConfig.koreanLanguageLevels.TOPIK2.toLowerCase()}>{appConfig.koreanLanguageLevels.TOPIK2}</label>
+          <label htmlFor={appConfig.koreanLanguageLevels.TOPIK2.toLowerCase()}>
+            {appConfig.koreanLanguageLevels.TOPIK2}
+          </label>
           <input
             type="radio"
             id={appConfig.koreanLanguageLevels.TOPIK3.toLowerCase()}
@@ -44,7 +49,9 @@ const LanguageLevelForm = ({
             checked={languageLevel === appConfig.koreanLanguageLevels.TOPIK3}
             onChange={handleChange}
           ></input>
-          <label htmlFor={appConfig.koreanLanguageLevels.TOPIK1.toLowerCase()}>{appConfig.koreanLanguageLevels.TOPIK3}</label>
+          <label htmlFor={appConfig.koreanLanguageLevels.TOPIK3.toLowerCase()}>
+            {appConfig.koreanLanguageLevels.TOPIK3}
+          </label>
           <input
             type="radio"
             id={appConfig.koreanLanguageLevels.TOPIK4.toLowerCase()}
@@ -53,7 +60,9 @@ const LanguageLevelForm = ({
             checked={languageLevel === appConfig.koreanLanguageLevels.TOPIK4}
             onChange={handleChange}
           ></input>
-          <label htmlFor="topik4">{appConfig.koreanLanguageLevels.TOPIK4}</label>
+          <label htmlFor="topik4">
+            {appConfig.koreanLanguageLevels.TOPIK4}
+          </label>
           <input
             type="radio"
             id={appConfig.koreanLanguageLevels.TOPIK5.toLowerCase()}
@@ -62,7 +71,9 @@ const LanguageLevelForm = ({
             checked={languageLevel === appConfig.koreanLanguageLevels.TOPIK5}
             onChange={handleChange}
           ></input>
-          <label htmlFor="topik5">{appConfig.koreanLanguageLevels.TOPIK5}</label>
+          <label htmlFor="topik5">
+            {appConfig.koreanLanguageLevels.TOPIK5}
+          </label>
           <input
             type="radio"
             id={appConfig.koreanLanguageLevels.TOPIK6.toLowerCase()}
@@ -71,10 +82,13 @@ const LanguageLevelForm = ({
             checked={languageLevel === appConfig.koreanLanguageLevels.TOPIK6}
             onChange={handleChange}
           ></input>
-          <label htmlFor={appConfig.koreanLanguageLevels.TOPIK6.toLowerCase()}>{appConfig.koreanLanguageLevels.TOPIK6}</label>
+          <label htmlFor={appConfig.koreanLanguageLevels.TOPIK6.toLowerCase()}>
+            {appConfig.koreanLanguageLevels.TOPIK6}
+          </label>
         </form>
       )}
-      {(languageMode === appConfig.languageModes.FRENCH || languageMode === appConfig.languageModes.SPANISH) && (
+      {(languageMode === appConfig.languageModes.FRENCH ||
+        languageMode === appConfig.languageModes.SPANISH) && (
         <form>
           <input
             type="radio"
@@ -84,7 +98,9 @@ const LanguageLevelForm = ({
             checked={languageLevel === appConfig.cferLanguageLevels.A1}
             onChange={handleChange}
           ></input>
-          <label htmlFor={appConfig.cferLanguageLevels.A1.toLowerCase()}>{appConfig.cferLanguageLevels.A1}</label>
+          <label htmlFor={appConfig.cferLanguageLevels.A1.toLowerCase()}>
+            {appConfig.cferLanguageLevels.A1}
+          </label>
           <input
             type="radio"
             id={appConfig.cferLanguageLevels.A2.toLowerCase()}
@@ -93,7 +109,9 @@ const LanguageLevelForm = ({
             checked={languageLevel === appConfig.cferLanguageLevels.A2}
             onChange={handleChange}
           ></input>
-          <label htmlFor={appConfig.cferLanguageLevels.A2.toLowerCase()}>{appConfig.cferLanguageLevels.A2}</label>
+          <label htmlFor={appConfig.cferLanguageLevels.A2.toLowerCase()}>
+            {appConfig.cferLanguageLevels.A2}
+          </label>
           <input
             type="radio"
             id={appConfig.cferLanguageLevels.B1.toLowerCase()}
@@ -102,7 +120,9 @@ const LanguageLevelForm = ({
             checked={languageLevel === appConfig.cferLanguageLevels.B1}
             onChange={handleChange}
           ></input>
-          <label htmlFor={appConfig.cferLanguageLevels.B1.toLowerCase()}>{appConfig.cferLanguageLevels.B1}</label>
+          <label htmlFor={appConfig.cferLanguageLevels.B1.toLowerCase()}>
+            {appConfig.cferLanguageLevels.B1}
+          </label>
           <input
             type="radio"
             id={appConfig.cferLanguageLevels.B2.toLowerCase()}
@@ -111,7 +131,9 @@ const LanguageLevelForm = ({
             checked={languageLevel === appConfig.cferLanguageLevels.B2}
             onChange={handleChange}
           ></input>
-          <label htmlFor={appConfig.cferLanguageLevels.B2.toLowerCase()}>{appConfig.cferLanguageLevels.B2}</label>
+          <label htmlFor={appConfig.cferLanguageLevels.B2.toLowerCase()}>
+            {appConfig.cferLanguageLevels.B2}
+          </label>
           <input
             type="radio"
             id={appConfig.cferLanguageLevels.C1.toLowerCase()}
@@ -120,7 +142,9 @@ const LanguageLevelForm = ({
             checked={languageLevel === appConfig.cferLanguageLevels.C1}
             onChange={handleChange}
           ></input>
-          <label htmlFor={appConfig.cferLanguageLevels.C1.toLowerCase()}>{appConfig.cferLanguageLevels.C1}</label>
+          <label htmlFor={appConfig.cferLanguageLevels.C1.toLowerCase()}>
+            {appConfig.cferLanguageLevels.C1}
+          </label>
           <input
             type="radio"
             id={appConfig.cferLanguageLevels.C2.toLowerCase()}
@@ -129,7 +153,9 @@ const LanguageLevelForm = ({
             checked={languageLevel === appConfig.cferLanguageLevels.C2}
             onChange={handleChange}
           ></input>
-          <label htmlFor={appConfig.cferLanguageLevels.C2.toLowerCase()}>{appConfig.cferLanguageLevels.C2}</label>
+          <label htmlFor={appConfig.cferLanguageLevels.C2.toLowerCase()}>
+            {appConfig.cferLanguageLevels.C2}
+          </label>
         </form>
       )}
     </div>

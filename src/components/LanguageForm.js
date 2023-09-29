@@ -1,6 +1,6 @@
 import React from "react";
 import PropTypes from "prop-types";
-import appConfig from "../config";
+import appConfig from "../config.js";
 
 const LanguageForm = ({ setLanguageMode, languageMode, setLanguageLevel }) => {
   const handleChange = (e) => {
@@ -17,6 +17,7 @@ const LanguageForm = ({ setLanguageMode, languageMode, setLanguageLevel }) => {
     }
     console.log(`LanguageForm.handleChange - ${languageMode}`);
   };
+  // TODO: Create component for input element
   return (
     <div className="language-form">
       <form>

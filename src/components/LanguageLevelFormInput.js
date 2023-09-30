@@ -13,7 +13,6 @@ const LanguageLevelFormInput = ({
     }
     console.log(`LanguageLevelFormInput.handleChange - ${e.target.value}`);
   };
-  // TODO: Create component for input element
   return (
     <div className="language-form-input">
       <input

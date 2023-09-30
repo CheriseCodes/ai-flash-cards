@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import WordInput from "./components/WordInput.js";
 import FlashCard from "./components/FlashCard.js";
-import LanguageForm from "./components/LanguageForm.js";
+import LanguageModeForm from "./components/LanguageModeForm.js";
 import LanguageLevelForm from "./components/LanguageLevelForm.js";
 
 import appConfig from "./config.js";
@@ -79,7 +79,7 @@ const App = () => {
   // TODO: Convert buttons into svgs
   return (
     <div className="App">
-      <LanguageForm
+      <LanguageModeForm
         setLanguageMode={setLanguageMode}
         languageMode={languageMode}
         setLanguageLevel={setLanguageLevel}

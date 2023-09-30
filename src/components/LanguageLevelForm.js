@@ -8,7 +8,6 @@ const LanguageLevelForm = ({
   languageLevel,
   setLanguageLevel,
 }) => {
-  // TODO: Create component for input element
   return (
     <div className="language-form">
       {languageMode === appConfig.languageModes.KOREAN && (

@@ -26,8 +26,6 @@ const WordInput = ({ generateCard, spinner }) => {
 WordInput.propTypes = {
   generateCard: PropTypes.func,
   spinner: PropTypes.bool,
-  setAllCardData: PropTypes.func,
-  allCardData: PropTypes.arrayOf(PropTypes.object),
 };
 
 export default WordInput;

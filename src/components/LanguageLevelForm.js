@@ -3,79 +3,75 @@ import PropTypes from "prop-types";
 import appConfig from "../config.js";
 import LanguageLevelFormInput from "./LanguageLevelFormInput.js";
 
-const LanguageLevelForm = ({
-  languageMode,
-  languageLevel,
-  setLanguageLevel,
-}) => {
+const LanguageLevelForm = ({ state, dispatch }) => {
   return (
     <div className="language-form">
-      {languageMode === appConfig.languageModes.KOREAN && (
+      {state.languageMode === appConfig.languageModes.KOREAN && (
         <form>
           <LanguageLevelFormInput
-            languageLevel={languageLevel}
-            setLanguageLevel={setLanguageLevel}
             languageLevelID={appConfig.koreanLanguageLevels.TOPIK1}
+            state={state}
+            dispatch={dispatch}
           />
           <LanguageLevelFormInput
-            languageLevel={languageLevel}
-            setLanguageLevel={setLanguageLevel}
             languageLevelID={appConfig.koreanLanguageLevels.TOPIK2}
+            state={state}
+            dispatch={dispatch}
           />
           <LanguageLevelFormInput
-            languageLevel={languageLevel}
-            setLanguageLevel={setLanguageLevel}
             languageLevelID={appConfig.koreanLanguageLevels.TOPIK3}
+            state={state}
+            dispatch={dispatch}
           />
           <LanguageLevelFormInput
-            languageLevel={languageLevel}
-            setLanguageLevel={setLanguageLevel}
             languageLevelID={appConfig.koreanLanguageLevels.TOPIK4}
+            state={state}
+            dispatch={dispatch}
           />
           <LanguageLevelFormInput
-            languageLevel={languageLevel}
-            setLanguageLevel={setLanguageLevel}
             languageLevelID={appConfig.koreanLanguageLevels.TOPIK5}
+            state={state}
+            dispatch={dispatch}
           />
           <LanguageLevelFormInput
-            languageLevel={languageLevel}
-            setLanguageLevel={setLanguageLevel}
             languageLevelID={appConfig.koreanLanguageLevels.TOPIK6}
+            state={state}
+            dispatch={dispatch}
           />
         </form>
       )}
-      {(languageMode === appConfig.languageModes.FRENCH ||
-        languageMode === appConfig.languageModes.SPANISH) && (
+      {(state.languageMode === appConfig.languageModes.FRENCH ||
+        state.languageMode === appConfig.languageModes.SPANISH) && (
         <form>
           <LanguageLevelFormInput
-            languageLevel={languageLevel}
-            setLanguageLevel={setLanguageLevel}
             languageLevelID={appConfig.cferLanguageLevels.A1}
+            state={state}
+            dispatch={dispatch}
           />
           <LanguageLevelFormInput
-            languageLevel={languageLevel}
-            setLanguageLevel={setLanguageLevel}
             languageLevelID={appConfig.cferLanguageLevels.A2}
+            state={state}
+            dispatch={dispatch}
           />
           <LanguageLevelFormInput
-            languageLevel={languageLevel}
-            setLanguageLevel={setLanguageLevel}
             languageLevelID={appConfig.cferLanguageLevels.B1}
+            state={state}
+            dispatch={dispatch}
           />
           <LanguageLevelFormInput
-            languageLevel={languageLevel}
-            setLanguageLevel={setLanguageLevel}
             languageLevelID={appConfig.cferLanguageLevels.B2}
+            state={state}
+            dispatch={dispatch}
           />
           <LanguageLevelFormInput
-            languageLevel={languageLevel}
-            setLanguageLevel={setLanguageLevel}
             languageLevelID={appConfig.cferLanguageLevels.C1}
+            state={state}
+            dispatch={dispatch}
           />
           <LanguageLevelFormInput
-            languageLevel={languageLevel}
-            setLanguageLevel={setLanguageLevel}
             languageLevelID={appConfig.cferLanguageLevels.C2}
+            state={state}
+            dispatch={dispatch}
           />
         </form>
       )}
@@ -84,9 +80,8 @@ const LanguageLevelForm = ({
 };
 
 LanguageLevelForm.propTypes = {
-  languageMode: PropTypes.string,
-  languageLevel: PropTypes.string,
-  setLanguageLevel: PropTypes.func,
+  state: PropTypes.object,
+  dispatch: PropTypes.func,
 };
 
 export default LanguageLevelForm;

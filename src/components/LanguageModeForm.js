@@ -4,31 +4,24 @@ import appConfig from "../config.js";
 
 import LanguageModeFormInput from "./LanguageModeFormInput.js";
 
-const LanguageModeForm = ({
-  setLanguageMode,
-  languageMode,
-  setLanguageLevel,
-}) => {
+const LanguageModeForm = ({ state, dispatch }) => {
   return (
     <div className="language-mode-form">
       <form>
         <LanguageModeFormInput
-          setLanguageMode={setLanguageMode}
-          languageMode={languageMode}
-          setLanguageLevel={setLanguageLevel}
           languageModeID={appConfig.languageModes.KOREAN}
+          state={state}
+          dispatch={dispatch}
         />
         <LanguageModeFormInput
-          setLanguageMode={setLanguageMode}
-          languageMode={languageMode}
-          setLanguageLevel={setLanguageLevel}
           languageModeID={appConfig.languageModes.FRENCH}
+          state={state}
+          dispatch={dispatch}
         />
         <LanguageModeFormInput
-          setLanguageMode={setLanguageMode}
-          languageMode={languageMode}
-          setLanguageLevel={setLanguageLevel}
           languageModeID={appConfig.languageModes.SPANISH}
+          state={state}
+          dispatch={dispatch}
         />
       </form>
     </div>
@@ -36,9 +29,8 @@ const LanguageModeForm = ({
 };
 
 LanguageModeForm.propTypes = {
-  setLanguageMode: PropTypes.func,
-  languageMode: PropTypes.string,
-  setLanguageLevel: PropTypes.func,
+  state: PropTypes.object,
+  dispatch: PropTypes.func,
 };
 
 export default LanguageModeForm;

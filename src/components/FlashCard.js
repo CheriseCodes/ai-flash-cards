@@ -1,60 +1,32 @@
 import React, { useRef, useState } from "react";
 import PropTypes from "prop-types";
 
-const FlashCard = ({
-  cardData,
-  setAllCardData,
-  allCardData,
-  replaceCard,
-  languageLevel,
-  languageMode,
-}) => {
+const FlashCard = ({ cardData, state, dispatch }) => {
   const [regenerateCardSpinner, setRegenerateCardSpinner] = useState(false);
   const [enableEdit, setEnableEdit] = useState(false);
-  //  const [ generateCardCount, setGenerateCardCount ] = useState(0)
   const [selected, setSelected] = useState(false);
 
   const wordRef = useRef(null);
   const originalRef = useRef(null);
   const translationRef = useRef(null);
 
-  // const firstCardData = JSON.parse(JSON.stringify(cardData))
-
-  // function stringify(obj) {
-  //     let cache = [];
-  //     const str = JSON.stringify(obj, function(key, value) {
-  //       if (typeof value === "object" && value !== null) {
-  //         if (cache.indexOf(value) !== -1) {
-  //           // Circular reference found, discard key
-  //           return "[Circular]";
-  //         }
-  //         // Store value in our collection
-  //         cache.push(value);
-  //       }
-  //       return value;
-  //     });
-  //     cache = null; // reset the cache
-  //     return str;
-  //   }
-
   const handleDeletion = () => {
-    setAllCardData((prev) =>
-      prev.filter((prevCardData) => {
-        return prevCardData.id !== cardData.id;
-      }),
-    );
+    dispatch({ type: "delete-card", payload: cardData.id });
   };
 
   const handleEdit = (e) => {
     if (enableEdit) {
       e.target.innerText = "Edit";
-      // const newCardData = JSON.parse(JSON.stringify(cardData))
       const newCardData = { id: null, word: null, or: null, tr: null };
       newCardData.id = cardData.id;
       newCardData.word = wordRef.current.value;
       newCardData.or = originalRef.current.value;
       newCardData.tr = translationRef.current.value;
-      replaceCard(cardData.id, newCardData);
+      newCardData.img = cardData.img;
+      dispatch({
+        type: "update-card",
+        payload: { id: cardData.id, data: newCardData },
+      });
     } else {
       e.target.innerText = "Save Edit";
     }
@@ -66,7 +38,7 @@ const FlashCard = ({
     try {
       setRegenerateCardSpinner(true);
       const currWord = wordRef.current.value;
-      const textGenUrl = `http://localhost:8000/openai/test/text?word=${currWord}&lang_mode=${languageMode}&lang_level=${languageLevel}`;
+      const textGenUrl = `http://localhost:8000/openai/test/text?word=${currWord}&lang_mode=${state.languageMode}&lang_level=${state.languageLevel}`;
 
       console.log(`FlashCard.handleRegenerateCard - ${textGenUrl}`);
       const response = await fetch(textGenUrl);
@@ -88,8 +60,11 @@ const FlashCard = ({
       console.log(
         `FlashCard.js - newCardData : ${JSON.stringify(newCardData)}`,
       );
-      replaceCard(cardData.id, newCardData);
-      console.log(`FlashCard.js - allCardData: ${JSON.stringify(allCardData)}`);
+      dispatch({
+        type: "update-card",
+        payload: { id: cardData.id, data: newCardData },
+      });
+      console.log(`FlashCard.js - allCardData: ${JSON.stringify(state.cards)}`);
       setRegenerateCardSpinner(false);
     } catch (e) {
       console.error(e);
@@ -137,17 +112,9 @@ const FlashCard = ({
 };
 
 FlashCard.propTypes = {
-  // cardId: PropTypes.string,
-  // word: PropTypes.string,
-  // imgUrl: PropTypes.string,
-  // originalText: PropTypes.string,
-  // translatedText: PropTypes.string,
   cardData: PropTypes.object,
-  setAllCardData: PropTypes.func,
-  allCardData: PropTypes.arrayOf(PropTypes.object),
-  replaceCard: PropTypes.func,
-  languageLevel: PropTypes.string,
-  languageMode: PropTypes.string,
+  state: PropTypes.object,
+  dispatch: PropTypes.func,
 };
 
 export default FlashCard;

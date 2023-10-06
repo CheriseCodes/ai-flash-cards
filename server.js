@@ -11,12 +11,42 @@ const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
 });
 
-app.get("/openai/test/text", async (req, res) => {
+app.get("/openai/test/all/text", async (req, res) => {
   try {
-    const wordToSearch = req.query.word;
+    const wordsToSearch = Array.isArray(req.query.word)
+      ? req.query.word
+      : [req.query.word];
+    console.log(wordsToSearch);
     const targetLanguage = req.query.lang_mode;
     const targetLevel = req.query.level_level;
-    console.log(wordToSearch);
+    const messages = [];
+    for (let wordToSearch of wordsToSearch) {
+      messages.push({
+        role: "user",
+        content: `Please create 1 example sentence under 15 words long showing how the word ${wordToSearch} is commonly used in ${targetLanguage}. Use up to ${targetLevel} vocabulary or grammar points (inclusive). Return the sentence in the following JSON format {"word": "${wordToSearch}","or": "Example sentence using the value of 'word'","tr":"English translation of example sentence"}.`,
+      });
+    }
+    const response = await openai.chat.completions.create({
+      model: "gpt-3.5-turbo",
+      messages,
+    });
+    if (response) {
+      console.log(response);
+      // res.send(response.choices[0].message.content)
+      res.send(response);
+    }
+  } catch (err) {
+    console.error(err);
+  }
+});
+
+app.get("/openai/test/text", async (req, res) => {
+  try {
+    const wordToSearch = Array.isArray(req.query.word)
+      ? req.query.word
+      : [req.query.word];
+    const targetLanguage = req.query.lang_mode;
+    const targetLevel = req.query.level_level;
     const messages = [
       {
         role: "user",
@@ -32,8 +62,8 @@ app.get("/openai/test/text", async (req, res) => {
       // res.send(response.choices[0].message.content)
       res.send(response);
     }
-  } catch (e) {
-    console.error(e);
+  } catch (err) {
+    console.error(err);
   }
 });
 

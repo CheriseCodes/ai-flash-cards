@@ -1,14 +1,13 @@
-import React, { useState, useReducer } from "react";
+import React, { useState } from "react";
+import { useSelector, useDispatch } from "react-redux";
 import WordInput from "./components/WordInput.js";
 import FlashCard from "./components/FlashCard.js";
 import LanguageModeForm from "./components/LanguageModeForm.js";
 import LanguageLevelForm from "./components/LanguageLevelForm.js";
 
-import reducer from "./reducer.js";
-import appConfig from "./config.js";
+// import reducer from "./reducer.js";
+// import appConfig from "./config.js";
 import { v4 as uuidv4 } from "uuid";
-
-//import cloneDeep from "lodash/cloneDeep.js";
 
 // TODO: Decide what data needs to persist between page refreshes
 // - allCardData
@@ -16,20 +15,21 @@ import { v4 as uuidv4 } from "uuid";
 // - languageMode
 // - languageLevel
 
-// TODO: Use reducer pattern
-// - action types: add-card, regenerate-card, update-card
-// - payload: input for each action type
-// data structure: { "cards": [...{card: data}], "language-mode": "mode", "language-level": "level"}
-
 // TODO: Transform reducer to Redux pattern
 const App = () => {
-  const [state, dispatch] = useReducer(reducer, {
-    cards: [],
-    languageMode: appConfig.languageModes.KOREAN,
-    languageLevel: appConfig.koreanLanguageLevels.TOPIK1,
-  });
+  // const [state, dispatch] = useReducer(reducer, {
+  //   cards: [],
+  //   languageMode: appConfig.languageModes.KOREAN,
+  //   languageLevel: appConfig.koreanLanguageLevels.TOPIK1,
+  // });
 
+  //  const store = configureStore(reducer);
   const [spinner, setSpinner] = useState(false);
+  const languageLevel = useSelector((state) => state.languageLevel);
+  const languageMode = useSelector((state) => state.languageMode);
+  const cards = useSelector((state) => state.cards);
+
+  const dispatch = useDispatch();
 
   const generateCard = async (word) => {
     console.log(`App.generateCard - word: ${word}`);
@@ -37,7 +37,7 @@ const App = () => {
       if (word) {
         setSpinner(true);
         const response = await fetch(
-          `http://localhost:8000/openai/test/text?word=${word}&lang_mode=${state.languageMode}&lang_level=${state.languageLevel}`,
+          `http://localhost:8000/openai/test/text?word=${word}&lang_mode=${languageMode}&lang_level=${languageLevel}`,
         );
         const json = await response.json();
         console.log(`generateCardImage response:${JSON.stringify(json)}`);
@@ -53,7 +53,7 @@ const App = () => {
         console.log(`App.generateCard - cardData: ${JSON.stringify(cardData)}`);
         dispatch({ type: "add-card", payload: cardData });
         setSpinner(false);
-        console.log(`App.generateCard - allCardData: ${state.cards}`);
+        console.log(`App.generateCard - allCardData: ${cards}`);
       }
     } catch (e) {
       console.error(e);
@@ -69,17 +69,12 @@ const App = () => {
   // TODO: Convert buttons into svgs
   return (
     <div className="App">
-      <LanguageModeForm state={state} dispatch={dispatch} />
-      <LanguageLevelForm state={state} dispatch={dispatch} />
+      <LanguageModeForm />
+      <LanguageLevelForm />
       <WordInput generateCard={generateCard} spinner={spinner} />
       <form className="flash-card-form" onSubmit={handleSubmit}>
-        {state.cards.map((cardData) => (
-          <FlashCard
-            key={cardData.id}
-            cardData={cardData}
-            state={state}
-            dispatch={dispatch}
-          />
+        {cards.map((cardData) => (
+          <FlashCard key={cardData.id} cardData={cardData} />
         ))}
         <button>Download</button>
       </form>

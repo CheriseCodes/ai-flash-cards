@@ -1,10 +1,14 @@
 import React from "react";
 import PropTypes from "prop-types";
+import { useSelector, useDispatch } from "react-redux";
 
-const LanguageLevelFormInput = ({ languageLevelID, state, dispatch }) => {
+const LanguageLevelFormInput = ({ languageLevelID }) => {
+  const languageLevel = useSelector((state) => state.languageLevel);
+  const dispatch = useDispatch();
+
   const handleChange = (e) => {
     console.log(e);
-    if (state.languageLevel !== e.target.value) {
+    if (languageLevel !== e.target.value) {
       //   setLanguageLevel(e.target.value);
       dispatch({ type: "update-language-level", payload: e.target.value });
     }
@@ -17,7 +21,7 @@ const LanguageLevelFormInput = ({ languageLevelID, state, dispatch }) => {
         id={languageLevelID.toLowerCase()}
         name="language_level"
         value={languageLevelID}
-        checked={state.languageLevel === languageLevelID}
+        checked={languageLevel === languageLevelID}
         onChange={handleChange}
       ></input>
       <label htmlFor={languageLevelID.toLowerCase()}>{languageLevelID}</label>
@@ -27,8 +31,6 @@ const LanguageLevelFormInput = ({ languageLevelID, state, dispatch }) => {
 
 LanguageLevelFormInput.propTypes = {
   languageLevelID: PropTypes.string,
-  state: PropTypes.object,
-  dispatch: PropTypes.func,
 };
 
 export default LanguageLevelFormInput;

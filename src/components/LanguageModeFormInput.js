@@ -1,12 +1,16 @@
 import React from "react";
 import PropTypes from "prop-types";
+import { useSelector, useDispatch } from "react-redux";
 import appConfig from "../config.js";
 
-const LanguageModeFormInput = ({ languageModeID, state, dispatch }) => {
+const LanguageModeFormInput = ({ languageModeID }) => {
+  const languageMode = useSelector((state) => state.languageMode);
+  const dispatch = useDispatch();
+
   const handleChange = (e) => {
     console.log(e);
-    console.log(`LanguageModeFormInput.handleChange - ${state.languageMode}`);
-    if (state.languageMode !== e.target.value) {
+    console.log(`LanguageModeFormInput.handleChange - ${languageMode}`);
+    if (languageMode !== e.target.value) {
       console.log(`setting language mode to: ${e.target.value}`);
       // setLanguageMode(e.target.value);
       dispatch({ type: "update-language-mode", payload: e.target.value });
@@ -24,7 +28,7 @@ const LanguageModeFormInput = ({ languageModeID, state, dispatch }) => {
         });
       }
     }
-    console.log(`LanguageModeFormInput.handleChange - ${state.languageMode}`);
+    console.log(`LanguageModeFormInput.handleChange - ${languageMode}`);
   };
   return (
     <div className="language-mode-form-input">
@@ -33,7 +37,7 @@ const LanguageModeFormInput = ({ languageModeID, state, dispatch }) => {
         id={`${languageModeID.toLowerCase()}-mode`}
         name="language_mode"
         value={languageModeID}
-        checked={state.languageMode === languageModeID}
+        checked={languageMode === languageModeID}
         onChange={handleChange}
       ></input>
       <label htmlFor={`${languageModeID.toLowerCase()}-mode`}>
@@ -45,8 +49,6 @@ const LanguageModeFormInput = ({ languageModeID, state, dispatch }) => {
 
 LanguageModeFormInput.propTypes = {
   languageModeID: PropTypes.string,
-  state: PropTypes.object,
-  dispatch: PropTypes.func,
 };
 
 export default LanguageModeFormInput;

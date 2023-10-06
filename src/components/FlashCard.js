@@ -1,7 +1,8 @@
 import React, { useRef, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
 import PropTypes from "prop-types";
 
-const FlashCard = ({ cardData, state, dispatch }) => {
+const FlashCard = ({ cardData }) => {
   const [regenerateCardSpinner, setRegenerateCardSpinner] = useState(false);
   const [enableEdit, setEnableEdit] = useState(false);
   const [selected, setSelected] = useState(false);
@@ -9,6 +10,12 @@ const FlashCard = ({ cardData, state, dispatch }) => {
   const wordRef = useRef(null);
   const originalRef = useRef(null);
   const translationRef = useRef(null);
+
+  const languageLevel = useSelector((state) => state.languageLevel);
+  const languageMode = useSelector((state) => state.languageMode);
+  const cards = useSelector((state) => state.cards);
+
+  const dispatch = useDispatch();
 
   const handleDeletion = () => {
     dispatch({ type: "delete-card", payload: cardData.id });
@@ -38,7 +45,7 @@ const FlashCard = ({ cardData, state, dispatch }) => {
     try {
       setRegenerateCardSpinner(true);
       const currWord = wordRef.current.value;
-      const textGenUrl = `http://localhost:8000/openai/test/text?word=${currWord}&lang_mode=${state.languageMode}&lang_level=${state.languageLevel}`;
+      const textGenUrl = `http://localhost:8000/openai/test/text?word=${currWord}&lang_mode=${languageMode}&lang_level=${languageLevel}`;
 
       console.log(`FlashCard.handleRegenerateCard - ${textGenUrl}`);
       const response = await fetch(textGenUrl);
@@ -64,7 +71,7 @@ const FlashCard = ({ cardData, state, dispatch }) => {
         type: "update-card",
         payload: { id: cardData.id, data: newCardData },
       });
-      console.log(`FlashCard.js - allCardData: ${JSON.stringify(state.cards)}`);
+      console.log(`FlashCard.js - allCardData: ${JSON.stringify(cards)}`);
       setRegenerateCardSpinner(false);
     } catch (e) {
       console.error(e);
@@ -113,8 +120,6 @@ const FlashCard = ({ cardData, state, dispatch }) => {
 
 FlashCard.propTypes = {
   cardData: PropTypes.object,
-  state: PropTypes.object,
-  dispatch: PropTypes.func,
 };
 
 export default FlashCard;

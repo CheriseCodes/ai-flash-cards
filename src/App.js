@@ -5,25 +5,12 @@ import FlashCard from "./components/FlashCard.js";
 import LanguageModeForm from "./components/LanguageModeForm.js";
 import LanguageLevelForm from "./components/LanguageLevelForm.js";
 
-// import reducer from "./reducer.js";
-// import appConfig from "./config.js";
 import { v4 as uuidv4 } from "uuid";
 
 // TODO: Decide what data needs to persist between page refreshes
-// - allCardData
 // - selectedCards
-// - languageMode
-// - languageLevel
 
-// TODO: Transform reducer to Redux pattern
 const App = () => {
-  // const [state, dispatch] = useReducer(reducer, {
-  //   cards: [],
-  //   languageMode: appConfig.languageModes.KOREAN,
-  //   languageLevel: appConfig.koreanLanguageLevels.TOPIK1,
-  // });
-
-  //  const store = configureStore(reducer);
   const [spinner, setSpinner] = useState(false);
   const languageLevel = useSelector((state) => state.languageLevel);
   const languageMode = useSelector((state) => state.languageMode);
@@ -51,7 +38,7 @@ const App = () => {
         cardData.id = uuidv4();
         cardData.img = imageJson.data[0].url;
         console.log(`App.generateCard - cardData: ${JSON.stringify(cardData)}`);
-        dispatch({ type: "add-card", payload: cardData });
+        dispatch({ type: "add-card", cardData: cardData });
         setSpinner(false);
         console.log(`App.generateCard - allCardData: ${cards}`);
       }
@@ -74,7 +61,10 @@ const App = () => {
       <WordInput generateCard={generateCard} spinner={spinner} />
       <form className="flash-card-form" onSubmit={handleSubmit}>
         {cards.map((cardData) => (
-          <FlashCard key={cardData.id} cardData={cardData} />
+          <FlashCard
+            key={JSON.parse(cardData).id}
+            cardData={JSON.parse(cardData)}
+          />
         ))}
         <button>Download</button>
       </form>

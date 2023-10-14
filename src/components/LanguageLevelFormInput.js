@@ -10,7 +10,7 @@ const LanguageLevelFormInput = ({ languageLevelID }) => {
     console.log(e);
     if (languageLevel !== e.target.value) {
       //   setLanguageLevel(e.target.value);
-      dispatch({ type: "update-language-level", payload: e.target.value });
+      dispatch({ type: "update-language-level", langLevel: e.target.value });
     }
     console.log(`LanguageLevelFormInput.handleChange - ${e.target.value}`);
   };

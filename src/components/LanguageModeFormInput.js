@@ -1,7 +1,6 @@
 import React from "react";
 import PropTypes from "prop-types";
 import { useSelector, useDispatch } from "react-redux";
-import appConfig from "../config.js";
 
 const LanguageModeFormInput = ({ languageModeID }) => {
   const languageMode = useSelector((state) => state.languageMode);
@@ -12,21 +11,7 @@ const LanguageModeFormInput = ({ languageModeID }) => {
     console.log(`LanguageModeFormInput.handleChange - ${languageMode}`);
     if (languageMode !== e.target.value) {
       console.log(`setting language mode to: ${e.target.value}`);
-      // setLanguageMode(e.target.value);
-      dispatch({ type: "update-language-mode", payload: e.target.value });
-      if (e.target.value === appConfig.languageModes.KOREAN) {
-        // setLanguageLevel(appConfig.koreanLanguageLevels.TOPIK1);
-        dispatch({
-          type: "update-language-level",
-          payload: appConfig.koreanLanguageLevels.TOPIK1,
-        });
-      } else {
-        // setLanguageLevel(appConfig.cferLanguageLevels.A1);
-        dispatch({
-          type: "update-language-level",
-          payload: appConfig.cferLanguageLevels.A1,
-        });
-      }
+      dispatch({ type: "update-language-mode", langMode: e.target.value });
     }
     console.log(`LanguageModeFormInput.handleChange - ${languageMode}`);
   };

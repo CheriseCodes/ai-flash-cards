@@ -1,44 +1,56 @@
+import appConfig from "./config.js";
+
 const reducer = (state, action) => {
   switch (action.type) {
     case "add-card": {
+      console.log(`add-card state: ${JSON.stringify(state)}`);
       return {
         ...state,
-        cards: [...state.cards, ...[action.payload]],
+        cards: [...state.cards, ...[JSON.stringify(action.cardData)]],
       };
     }
     case "update-card": {
+      console.log(`update-card state: ${JSON.stringify(state)}`);
       return {
         ...state,
         cards: state.cards.map((item) => {
-          if (item.id === action.payload.id) {
-            return { ...action.payload.data }; // Update the object with new values
+          if (item.includes(action.cardId)) {
+            return JSON.stringify(action.cardData);
           }
-          return item; // Return unchanged objects
+          return item;
         }),
       };
     }
     case "delete-card": {
+      console.log(`delete-card state: ${JSON.stringify(state)}`);
       return {
         ...state,
         cards: state.cards.filter((prevCardData) => {
-          return prevCardData.id !== action.payload;
+          return !prevCardData.includes(action.cardId);
         }),
       };
     }
     case "update-language-level": {
+      console.log(`update-language-level state: ${JSON.stringify(state)}`);
       return {
         ...state,
-        languageLevel: action.payload,
+        languageLevel: action.langLevel,
       };
     }
     case "update-language-mode": {
+      console.log(`update-language-mode state: ${JSON.stringify(state)}`);
+      let langLevel = appConfig.cferLanguageLevels.A1;
+      if (action.langMode === appConfig.languageModes.KOREAN) {
+        langLevel = appConfig.koreanLanguageLevels.TOPIK1;
+      }
       return {
         ...state,
-        languageMode: action.payload,
+        languageLevel: langLevel,
+        languageMode: action.langMode,
       };
     }
     default: {
-      return state;
+      return { ...state };
     }
   }
 };

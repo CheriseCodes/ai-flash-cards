@@ -18,7 +18,7 @@ const FlashCard = ({ cardData }) => {
   const dispatch = useDispatch();
 
   const handleDeletion = () => {
-    dispatch({ type: "delete-card", payload: cardData.id });
+    dispatch({ type: "delete-card", cardId: cardData.id });
   };
 
   const handleEdit = (e) => {
@@ -32,7 +32,8 @@ const FlashCard = ({ cardData }) => {
       newCardData.img = cardData.img;
       dispatch({
         type: "update-card",
-        payload: { id: cardData.id, data: newCardData },
+        cardId: cardData.id,
+        cardData: newCardData,
       });
     } else {
       e.target.innerText = "Save Edit";
@@ -69,7 +70,8 @@ const FlashCard = ({ cardData }) => {
       );
       dispatch({
         type: "update-card",
-        payload: { id: cardData.id, data: newCardData },
+        cardId: cardData.id,
+        cardData: newCardData,
       });
       console.log(`FlashCard.js - allCardData: ${JSON.stringify(cards)}`);
       setRegenerateCardSpinner(false);

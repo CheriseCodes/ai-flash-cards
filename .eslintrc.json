@@ -21,7 +21,7 @@
     "rules": {
         "prettier/prettier": "error"
     },
-    "ignorePatterns": ["**/node_modules/*.js"],
+    "ignorePatterns": ["**/node_modules/**"],
     "settings": {
         "react": {
             "version": "detect"

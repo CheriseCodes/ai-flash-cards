@@ -26,6 +26,7 @@ const preloadedState = {
   cards: [],
   languageMode: appConfig.languageModes.KOREAN,
   languageLevel: appConfig.koreanLanguageLevels.TOPIK1,
+  selectedCards: [],
 };
 
 const store = configureStore({

@@ -80,6 +80,26 @@ const FlashCard = ({ cardData }) => {
     }
   };
 
+  const handleSelectCard = (e) => {
+    console.log("e before:", e);
+
+    if (selected) {
+      // remove from selected cards
+      dispatch({
+        type: "remove-selected-card",
+        cardId: cardData.id,
+      });
+    } else {
+      // add to selected cards
+      dispatch({
+        type: "add-selected-card",
+        cardId: cardData.id,
+      });
+    }
+    setSelected((curr) => !curr);
+    console.log("e after:", e);
+  };
+
   return (
     <>
       {!regenerateCardSpinner && (
@@ -104,10 +124,7 @@ const FlashCard = ({ cardData }) => {
             defaultValue={cardData.tr}
             disabled={enableEdit ? "" : "disabled"}
           ></input>
-          <input
-            type="checkbox"
-            onChange={() => setSelected((curr) => !curr)}
-          ></input>
+          <input type="checkbox" onChange={handleSelectCard}></input>
           <div className="controls">
             <div onClick={handleDeletion}>X</div>
             <p onClick={handleRegenerateCard}>Regenerate</p>

@@ -7,8 +7,8 @@ import LanguageLevelForm from "./components/LanguageLevelForm.js";
 
 import { v4 as uuidv4 } from "uuid";
 
-// TODO: Decide what data needs to persist between page refreshes
-// - selectedCards
+// TODO: Allow select different OpenAI versions
+// TODO: Persist different OpenAI version settings
 
 const App = () => {
   const [spinner, setSpinner] = useState(false);
@@ -18,6 +18,7 @@ const App = () => {
 
   const dispatch = useDispatch();
 
+  // TODO: Move out of App.js
   const generateCard = async (word) => {
     console.log(`App.generateCard - word: ${word}`);
     try {

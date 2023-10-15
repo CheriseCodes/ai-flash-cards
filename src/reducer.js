@@ -49,6 +49,20 @@ const reducer = (state, action) => {
         languageMode: action.langMode,
       };
     }
+    case "add-selected-card": {
+      return {
+        ...state,
+        selectedCards: [...state.selectedCards, ...[action.cardId]],
+      };
+    }
+    case "remove-selected-card": {
+      return {
+        ...state,
+        selectedCards: state.selectedCards.filter((currId) => {
+          return currId != action.cardId;
+        }),
+      };
+    }
     default: {
       return { ...state };
     }

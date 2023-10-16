@@ -23,7 +23,7 @@ app.get("/openai/test/all/text", async (req, res) => {
     for (let wordToSearch of wordsToSearch) {
       messages.push({
         role: "user",
-        content: `Please create 1 example sentence under 15 words long showing how the word ${wordToSearch} is commonly used in ${targetLanguage}. Use up to ${targetLevel} vocabulary or grammar points (inclusive). Return the sentence in the following JSON format {"word": "${wordToSearch}","or": "Example sentence using the value of 'word'","tr":"English translation of example sentence"}.`,
+        content: `Please create 1 example sentence under 25 words long showing how the word ${wordToSearch} is commonly used in ${targetLanguage}. Use up to ${targetLevel} vocabulary or grammar points (inclusive). Return the sentence in the following JSON format {"word": "${wordToSearch}","or": "Example sentence using the value of 'word'","tr":"English translation of example sentence","wordTranslated": "English translation of ${wordToSearch}"}.`,
       });
     }
     const response = await openai.chat.completions.create({
@@ -31,7 +31,7 @@ app.get("/openai/test/all/text", async (req, res) => {
       messages,
     });
     if (response) {
-      console.log(response);
+      console.log("server.js text:", response);
       // res.send(response.choices[0].message.content)
       res.send(response);
     }
@@ -50,7 +50,7 @@ app.get("/openai/test/text", async (req, res) => {
     const messages = [
       {
         role: "user",
-        content: `Please create 1 example sentence under 15 words long showing how the word ${wordToSearch} is commonly used in ${targetLanguage}. Use up to ${targetLevel} vocabulary or grammar points (inclusive). Return the sentence in the following JSON format {"word": "${wordToSearch}","or": "Example sentence using the value of 'word'","tr":"English translation of example sentence"}.`,
+        content: `Please create 1 example sentence under 25 words long showing how the word ${wordToSearch} is commonly used in ${targetLanguage}. Use up to ${targetLevel} vocabulary or grammar points (inclusive). Return the sentence in the following JSON format {"word": "${wordToSearch}","or": "Example sentence using '${wordToSearch}'","tr":"English translation of example sentence","wordTranslated": "English translation of ${wordToSearch}"}.`,
       },
     ];
     const response = await openai.chat.completions.create({

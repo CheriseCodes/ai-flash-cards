@@ -8,6 +8,7 @@ const FlashCard = ({ cardData }) => {
   const [selected, setSelected] = useState(false);
 
   const wordRef = useRef(null);
+  const wordTranslatedRef = useRef(null);
   const originalRef = useRef(null);
   const translationRef = useRef(null);
 
@@ -27,6 +28,7 @@ const FlashCard = ({ cardData }) => {
       const newCardData = { id: null, word: null, or: null, tr: null };
       newCardData.id = cardData.id;
       newCardData.word = wordRef.current.value;
+      newCardData.wordTranslated = wordTranslatedRef.current.value;
       newCardData.or = originalRef.current.value;
       newCardData.tr = translationRef.current.value;
       newCardData.img = cardData.img;
@@ -111,6 +113,11 @@ const FlashCard = ({ cardData }) => {
           <input
             ref={wordRef}
             defaultValue={cardData.word}
+            disabled={enableEdit ? "" : "disabled"}
+          ></input>
+          <input
+            ref={wordTranslatedRef}
+            defaultValue={cardData.wordTranslated}
             disabled={enableEdit ? "" : "disabled"}
           ></input>
           <input

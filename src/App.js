@@ -15,6 +15,7 @@ const App = () => {
   const languageLevel = useSelector((state) => state.languageLevel);
   const languageMode = useSelector((state) => state.languageMode);
   const cards = useSelector((state) => state.cards);
+  const selectedCards = useSelector((state) => state.selectedCards);
 
   const dispatch = useDispatch();
 
@@ -53,6 +54,20 @@ const App = () => {
     console.log();
   };
 
+  const handleDownload = () => {
+    let fileContents = "#separator:tab\n#html:true\n";
+    const parsedCards = cards.map((card) => JSON.parse(card));
+    const cardsToDownload = parsedCards.filter((card) => {
+      return selectedCards.includes(card.id);
+    });
+    for (let card of cardsToDownload) {
+      fileContents = fileContents.concat(
+        `${card.word}<br>${card.or}    <img src="${card.img}"><br>${card.tr}`,
+      );
+    }
+    console.log(fileContents);
+  };
+
   // TODO: Add tool tip for each button
   // TODO: Convert buttons into svgs
   return (
@@ -67,7 +82,7 @@ const App = () => {
             cardData={JSON.parse(cardData)}
           />
         ))}
-        <button>Download</button>
+        <button onClick={handleDownload}>Download</button>
       </form>
       {spinner && <p>Generating sentences...</p>}
     </div>

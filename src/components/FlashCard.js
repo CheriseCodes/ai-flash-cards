@@ -111,29 +111,36 @@ const FlashCard = ({ cardData }) => {
             selected ? "selected-flashcard" : "unselected-flashcard"
           }`}
         >
-          <input
-            ref={wordRef}
-            defaultValue={cardData.word}
-            disabled={enableEdit ? "" : "disabled"}
-          ></input>
-          <input
-            ref={originalRef}
-            defaultValue={cardData.sampleSentence}
-            disabled={enableEdit ? "" : "disabled"}
-          ></input>
-          <img src={cardData.img}></img>
-          <input
-            ref={wordTranslatedRef}
-            defaultValue={cardData.wordTranslated}
-            disabled={enableEdit ? "" : "disabled"}
-          ></input>
-          <input
-            ref={translationRef}
-            defaultValue={cardData.translatedSampleSentence}
-            disabled={enableEdit ? "" : "disabled"}
-          ></input>
-          <input type="checkbox" onChange={handleSelectCard}></input>
-          <div className="controls">
+          <div className="flash-card-content">
+            <input
+              ref={wordRef}
+              defaultValue={cardData.word}
+              disabled={enableEdit ? "" : "disabled"}
+              className="flash-card-word"
+            ></input>
+            <textarea
+              ref={originalRef}
+              defaultValue={cardData.sampleSentence}
+              disabled={enableEdit ? "" : "disabled"}
+              className="flash-card-sentence"
+            ></textarea>
+            <img height={250} width={250} src={cardData.img}></img>
+            <input
+              ref={wordTranslatedRef}
+              defaultValue={cardData.wordTranslated}
+              disabled={enableEdit ? "" : "disabled"}
+              className="flash-card-word"
+            ></input>
+            <textarea
+              ref={translationRef}
+              defaultValue={cardData.translatedSampleSentence}
+              disabled={enableEdit ? "" : "disabled"}
+              className="flash-card-sentence"
+            ></textarea>
+          </div>
+          <div className="flash-card-controls">
+            <input type="checkbox" onChange={handleSelectCard}></input>
+
             <div onClick={handleDeletion}>X</div>
             <p onClick={handleRegenerateCard}>Regenerate</p>
             <p onClick={handleEdit}>Edit</p>

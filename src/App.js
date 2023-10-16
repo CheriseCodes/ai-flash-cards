@@ -76,12 +76,14 @@ const App = () => {
       <LanguageLevelForm />
       <WordInput generateCard={generateCard} spinner={spinner} />
       <form className="flash-card-form" onSubmit={handleSubmit}>
-        {cards.map((cardData) => (
-          <FlashCard
-            key={JSON.parse(cardData).id}
-            cardData={JSON.parse(cardData)}
-          />
-        ))}
+        <div className="flash-card-container">
+          {cards.map((cardData) => (
+            <FlashCard
+              key={JSON.parse(cardData).id}
+              cardData={JSON.parse(cardData)}
+            />
+          ))}
+        </div>
         <button onClick={handleDownload}>Download</button>
       </form>
       {spinner && <p>Generating sentences...</p>}

@@ -29,8 +29,8 @@ const FlashCard = ({ cardData }) => {
       newCardData.id = cardData.id;
       newCardData.word = wordRef.current.value;
       newCardData.wordTranslated = wordTranslatedRef.current.value;
-      newCardData.or = originalRef.current.value;
-      newCardData.tr = translationRef.current.value;
+      newCardData.sampleSentence = originalRef.current.value;
+      newCardData.translatedSampleSentence = translationRef.current.value;
       newCardData.img = cardData.img;
       dispatch({
         type: "update-card",
@@ -58,14 +58,15 @@ const FlashCard = ({ cardData }) => {
       const imageResponse = await fetch(imageGenUrl);
       const imageJson = await imageResponse.json();
       console.log(
-        `newCardData JSON - ${generatedCardData.or}, ${generatedCardData.tr}`,
+        `newCardData JSON - ${generatedCardData.sampleSentence}, ${generatedCardData.translatedSampleSentence}`,
       );
       const newCardData = {
         id: cardData.id,
         word: currWord,
         img: imageJson.data[0].url,
-        or: generatedCardData.or,
-        tr: generatedCardData.tr,
+        sampleSentence: generatedCardData.sampleSentence,
+        translatedSampleSentence: generatedCardData.translatedSampleSentence,
+        wordTranslated: generatedCardData.wordTranslated,
       };
       console.log(
         `FlashCard.js - newCardData : ${JSON.stringify(newCardData)}`,
@@ -116,19 +117,19 @@ const FlashCard = ({ cardData }) => {
             disabled={enableEdit ? "" : "disabled"}
           ></input>
           <input
+            ref={originalRef}
+            defaultValue={cardData.sampleSentence}
+            disabled={enableEdit ? "" : "disabled"}
+          ></input>
+          <img src={cardData.img}></img>
+          <input
             ref={wordTranslatedRef}
             defaultValue={cardData.wordTranslated}
             disabled={enableEdit ? "" : "disabled"}
           ></input>
           <input
-            ref={originalRef}
-            defaultValue={cardData.or}
-            disabled={enableEdit ? "" : "disabled"}
-          ></input>
-          <img src={cardData.img}></img>
-          <input
             ref={translationRef}
-            defaultValue={cardData.tr}
+            defaultValue={cardData.translatedSampleSentence}
             disabled={enableEdit ? "" : "disabled"}
           ></input>
           <input type="checkbox" onChange={handleSelectCard}></input>

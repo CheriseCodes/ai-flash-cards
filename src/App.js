@@ -62,7 +62,7 @@ const App = () => {
     });
     for (let card of cardsToDownload) {
       fileContents = fileContents.concat(
-        `${card.word}<br>${card.or}    <img src="${card.img}"><br>${card.tr}`,
+        `${card.word}<br>${card.sampleSentence}    <img src="${card.img}"><br>${card.translatedSampleSentence}`,
       );
     }
     console.log(fileContents);

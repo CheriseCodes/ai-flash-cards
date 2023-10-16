@@ -50,7 +50,7 @@ app.get("/openai/test/text", async (req, res) => {
     const messages = [
       {
         role: "user",
-        content: `Please create 1 example sentence under 25 words long showing how the word ${wordToSearch} is commonly used in ${targetLanguage}. Use up to ${targetLevel} vocabulary or grammar points (inclusive). Return the sentence in the following JSON format {"word": "${wordToSearch}","or": "Example sentence using '${wordToSearch}'","tr":"English translation of example sentence","wordTranslated": "English translation of ${wordToSearch}"}.`,
+        content: `Please create 1 example sentence under 25 words long showing how the word ${wordToSearch} is commonly used in ${targetLanguage}. Use up to ${targetLevel} vocabulary or grammar points (inclusive). Return the sentence in the following JSON format {"word": "${wordToSearch}","sampleSentence": "Example sentence using '${wordToSearch}'","translatedSampleSentence":"English translation of example sentence","wordTranslated": "English translation of ${wordToSearch}"}.`,
       },
     ];
     const response = await openai.chat.completions.create({

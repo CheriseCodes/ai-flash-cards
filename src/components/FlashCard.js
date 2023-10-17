@@ -54,7 +54,7 @@ const FlashCard = ({ cardData }) => {
       const response = await fetch(textGenUrl);
       const json = await response.json();
       const generatedCardData = JSON.parse(json.choices[0].message.content);
-      const imageGenUrl = `http://localhost:8000/openai/test/imagine?sentence=${generatedCardData.tr}`;
+      const imageGenUrl = `http://localhost:8000/openai/test/imagine?sentence=${generatedCardData.translatedSampleSentence}`;
       const imageResponse = await fetch(imageGenUrl);
       const imageJson = await imageResponse.json();
       console.log(

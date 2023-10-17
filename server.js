@@ -11,50 +11,34 @@ const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
 });
 
-app.get("/openai/test/all/text", async (req, res) => {
+app.get("/openai/test/text", async (req, res) => {
   try {
     const wordsToSearch = Array.isArray(req.query.word)
       ? req.query.word
       : [req.query.word];
-    console.log(wordsToSearch);
     const targetLanguage = req.query.lang_mode;
-    const targetLevel = req.query.level_level;
+    const targetLevel = req.query.lang_level;
     const messages = [];
+    let cert = " ";
+    if (targetLanguage === "Spanish") {
+      cert = cert.concat("DELE");
+    } else if (targetLanguage === "French") {
+      if (["C1", "C2"].includes(targetLevel)) {
+        cert = cert.concat("DALF");
+      } else {
+        cert = cert.concat("DELF");
+      }
+    }
     for (let wordToSearch of wordsToSearch) {
       messages.push({
         role: "user",
-        content: `Please create 1 example sentence under 25 words long showing how the word ${wordToSearch} is commonly used in ${targetLanguage}. Use up to ${targetLevel} vocabulary or grammar points (inclusive). Return the sentence in the following JSON format {"word": "${wordToSearch}","or": "Example sentence using the value of 'word'","tr":"English translation of example sentence","wordTranslated": "English translation of ${wordToSearch}"}.`,
+        content: `Please create 1 example sentence under 100 words in length showing how the word ${wordToSearch} is commonly used in ${targetLanguage}. Use${cert === " " ? "" : cert} ${targetLevel} vocabulary and grammar points. Return the sentence in the following JSON format {"word": "${wordToSearch}","sampleSentence": "Example sentence using ${wordToSearch}","translatedSentence":"English translation of the example sentence","wordTranslated": "English translation of ${wordToSearch}"}.`,
       });
     }
+    console.log("promt for text:", messages[0].content);
     const response = await openai.chat.completions.create({
       model: "gpt-3.5-turbo",
-      messages,
-    });
-    if (response) {
-      console.log("server.js text:", response);
-      // res.send(response.choices[0].message.content)
-      res.send(response);
-    }
-  } catch (err) {
-    console.error(err);
-  }
-});
-
-app.get("/openai/test/text", async (req, res) => {
-  try {
-    const wordToSearch = Array.isArray(req.query.word)
-      ? req.query.word
-      : [req.query.word];
-    const targetLanguage = req.query.lang_mode;
-    const targetLevel = req.query.level_level;
-    const messages = [
-      {
-        role: "user",
-        content: `Please create 1 example sentence under 25 words long showing how the word ${wordToSearch} is commonly used in ${targetLanguage}. Use up to ${targetLevel} vocabulary or grammar points (inclusive). Return the sentence in the following JSON format {"word": "${wordToSearch}","sampleSentence": "Example sentence using '${wordToSearch}'","translatedSampleSentence":"English translation of example sentence","wordTranslated": "English translation of ${wordToSearch}"}.`,
-      },
-    ];
-    const response = await openai.chat.completions.create({
-      model: "gpt-3.5-turbo",
+      temperature: 1,
       messages,
     });
     if (response?.id) {
@@ -71,9 +55,10 @@ app.get("/openai/test/text", async (req, res) => {
 app.get("/openai/test/imagine", async (req, res) => {
   try {
     const sentenceToVisualize = req.query.sentence;
+    console.log("visualizing...", sentenceToVisualize);
     // TODO: Try add more American illustrators - https://www.christies.com/en/stories/that-s-america-a-collector-s-guide-to-american-il-a870d242cd3a4c6784cd603427d4d83a
     const response = await openai.images.generate({
-      prompt: `"${sentenceToVisualize}" visualized, Norman Rockwell illustration style, Claude Monet painting style, vibrant colors, realistic, detailed, without words, without text, without writing`,
+      prompt: `${sentenceToVisualize}, Norman Rockwell illustration style, Claude Monet painting style, vibrant colors, realistic, London, Toronto, Melbourne, Cape Town, Shanghai`,
       n: 1,
       size: "256x256",
     });

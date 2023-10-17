@@ -34,7 +34,7 @@ const App = () => {
         let cardData = json.choices[0].message.content; // stringified JSON
         cardData = JSON.parse(cardData);
         const imageResponse = await fetch(
-          `http://localhost:8000/openai/test/imagine?sentence=${cardData.tr}`,
+          `http://localhost:8000/openai/test/imagine?sentence=${cardData.translatedSampleSentence}`,
         );
         const imageJson = await imageResponse.json();
         cardData.id = uuidv4();

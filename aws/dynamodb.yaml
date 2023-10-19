@@ -1,0 +1,29 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Description: DynamoDB resources to store data
+Resources:
+  OpenAI-Dalle2-256x256-DynamoDBTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      KeySchema:
+        - AttributeName: Created
+          KeyType: HASH
+      TableName: OpenAIDalle
+      TableClass: STANDARD
+      DeletionProtectionEnabled: True
+      ProvisionedThroughput:
+        ReadCapacityUnits: 1
+        WriteCapacityUnits: 1
+      AttributeDefinitions:
+        - AttributeName: Created
+          AttributeType: N
+        - AttributeName: Prompt
+          AttributeType: S
+        - AttributeName: ImageLink
+          AttributeType: S
+        - AttributeName: TimeStamp
+          AttributeType: S
+        
+      # TODO: Add TimeToLiveSpecification:
+      # TODO: Remove TTL when in production
+    
+

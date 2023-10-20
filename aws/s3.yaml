@@ -1,13 +1,13 @@
 AWSTemplateFormatVersion: "2010-09-09"
-Description: DynamoDB resources to store data
-Resources:
-  OpenAI-Dalle-S3:
-    Type: AWS::DynamoDB::Table
-    Properties: AWS::S3::Bucket
-      BucketName: OpenAI-Dalle-S3-40D44616
-      # TODO: AWS::S3::BucketPolicy
+Description: S3 resources to store data for GenAI flash card application
+# TODO: AWS::S3::BucketPolicy
 
-      # TODO: AccelerateConfiguration, AnalyticsConfigurations, BucketEncryption, IntelligentTieringConfigurations, LifecycleConfiguration
-      # TODO: LoggingConfiguration, MetricsConfigurations, NotificationConfiguration, OwnershipControls, PublicAccessBlockConfiguration
-      # TODO: Move infrequently accessed images to a glacier bucket
+# TODO: AccelerateConfiguration, AnalyticsConfigurations, BucketEncryption, IntelligentTieringConfigurations, LifecycleConfiguration
+# TODO: LoggingConfiguration, MetricsConfigurations, NotificationConfiguration, OwnershipControls, PublicAccessBlockConfiguration
+# TODO: Move infrequently accessed images to a glacier bucket
+Resources:
+  OpenAIDalleSBucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: OpenAI-Dalle-S3-40D44616
       

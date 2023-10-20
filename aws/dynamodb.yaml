@@ -1,19 +1,26 @@
 AWSTemplateFormatVersion: "2010-09-09"
-Description: DynamoDB resources to store data
+Description: DynamoDB resources to store data for GenAI flash card application
 Resources:
-  OpenAI-Dalle2-256x256-DynamoDBTable:
+  FlashCardGenAIDynamoDBTable:
     Type: AWS::DynamoDB::Table
     Properties:
       KeySchema:
         - AttributeName: Created
           KeyType: HASH
-      TableName: OpenAIDalle
+      TableName: FlashCardGenAITable
       TableClass: STANDARD
       DeletionProtectionEnabled: True
       ProvisionedThroughput:
         ReadCapacityUnits: 1
         WriteCapacityUnits: 1
+      TimeToLiveSpecification:
+        AttributeName: TimeToLive
+        Enabled: true
       AttributeDefinitions:
+        - AttributeName: User
+          AttributeType: S
+        - AttributeName: FlashCard
+          AttributeType: S
         - AttributeName: Created
           AttributeType: N
         - AttributeName: Prompt
@@ -22,8 +29,15 @@ Resources:
           AttributeType: S
         - AttributeName: TimeStamp
           AttributeType: S
-        
-      # TODO: Add TimeToLiveSpecification:
-      # TODO: Remove TTL when in production
-    
-
+        - AttributeName: Model
+          AttributeType: S
+        - AttributeName: Content
+          AttributeType: S
+        - AttributeName: FinishReason
+          AttributeType: S
+        - AttributeName: PromptTokens
+          AttributeType: S
+        - AttributeName: CompletionTokens
+          AttributeType: S
+        - AttributeName: TotalTokens
+          AttributeType: S

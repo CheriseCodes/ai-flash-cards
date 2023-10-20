@@ -4,9 +4,6 @@ Resources:
   FlashCardGenAIDynamoDBTable:
     Type: AWS::DynamoDB::Table
     Properties:
-      KeySchema:
-        - AttributeName: Created
-          KeyType: HASH
       TableName: FlashCardGenAITable
       TableClass: STANDARD
       DeletionProtectionEnabled: True
@@ -16,28 +13,13 @@ Resources:
       TimeToLiveSpecification:
         AttributeName: TimeToLive
         Enabled: true
+      KeySchema:
+        - AttributeName: User
+          KeyType: HASH
+        - AttributeName: TimeStamp
+          KeyType: RANGE
       AttributeDefinitions:
         - AttributeName: User
           AttributeType: S
-        - AttributeName: FlashCard
-          AttributeType: S
-        - AttributeName: Created
-          AttributeType: N
-        - AttributeName: Prompt
-          AttributeType: S
-        - AttributeName: ImageLink
-          AttributeType: S
         - AttributeName: TimeStamp
-          AttributeType: S
-        - AttributeName: Model
-          AttributeType: S
-        - AttributeName: Content
-          AttributeType: S
-        - AttributeName: FinishReason
-          AttributeType: S
-        - AttributeName: PromptTokens
-          AttributeType: S
-        - AttributeName: CompletionTokens
-          AttributeType: S
-        - AttributeName: TotalTokens
           AttributeType: S

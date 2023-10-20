@@ -9,5 +9,5 @@ Resources:
   OpenAIDalleSBucket:
     Type: AWS::S3::Bucket
     Properties:
-      BucketName: OpenAI-Dalle-S3-40D44616
+      BucketName: openai-dalle-s3-40d44616
       

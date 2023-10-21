@@ -8,7 +8,6 @@ const app = express();
 app.use(cors());
 
 // TODO: Store generated responses in a database
-
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
 });
@@ -34,7 +33,9 @@ app.get("/openai/test/text", async (req, res) => {
     for (let wordToSearch of wordsToSearch) {
       messages.push({
         role: "user",
-        content: `Please create 1 example sentence under 100 words in length showing how the word ${wordToSearch} is commonly used in ${targetLanguage}. Use${cert === " " ? "" : cert} ${targetLevel} vocabulary and grammar points. Return the sentence in the following JSON format {"word": "${wordToSearch}","sampleSentence": "Example sentence using ${wordToSearch}","translatedSampleSentence":"English translation of the example sentence","wordTranslated": "English translation of ${wordToSearch}"}.`,
+        content: `Please create 1 example sentence under 100 words in length showing how the word ${wordToSearch} is commonly used in ${targetLanguage}. Use${
+          cert === " " ? "" : cert
+        } ${targetLevel} vocabulary and grammar points. Return the sentence in the following JSON format {"word": "${wordToSearch}","sampleSentence": "Example sentence using ${wordToSearch}","translatedSampleSentence":"English translation of the example sentence","wordTranslated": "English translation of ${wordToSearch}"}.`,
       });
     }
     console.log("promt for text:", messages[0].content);
@@ -54,6 +55,7 @@ app.get("/openai/test/text", async (req, res) => {
 });
 
 // TODO: Automate creating mock API responses
+// TODO: Store images in database because can't access them without being signed into OpenAI
 app.get("/openai/test/imagine", async (req, res) => {
   try {
     const sentenceToVisualize = req.query.sentence;

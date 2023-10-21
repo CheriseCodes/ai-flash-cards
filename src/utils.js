@@ -58,20 +58,26 @@ const regenerateCard = async (
     const response = await fetch(textGenUrl);
     const json = await response.json();
     const generatedCardData = JSON.parse(json.choices[0].message.content);
+    let newCardData = {
+      id: cardData.id,
+      word: currWord,
+      sampleSentence: generatedCardData.sampleSentence,
+      translatedSampleSentence: generatedCardData.translatedSampleSentence,
+      wordTranslated: generatedCardData.wordTranslated,
+    };
+    dispatch({
+      type: "update-card",
+      cardId: cardData.id,
+      cardData: newCardData,
+    });
+    setRegenerateCardSpinner(false);
     const imageGenUrl = `http://localhost:8000/openai/test/imagine?sentence=${generatedCardData.translatedSampleSentence}`;
     const imageResponse = await fetch(imageGenUrl);
     const imageJson = await imageResponse.json();
     console.log(
       `newCardData JSON - ${generatedCardData.sampleSentence}, ${generatedCardData.translatedSampleSentence}`,
     );
-    const newCardData = {
-      id: cardData.id,
-      word: currWord,
-      img: imageJson.data[0].url,
-      sampleSentence: generatedCardData.sampleSentence,
-      translatedSampleSentence: generatedCardData.translatedSampleSentence,
-      wordTranslated: generatedCardData.wordTranslated,
-    };
+    newCardData.img = imageJson.data[0].url;
     console.log(`FlashCard.js - newCardData : ${JSON.stringify(newCardData)}`);
     dispatch({
       type: "update-card",
@@ -79,7 +85,6 @@ const regenerateCard = async (
       cardData: newCardData,
     });
     //   console.log(`FlashCard.js - allCardData: ${JSON.stringify(cards)}`);
-    setRegenerateCardSpinner(false);
   } catch (e) {
     console.error(e);
   }

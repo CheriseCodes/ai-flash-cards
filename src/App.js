@@ -29,18 +29,24 @@ const App = () => {
           `http://localhost:8000/openai/test/text?word=${word}&lang_mode=${languageMode}&lang_level=${languageLevel}`,
         );
         const json = await response.json();
+
         console.log(`generateCardImage response:${JSON.stringify(json)}`);
         console.log(`generateCards response:${JSON.stringify(json)}`);
         let cardData = json.choices[0].message.content; // stringified JSON
         cardData = JSON.parse(cardData);
+        cardData.id = uuidv4();
+        dispatch({ type: "add-card", cardData: cardData });
         const imageResponse = await fetch(
           `http://localhost:8000/openai/test/imagine?sentence=${cardData.translatedSampleSentence}`,
         );
         const imageJson = await imageResponse.json();
-        cardData.id = uuidv4();
         cardData.img = imageJson.data[0].url;
         console.log(`App.generateCard - cardData: ${JSON.stringify(cardData)}`);
-        dispatch({ type: "add-card", cardData: cardData });
+        dispatch({
+          type: "update-card",
+          cardData: cardData,
+          cardId: cardData.id,
+        });
         setSpinner(false);
         console.log(`App.generateCard - allCardData: ${cards}`);
       }
@@ -84,6 +90,7 @@ const App = () => {
             />
           ))}
         </div>
+        {/* TODO: Fix far away download button */}
         <button onClick={handleDownload}>Download</button>
       </form>
       {spinner && <p>Generating sentences...</p>}

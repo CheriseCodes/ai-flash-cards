@@ -1,8 +1,14 @@
 import React, { useRef } from "react";
+import { useSelector, useDispatch } from "react-redux";
 import PropTypes from "prop-types";
+import generateCard from "../utils.js";
 
-const WordInput = ({ generateCard, spinner }) => {
+const WordInput = ({ setSpinner, spinner }) => {
+  const languageLevel = useSelector((state) => state.languageLevel);
+  const languageMode = useSelector((state) => state.languageMode);
+  const dispatch = useDispatch();
   const textAreaRef = useRef(null);
+
   const handleSubmit = (e) => {
     e.preventDefault();
     const wordList = textAreaRef.current.value;
@@ -10,7 +16,7 @@ const WordInput = ({ generateCard, spinner }) => {
       console.log(
         `WordInput.handleSubmit - \${index}:\${word.trim()}: ${index}:${word.trim()}`,
       );
-      generateCard(word);
+      generateCard(dispatch, setSpinner, word, languageMode, languageLevel);
     }
   };
   return (
@@ -24,7 +30,7 @@ const WordInput = ({ generateCard, spinner }) => {
 };
 
 WordInput.propTypes = {
-  generateCard: PropTypes.func,
+  setSpinner: PropTypes.func,
   spinner: PropTypes.bool,
 };
 

@@ -1,59 +1,17 @@
 import React, { useState } from "react";
-import { useSelector, useDispatch } from "react-redux";
+import { useSelector } from "react-redux";
 import WordInput from "./components/WordInput.js";
 import FlashCard from "./components/FlashCard.js";
 import LanguageModeForm from "./components/LanguageModeForm.js";
 import LanguageLevelForm from "./components/LanguageLevelForm.js";
-
-import { v4 as uuidv4 } from "uuid";
 
 // TODO: Allow select different OpenAI versions
 // TODO: Persist different OpenAI version settings
 
 const App = () => {
   const [spinner, setSpinner] = useState(false);
-  const languageLevel = useSelector((state) => state.languageLevel);
-  const languageMode = useSelector((state) => state.languageMode);
   const cards = useSelector((state) => state.cards);
   const selectedCards = useSelector((state) => state.selectedCards);
-
-  const dispatch = useDispatch();
-
-  // TODO: Move out of App.js
-  const generateCard = async (word) => {
-    console.log(`App.generateCard - word: ${word}`);
-    try {
-      if (word) {
-        setSpinner(true);
-        const response = await fetch(
-          `http://localhost:8000/openai/test/text?word=${word}&lang_mode=${languageMode}&lang_level=${languageLevel}`,
-        );
-        const json = await response.json();
-
-        console.log(`generateCardImage response:${JSON.stringify(json)}`);
-        console.log(`generateCards response:${JSON.stringify(json)}`);
-        let cardData = json.choices[0].message.content; // stringified JSON
-        cardData = JSON.parse(cardData);
-        cardData.id = uuidv4();
-        dispatch({ type: "add-card", cardData: cardData });
-        const imageResponse = await fetch(
-          `http://localhost:8000/openai/test/imagine?sentence=${cardData.translatedSampleSentence}`,
-        );
-        const imageJson = await imageResponse.json();
-        cardData.img = imageJson.data[0].url;
-        console.log(`App.generateCard - cardData: ${JSON.stringify(cardData)}`);
-        dispatch({
-          type: "update-card",
-          cardData: cardData,
-          cardId: cardData.id,
-        });
-        setSpinner(false);
-        console.log(`App.generateCard - allCardData: ${cards}`);
-      }
-    } catch (e) {
-      console.error(e);
-    }
-  };
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -80,7 +38,7 @@ const App = () => {
     <div className="App">
       <LanguageModeForm />
       <LanguageLevelForm />
-      <WordInput generateCard={generateCard} spinner={spinner} />
+      <WordInput setSpinner={setSpinner} spinner={spinner} />
       <form className="flash-card-form" onSubmit={handleSubmit}>
         <div className="flash-card-container">
           {cards.map((cardData) => (

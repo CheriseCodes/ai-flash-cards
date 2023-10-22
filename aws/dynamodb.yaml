@@ -6,7 +6,7 @@ Resources:
     Properties:
       TableName: FlashCardGenAITable
       TableClass: STANDARD
-      DeletionProtectionEnabled: True
+      # DeletionProtectionEnabled: True
       ProvisionedThroughput:
         ReadCapacityUnits: 1
         WriteCapacityUnits: 1

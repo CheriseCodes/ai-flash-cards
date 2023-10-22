@@ -4,6 +4,7 @@ import WordInput from "./components/WordInput.js";
 import FlashCard from "./components/FlashCard.js";
 import LanguageModeForm from "./components/LanguageModeForm.js";
 import LanguageLevelForm from "./components/LanguageLevelForm.js";
+import LoadingSpinner from "./components/LoadingSpinner.js";
 
 // TODO: Allow select different OpenAI versions
 // TODO: Persist different OpenAI version settings
@@ -39,6 +40,7 @@ const App = () => {
       <LanguageModeForm />
       <LanguageLevelForm />
       <WordInput setSpinner={setSpinner} spinner={spinner} />
+      <button onClick={handleDownload}>Download</button>
       <form className="flash-card-form" onSubmit={handleSubmit}>
         <div className="flash-card-container">
           {cards.map((cardData) => (
@@ -48,10 +50,8 @@ const App = () => {
             />
           ))}
         </div>
-        {/* TODO: Fix far away download button */}
-        <button onClick={handleDownload}>Download</button>
       </form>
-      {spinner && <p>Generating sentences...</p>}
+      {spinner && <LoadingSpinner purpose={"Generating cards"} />}
     </div>
   );
 };

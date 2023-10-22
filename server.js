@@ -3,6 +3,8 @@ import express from "express";
 import OpenAI from "openai";
 import cors from "cors";
 
+import appConfig from "./src/config.js";
+
 const PORT = 8000;
 const app = express();
 app.use(cors());
@@ -18,17 +20,25 @@ app.get("/openai/test/text", async (req, res) => {
       ? req.query.word
       : [req.query.word];
     const targetLanguage = req.query.lang_mode;
-    const targetLevel = req.query.lang_level;
+    let targetLevel = req.query.lang_level;
     const messages = [];
     let cert = " ";
-    if (targetLanguage === "Spanish") {
+    if (targetLanguage === appConfig.languageModes.SPANISH) {
       cert = cert.concat("DELE");
-    } else if (targetLanguage === "French") {
+    } else if (targetLanguage === appConfig.languageModes.FRENCH) {
       if (["C1", "C2"].includes(targetLevel)) {
         cert = cert.concat("DALF");
       } else {
         cert = cert.concat("DELF");
       }
+    } else if (targetLanguage == appConfig.languageModes.KOREAN) {
+      targetLevel = `${targetLevel.slice(0, -1)} ${targetLevel.slice(-1)}`
+      if (["1","2"].includes(targetLevel.slice(-1))) {
+        cert = cert.concat("TOPIK I")
+      } else {
+        cert = cert.concat("TOPIK II")
+      }
+      targetLevel = `(${targetLevel})`;
     }
     for (let wordToSearch of wordsToSearch) {
       messages.push({

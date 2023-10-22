@@ -1,9 +1,12 @@
 import React from "react";
 import PropTypes from "prop-types";
+import appConfig from "../config.js";
+
 import { useSelector, useDispatch } from "react-redux";
 
 const LanguageLevelFormInput = ({ languageLevelID }) => {
   const languageLevel = useSelector((state) => state.languageLevel);
+  const languageMode = useSelector((state) => state.languageMode);
   const dispatch = useDispatch();
 
   const handleChange = (e) => {
@@ -24,7 +27,11 @@ const LanguageLevelFormInput = ({ languageLevelID }) => {
         checked={languageLevel === languageLevelID}
         onChange={handleChange}
       ></input>
-      <label htmlFor={languageLevelID.toLowerCase()}>{languageLevelID}</label>
+      <label htmlFor={languageLevelID.toLowerCase()}>
+        {languageMode === appConfig.languageModes.KOREAN
+          ? `${languageLevelID.slice(0, -1)} ${languageLevelID.slice(-1)}`
+          : languageLevelID}
+      </label>
     </div>
   );
 };

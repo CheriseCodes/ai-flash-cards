@@ -4,7 +4,6 @@ import PropTypes from "prop-types";
 import generateCard from "../utils.js";
 
 const FlashCard = ({ cardData }) => {
-  const [regenerateCardSpinner, setRegenerateCardSpinner] = useState(false);
   const [enableEdit, setEnableEdit] = useState(false);
   const [selected, setSelected] = useState(false);
 
@@ -22,7 +21,7 @@ const FlashCard = ({ cardData }) => {
     const currWord = wordRef.current.value;
     generateCard(
       dispatch,
-      setRegenerateCardSpinner,
+      null,
       false,
       currWord,
       languageMode,
@@ -79,7 +78,7 @@ const FlashCard = ({ cardData }) => {
 
   return (
     <>
-      {!regenerateCardSpinner && (
+      {!cardData.generatingText && (
         <div
           className={`flash-card ${
             selected ? "selected-flashcard" : "unselected-flashcard"
@@ -98,7 +97,7 @@ const FlashCard = ({ cardData }) => {
               disabled={enableEdit ? "" : "disabled"}
               className="flash-card-sentence"
             ></textarea>
-            {cardData.img ? (
+            {!cardData.generatingImage ? (
               <img height={250} width={250} src={cardData.img}></img>
             ) : (
               <p>Generating image...</p>
@@ -125,7 +124,7 @@ const FlashCard = ({ cardData }) => {
           </div>
         </div>
       )}
-      {regenerateCardSpinner && <p>Generating...</p>}
+      {cardData.generatingText && <p>Generating...</p>}
     </>
   );
 };

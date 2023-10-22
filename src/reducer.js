@@ -30,6 +30,32 @@ const reducer = (state, action) => {
         }),
       };
     }
+    case "toggle-generating-text": {
+      return {
+        ...state,
+        cards: state.cards.map((item) => {
+          if (item.includes(action.cardId)) {
+            const cardJson = JSON.parse(item);
+            cardJson.generatingText = !cardJson.generatingText;
+            return JSON.stringify(cardJson);
+          }
+          return item;
+        }),
+      };
+    }
+    case "toggle-generating-image": {
+      return {
+        ...state,
+        cards: state.cards.map((item) => {
+          if (item.includes(action.cardId)) {
+            const cardJson = JSON.parse(item);
+            cardJson.generatingImage = !cardJson.generatingImage;
+            return JSON.stringify(cardJson);
+          }
+          return item;
+        }),
+      };
+    }
     case "update-language-level": {
       console.log(`update-language-level state: ${JSON.stringify(state)}`);
       return {

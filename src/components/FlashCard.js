@@ -1,7 +1,7 @@
 import React, { useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import PropTypes from "prop-types";
-import { regenerateCard } from "../utils.js";
+import generateCard from "../utils.js";
 
 const FlashCard = ({ cardData }) => {
   const [regenerateCardSpinner, setRegenerateCardSpinner] = useState(false);
@@ -20,9 +20,10 @@ const FlashCard = ({ cardData }) => {
 
   const handleRegenerateCard = async () => {
     const currWord = wordRef.current.value;
-    regenerateCard(
+    generateCard(
       dispatch,
       setRegenerateCardSpinner,
+      false,
       currWord,
       languageMode,
       languageLevel,

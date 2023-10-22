@@ -16,7 +16,14 @@ const WordInput = ({ setSpinner, spinner }) => {
       console.log(
         `WordInput.handleSubmit - \${index}:\${word.trim()}: ${index}:${word.trim()}`,
       );
-      generateCard(dispatch, setSpinner, word, languageMode, languageLevel);
+      generateCard(
+        dispatch,
+        setSpinner,
+        true,
+        word,
+        languageMode,
+        languageLevel,
+      );
     }
   };
   return (

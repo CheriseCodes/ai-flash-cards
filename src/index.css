@@ -15,7 +15,7 @@
 }
 
 .flash-card {
-  width: 300px;
+  flex: min-content;
   margin: 10px;
 }
 
@@ -26,8 +26,6 @@
 }
 
 .flash-card-container {
-  display: grid;
-  grid-auto-flow: row;
-  grid-template-columns: repeat(3, 1fr);
-  grid-template-rows: repeat(2, 1fr);
+  display: flex;
+  flex-wrap: wrap;
 }

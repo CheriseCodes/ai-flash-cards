@@ -28,10 +28,13 @@ const generateCard = async (
           `http://localhost:8000/openai/test/text?word=${word}&lang_mode=${languageMode}&lang_level=${languageLevel}`,
         );
         const json = await response.json();
-        console.log(`generateCardImage response:${JSON.stringify(json)}`);
-        console.log(`generateCards response:${JSON.stringify(json)}`);
         let cardData = json.choices[0].message.content; // stringified JSON
-        cardData = JSON.parse(cardData);
+        try {
+          cardData = JSON.parse(cardData);
+        } catch (e) {
+          dispatch({ type: "delete-card", cardId: cardId });
+          console.error(e);
+        }
         cardData.wordTranslated = cardData.wordTranslated.toLowerCase();
         cardData.id = cardId;
         cardData.generatingText = false;
@@ -53,19 +56,30 @@ const generateCard = async (
         //   console.log(`App.generateCard - allCardData: ${cards}`);
       }
     } catch (e) {
+      // Delete newly created card if there is an error
       console.error(e);
     }
   } else {
+    const cardId = cardData.id;
     try {
-      const cardId = cardData.id;
       dispatch({ type: "toggle-generating-text", cardId: cardId });
       const textGenUrl = `http://localhost:8000/openai/test/text?word=${word}&lang_mode=${languageMode}&lang_level=${languageLevel}`;
       console.log(`FlashCard.handleRegenerateCard - ${textGenUrl}`);
       const response = await fetch(textGenUrl);
       const json = await response.json();
-      const generatedCardData = JSON.parse(json.choices[0].message.content);
+      const content = json.choices[0].message.content;
+
+      try {
+        cardData = JSON.parse(cardData);
+      } catch (e) {
+        // Signal that no longer generating text on error
+        dispatch({ type: "toggle-generating-text", cardId: cardId });
+        // TODO: Let user know that the text wasn't regenerated correctly
+        console.error(e);
+      }
+      const generatedCardData = JSON.parse(content);
       let newCardData = {
-        id: cardData.id,
+        id: cardId,
         word: word,
         sampleSentence: generatedCardData.sampleSentence,
         translatedSampleSentence: generatedCardData.translatedSampleSentence,
@@ -75,7 +89,7 @@ const generateCard = async (
       };
       dispatch({
         type: "update-card",
-        cardId: cardData.id,
+        cardId: cardId,
         cardData: newCardData,
       });
       const imageGenUrl = `http://localhost:8000/openai/test/imagine?sentence=${generatedCardData.translatedSampleSentence}`;
@@ -91,11 +105,13 @@ const generateCard = async (
       );
       dispatch({
         type: "update-card",
-        cardId: cardData.id,
+        cardId: cardId,
         cardData: newCardData,
       });
       //   console.log(`FlashCard.js - allCardData: ${JSON.stringify(cards)}`);
     } catch (e) {
+      // Signal that no longer generating text on error
+      dispatch({ type: "toggle-generating-text", cardId: cardId });
       console.error(e);
     }
   }

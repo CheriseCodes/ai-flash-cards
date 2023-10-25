@@ -40,6 +40,7 @@ const App = () => {
       <LanguageModeForm />
       <LanguageLevelForm />
       <WordInput setSpinner={setSpinner} spinner={spinner} />
+      {/* TODO: use loading button boostrap component */}
       <button onClick={handleDownload}>Download</button>
       <form className="flash-card-form" onSubmit={handleSubmit}>
         <div className="flash-card-container">

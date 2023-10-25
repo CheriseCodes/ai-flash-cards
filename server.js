@@ -32,11 +32,11 @@ app.get("/openai/test/text", async (req, res) => {
         cert = cert.concat("DELF");
       }
     } else if (targetLanguage == appConfig.languageModes.KOREAN) {
-      targetLevel = `${targetLevel.slice(0, -1)} ${targetLevel.slice(-1)}`
-      if (["1","2"].includes(targetLevel.slice(-1))) {
-        cert = cert.concat("TOPIK I")
+      targetLevel = `${targetLevel.slice(0, -1)} ${targetLevel.slice(-1)}`;
+      if (["1", "2"].includes(targetLevel.slice(-1))) {
+        cert = cert.concat("TOPIK I");
       } else {
-        cert = cert.concat("TOPIK II")
+        cert = cert.concat("TOPIK II");
       }
       targetLevel = `(${targetLevel})`;
     }
@@ -56,7 +56,7 @@ app.get("/openai/test/text", async (req, res) => {
     });
     if (response?.id) {
       console.log(response.choices[0].message.content);
-      // res.send(response.choices[0].message.content)
+      // res.send(response.choices[0].message.content);
       res.send(response);
     }
   } catch (err) {

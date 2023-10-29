@@ -40,3 +40,8 @@
   display: flex;
   justify-content: space-around;
 }
+
+.word-input {
+  display: flex;
+  justify-content: space-around;
+}

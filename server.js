@@ -3,7 +3,7 @@ import express from "express";
 import OpenAI from "openai";
 import cors from "cors";
 
-import { open } from 'node:fs/promises';
+import { open } from "node:fs/promises";
 
 import { PutObjectCommand, S3Client } from "@aws-sdk/client-s3";
 import { DynamoDBClient, ListTablesCommand } from "@aws-sdk/client-dynamodb";
@@ -12,11 +12,13 @@ import { fromSSO } from "@aws-sdk/credential-providers";
 import appConfig from "./src/config.js";
 
 const s3Client = new S3Client({
-  credentials: fromSSO({profile: process.env.AWS_PROFILE}),
-  region: "ca-central-1" });
+  credentials: fromSSO({ profile: process.env.AWS_PROFILE }),
+  region: "ca-central-1",
+});
 const dynamoDbClient = new DynamoDBClient({
-  credentials: fromSSO({profile: process.env.AWS_PROFILE}),
-  region: "ca-central-1" });
+  credentials: fromSSO({ profile: process.env.AWS_PROFILE }),
+  region: "ca-central-1",
+});
 
 const PORT = 8000;
 const app = express();
@@ -126,17 +128,17 @@ app.get("/openai-test", async (req, res) => {
 });
 
 app.get("/download/dalle", async (req, res) => {
-  res.send({"Hello": "World"});
-  
+  res.send({ Hello: "World" });
 });
 
 app.get("/aws/test", async (req, res) => {
   try {
     // Read content of downloaded file
-    const fd = await open('/home/image.png');
+    const fd = await open("/home/image.png");
     // Create a stream from some character device.
     const stream = fd.createReadStream();
-    const input = { // PutObjectRequest
+    const input = {
+      // PutObjectRequest
       Body: stream,
       Bucket: "bucket_name", // required
       Key: "image.png", // required
@@ -145,8 +147,8 @@ app.get("/aws/test", async (req, res) => {
     // const response = await dynamoDbClient.send(command);
     const command = new PutObjectCommand(input);
     const response = await s3Client.send(command);
-    
-    res.send(response)
+
+    res.send(response);
     stream.close(); // This may not close the stream.
     // Artificially marking end-of-stream, as if the underlying resource had
     // indicated end-of-file by itself, allows the stream to close.

@@ -9,47 +9,52 @@ const LanguageLevelForm = () => {
     <div className="language-form">
       {languageMode === appConfig.languageModes.KOREAN && (
         <form>
-          <LanguageLevelFormInput
-            languageLevelID={appConfig.koreanLanguageLevels.TOPIK1}
-          />
-          <LanguageLevelFormInput
-            languageLevelID={appConfig.koreanLanguageLevels.TOPIK2}
-          />
-          <LanguageLevelFormInput
-            languageLevelID={appConfig.koreanLanguageLevels.TOPIK3}
-          />
-          <LanguageLevelFormInput
-            languageLevelID={appConfig.koreanLanguageLevels.TOPIK4}
-          />
-          <LanguageLevelFormInput
-            languageLevelID={appConfig.koreanLanguageLevels.TOPIK5}
-          />
-          <LanguageLevelFormInput
-            languageLevelID={appConfig.koreanLanguageLevels.TOPIK6}
-          />
+          <div className="language-level-container">
+            <span>Language Level:</span>
+            <LanguageLevelFormInput
+              languageLevelID={appConfig.koreanLanguageLevels.TOPIK1}
+            />
+            <LanguageLevelFormInput
+              languageLevelID={appConfig.koreanLanguageLevels.TOPIK2}
+            />
+            <LanguageLevelFormInput
+              languageLevelID={appConfig.koreanLanguageLevels.TOPIK3}
+            />
+            <LanguageLevelFormInput
+              languageLevelID={appConfig.koreanLanguageLevels.TOPIK4}
+            />
+            <LanguageLevelFormInput
+              languageLevelID={appConfig.koreanLanguageLevels.TOPIK5}
+            />
+            <LanguageLevelFormInput
+              languageLevelID={appConfig.koreanLanguageLevels.TOPIK6}
+            />
+          </div>
         </form>
       )}
       {(languageMode === appConfig.languageModes.FRENCH ||
         languageMode === appConfig.languageModes.SPANISH) && (
         <form>
-          <LanguageLevelFormInput
-            languageLevelID={appConfig.cferLanguageLevels.A1}
-          />
-          <LanguageLevelFormInput
-            languageLevelID={appConfig.cferLanguageLevels.A2}
-          />
-          <LanguageLevelFormInput
-            languageLevelID={appConfig.cferLanguageLevels.B1}
-          />
-          <LanguageLevelFormInput
-            languageLevelID={appConfig.cferLanguageLevels.B2}
-          />
-          <LanguageLevelFormInput
-            languageLevelID={appConfig.cferLanguageLevels.C1}
-          />
-          <LanguageLevelFormInput
-            languageLevelID={appConfig.cferLanguageLevels.C2}
-          />
+          <div className="language-level-container">
+            <LanguageLevelFormInput
+              languageLevelID={appConfig.cferLanguageLevels.A1}
+            />
+            <LanguageLevelFormInput
+              languageLevelID={appConfig.cferLanguageLevels.A2}
+            />
+            <LanguageLevelFormInput
+              languageLevelID={appConfig.cferLanguageLevels.B1}
+            />
+            <LanguageLevelFormInput
+              languageLevelID={appConfig.cferLanguageLevels.B2}
+            />
+            <LanguageLevelFormInput
+              languageLevelID={appConfig.cferLanguageLevels.C1}
+            />
+            <LanguageLevelFormInput
+              languageLevelID={appConfig.cferLanguageLevels.C2}
+            />
+          </div>
         </form>
       )}
     </div>

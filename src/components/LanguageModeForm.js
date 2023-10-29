@@ -7,15 +7,18 @@ const LanguageModeForm = () => {
   return (
     <div className="language-mode-form">
       <form>
-        <LanguageModeFormInput
-          languageModeID={appConfig.languageModes.KOREAN}
-        />
-        <LanguageModeFormInput
-          languageModeID={appConfig.languageModes.FRENCH}
-        />
-        <LanguageModeFormInput
-          languageModeID={appConfig.languageModes.SPANISH}
-        />
+        <div className="language-mode-container">
+          <span>Target Language:</span>
+          <LanguageModeFormInput
+            languageModeID={appConfig.languageModes.KOREAN}
+          />
+          <LanguageModeFormInput
+            languageModeID={appConfig.languageModes.FRENCH}
+          />
+          <LanguageModeFormInput
+            languageModeID={appConfig.languageModes.SPANISH}
+          />
+        </div>
       </form>
     </div>
   );

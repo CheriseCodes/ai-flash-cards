@@ -28,4 +28,15 @@
 .flash-card-container {
   display: flex;
   flex-wrap: wrap;
+  justify-content: space-around;
+}
+
+.language-mode-container {
+  display: flex;
+  justify-content: space-around;
+}
+
+.language-level-container {
+  display: flex;
+  justify-content: space-around;
 }

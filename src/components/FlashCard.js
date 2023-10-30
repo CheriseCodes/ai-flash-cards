@@ -99,11 +99,13 @@ const FlashCard = ({ cardData }) => {
                 disabled={enableEdit ? "" : "disabled"}
                 className="flash-card-sentence"
               ></textarea>
-              {!cardData.generatingImage ? (
-                <img height={250} width={250} src={cardData.img}></img>
-              ) : (
-                <LoadingSpinner />
-              )}
+              <div className="image-container">
+                {!cardData.generatingImage ? (
+                  <img height={250} width={250} src={cardData.img}></img>
+                ) : (
+                  <LoadingSpinner />
+                )}
+              </div>
               <input
                 ref={wordTranslatedRef}
                 defaultValue={cardData.wordTranslated}

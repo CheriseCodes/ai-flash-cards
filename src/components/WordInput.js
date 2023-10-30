@@ -47,7 +47,7 @@ const WordInput = () => {
 
   return (
     <div className="word-input">
-      <form>
+      <form className="word-input-form">
         <input type="text" name="card-subject" ref={textAreaRef}></input>
         <Button variant="primary" disabled={spinner} onClick={handleSubmit}>
           {" "}

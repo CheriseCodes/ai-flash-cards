@@ -6,9 +6,9 @@ import LanguageModeFormInput from "./LanguageModeFormInput.js";
 const LanguageModeForm = () => {
   return (
     <div className="language-mode-form">
+      <h2>Target Language</h2>
       <form>
         <div className="language-mode-container">
-          <span>Target Language:</span>
           <LanguageModeFormInput
             languageModeID={appConfig.languageModes.KOREAN}
           />

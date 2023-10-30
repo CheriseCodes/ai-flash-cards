@@ -1,0 +1,25 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Description: DynamoDB resources to store data for GenAI flash card application
+Resources:
+  FlashCardGenAIDynamoDBTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: FlashCardGenAITable
+      TableClass: STANDARD
+      # DeletionProtectionEnabled: True
+      ProvisionedThroughput:
+        ReadCapacityUnits: 1
+        WriteCapacityUnits: 1
+      TimeToLiveSpecification:
+        AttributeName: TimeToLive
+        Enabled: true
+      KeySchema:
+        - AttributeName: User
+          KeyType: HASH
+        - AttributeName: TimeStamp
+          KeyType: RANGE
+      AttributeDefinitions:
+        - AttributeName: User
+          AttributeType: S
+        - AttributeName: TimeStamp
+          AttributeType: S

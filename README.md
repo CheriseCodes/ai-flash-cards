@@ -6,18 +6,9 @@ Automate the creation of flashcards for language learning using ChatGPT and DALL
 
 In the project directory, you can run:
 
-### `npm start`
-
-TBD
-
-### `npm test`
-
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
-
 ### `npm run start:frontend`
 
-React the React frontend code
+Run the React frontend code
 
 ### `npm run start:backend`
 
@@ -42,6 +33,15 @@ The build is minified and the filenames include the hashes.\
 Your app is ready to be deployed!
 
 See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+
+### `npm start`
+
+TBD
+
+### `npm test`
+
+Launches the test runner in the interactive watch mode.\
+See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
 
 ### `npm run eject`
 

@@ -1,6 +1,6 @@
-# Getting Started with Create React App
+# AI Generated Flashcards
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+Automate the creation of flashcards for language learning using ChatGPT and DALLE.
 
 ## Available Scripts
 
@@ -8,16 +8,30 @@ In the project directory, you can run:
 
 ### `npm start`
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
-
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+TBD
 
 ### `npm test`
 
 Launches the test runner in the interactive watch mode.\
 See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+
+### `npm run start:frontend`
+
+React the React frontend code
+
+### `npm run start:backend`
+
+Runs the Node.js and Express backend code
+
+
+### `npm run lint`
+
+Run eslint to check for code quality issues
+
+
+### `npm run lint:fix`
+
+Automatically fix code quality issues identified by eslint
 
 ### `npm run build`
 

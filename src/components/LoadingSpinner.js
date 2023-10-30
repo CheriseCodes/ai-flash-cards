@@ -1,18 +1,12 @@
 import React from "react";
-import PropTypes from "prop-types";
 import Spinner from "react-bootstrap/esm/Spinner.js";
 
-const LoadingSpinner = ({ purpose }) => {
+const LoadingSpinner = () => {
   return (
     <div className="loading-spinner">
-      <span>{purpose}</span>
-      <Spinner animation="grow" variant="primary" />
+      <Spinner className="spinner" animation="grow" variant="primary" />
     </div>
   );
-};
-
-LoadingSpinner.propTypes = {
-  purpose: PropTypes.string,
 };
 
 export default LoadingSpinner;

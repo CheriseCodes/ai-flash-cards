@@ -97,6 +97,14 @@ app.get("/openai/test/imagine", async (req, res) => {
     }
   } catch (e) {
     console.error(e);
+    res.send({
+      created: 1698357296,
+      data: [
+        {
+          url: "https://m.media-amazon.com/images/I/418Jmnejj8L.jpg",
+        },
+      ],
+    });
   }
 });
 

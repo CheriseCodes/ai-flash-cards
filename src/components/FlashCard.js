@@ -2,6 +2,7 @@ import React, { useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import PropTypes from "prop-types";
 import generateCard from "../utils.js";
+import LoadingSpinner from "./LoadingSpinner.js";
 
 const FlashCard = ({ cardData }) => {
   const [enableEdit, setEnableEdit] = useState(false);
@@ -76,56 +77,56 @@ const FlashCard = ({ cardData }) => {
     console.log("e after:", e);
   };
 
-  // TODO: Use bootstrap spinner for flash card content and image
   return (
     <>
-      {!cardData.generatingText && (
-        <div
-          className={`flash-card ${
-            selected ? "selected-flashcard" : "unselected-flashcard"
-          }`}
-        >
-          <div className="flash-card-content">
-            <input
-              ref={wordRef}
-              defaultValue={cardData.word}
-              disabled={enableEdit ? "" : "disabled"}
-              className="flash-card-word"
-            ></input>
-            <textarea
-              ref={originalRef}
-              defaultValue={cardData.sampleSentence}
-              disabled={enableEdit ? "" : "disabled"}
-              className="flash-card-sentence"
-            ></textarea>
-            {!cardData.generatingImage ? (
-              <img height={250} width={250} src={cardData.img}></img>
-            ) : (
-              <p>Generating image...</p>
-            )}
-            <input
-              ref={wordTranslatedRef}
-              defaultValue={cardData.wordTranslated}
-              disabled={enableEdit ? "" : "disabled"}
-              className="flash-card-word"
-            ></input>
-            <textarea
-              ref={translationRef}
-              defaultValue={cardData.translatedSampleSentence}
-              disabled={enableEdit ? "" : "disabled"}
-              className="flash-card-sentence"
-            ></textarea>
-          </div>
-          <div className="flash-card-controls">
-            <input type="checkbox" onChange={handleSelectCard}></input>
-
-            <div onClick={handleDeletion}>X</div>
-            <p onClick={handleRegenerateCard}>Regenerate</p>
-            <p onClick={handleEdit}>Edit</p>
-          </div>
-        </div>
-      )}
-      {cardData.generatingText && <p>Generating...</p>}
+      <div
+        className={`flash-card ${
+          selected ? "selected-flashcard" : "unselected-flashcard"
+        }`}
+      >
+        {!cardData.generatingText && (
+          <>
+            <div className="flash-card-content">
+              <input
+                ref={wordRef}
+                defaultValue={cardData.word}
+                disabled={enableEdit ? "" : "disabled"}
+                className="flash-card-word"
+              ></input>
+              <textarea
+                ref={originalRef}
+                defaultValue={cardData.sampleSentence}
+                disabled={enableEdit ? "" : "disabled"}
+                className="flash-card-sentence"
+              ></textarea>
+              {!cardData.generatingImage ? (
+                <img height={250} width={250} src={cardData.img}></img>
+              ) : (
+                <LoadingSpinner />
+              )}
+              <input
+                ref={wordTranslatedRef}
+                defaultValue={cardData.wordTranslated}
+                disabled={enableEdit ? "" : "disabled"}
+                className="flash-card-word"
+              ></input>
+              <textarea
+                ref={translationRef}
+                defaultValue={cardData.translatedSampleSentence}
+                disabled={enableEdit ? "" : "disabled"}
+                className="flash-card-sentence"
+              ></textarea>
+            </div>
+            <div className="flash-card-controls">
+              <input type="checkbox" onChange={handleSelectCard}></input>
+              <div onClick={handleDeletion}>X</div>
+              <p onClick={handleRegenerateCard}>Regenerate</p>
+              <p onClick={handleEdit}>Edit</p>
+            </div>
+          </>
+        )}
+        {cardData.generatingText && <LoadingSpinner />}
+      </div>
     </>
   );
 };

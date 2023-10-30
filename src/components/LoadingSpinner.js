@@ -6,7 +6,7 @@ const LoadingSpinner = ({ purpose }) => {
   return (
     <div className="loading-spinner">
       <span>{purpose}</span>
-      <Spinner animation="grow" variant="primary" />
+      <Spinner className="spinner" animation="grow" variant="primary" />
     </div>
   );
 };

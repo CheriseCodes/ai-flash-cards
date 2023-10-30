@@ -76,6 +76,7 @@ const FlashCard = ({ cardData }) => {
     console.log("e after:", e);
   };
 
+  // TODO: Use bootstrap spinner for flash card content and image
   return (
     <>
       {!cardData.generatingText && (

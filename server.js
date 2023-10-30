@@ -86,9 +86,9 @@ app.get("/openai/test/imagine", async (req, res) => {
       created: 1698357296,
       data: [
         {
-          url: 'https://m.media-amazon.com/images/I/418Jmnejj8L.jpg'
-        }
-      ]
+          url: "https://m.media-amazon.com/images/I/418Jmnejj8L.jpg",
+        },
+      ],
     });
   }
 });

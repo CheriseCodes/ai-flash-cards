@@ -20,6 +20,9 @@ const App = () => {
   // TODO: Convert buttons into svgs
   return (
     <div className="App">
+      <div className="header">
+        <h1 className="title">AI Generated Flashcards</h1>
+      </div>
       <WordInput />
       <LanguageModeForm />
       <LanguageLevelForm />

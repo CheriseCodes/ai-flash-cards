@@ -2,7 +2,7 @@ import React, { useRef, useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import PropTypes from "prop-types";
 import generateCard from "../utils.js";
-import LoadingSpinner from "./LoadingSpinner.js";
+import Button from "react-bootstrap/esm/Button.js";
 
 const WordInput = () => {
   const languageLevel = useSelector((state) => state.languageLevel);
@@ -47,11 +47,16 @@ const WordInput = () => {
 
   return (
     <div className="word-input">
-      <form onSubmit={handleSubmit}>
+      <form>
         <input type="text" name="card-subject" ref={textAreaRef}></input>
-        {!spinner && <button>Generate Flashcards</button>}
-        <button onClick={handleDownload}>Download</button>
-        {spinner && <LoadingSpinner purpose={"Generating cards"} />}
+        <Button variant="primary" disabled={spinner} onClick={handleSubmit}>
+          {" "}
+          {spinner ? "Generating..." : "Generate"}
+        </Button>
+        <Button variant="primary" onClick={handleDownload}>
+          Download
+        </Button>
+        {/* {spinner && <LoadingSpinner purpose={"Generating cards"} />} */}
       </form>
     </div>
   );

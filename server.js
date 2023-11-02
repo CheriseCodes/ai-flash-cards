@@ -64,7 +64,6 @@ app.get("/openai/test/text", async (req, res) => {
   }
 });
 
-// TODO: Automate creating mock API responses
 // TODO: Store images in database because can't access them without being signed into OpenAI
 app.get("/openai/test/imagine", async (req, res) => {
   try {

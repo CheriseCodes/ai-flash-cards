@@ -4,7 +4,7 @@ import PropTypes from "prop-types";
 import generateCard from "../utils.js";
 import Button from "react-bootstrap/esm/Button.js";
 
-const WordInput = () => {
+const WordInput = ({ setErrors }) => {
   const languageLevel = useSelector((state) => state.languageLevel);
   const languageMode = useSelector((state) => state.languageMode);
   const [spinner, setSpinner] = useState(false);
@@ -27,11 +27,14 @@ const WordInput = () => {
         word,
         languageMode,
         languageLevel,
+        null,
+        setErrors,
       );
     }
   };
 
   const handleDownload = () => {
+    // TODO: upgrade download file
     let fileContents = "#separator:tab\n#html:true\n";
     const parsedCards = cards.map((card) => JSON.parse(card));
     const cardsToDownload = parsedCards.filter((card) => {
@@ -63,8 +66,7 @@ const WordInput = () => {
 };
 
 WordInput.propTypes = {
-  setSpinner: PropTypes.func,
-  spinner: PropTypes.bool,
+  setErrors: PropTypes.func,
 };
 
 export default WordInput;

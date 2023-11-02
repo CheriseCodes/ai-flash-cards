@@ -7,7 +7,7 @@ const LanguageLevelForm = () => {
   const languageMode = useSelector((state) => state.languageMode);
   return (
     <div className="language-form">
-      <h2>Target Language</h2>
+      <h2>Target Level</h2>
       {languageMode === appConfig.languageModes.KOREAN && (
         <form>
           <div className="language-level-container">

@@ -26,6 +26,9 @@
   justify-content: center;
   align-items: center;
   padding: 25px;
+  background-color: #F4F8FF;
+  border-radius: 10px;
+  border: 2px solid #AEB4BE;
 }
 
 .flash-card-container {
@@ -36,12 +39,12 @@
 
 .language-mode-container {
   display: flex;
-  justify-content: space-between;
+  justify-content: flex-start;
 }
 
 .language-level-container {
   display: flex;
-  justify-content: space-between;
+  justify-content: flex-start;
 }
 
 .word-input {
@@ -91,7 +94,26 @@
   margin-left: 5px;
 }
 
+.language-mode-form-input {
+  width: 15%;
+}
+
+.language-form-input {
+  width: 15%;
+}
+
 .language-mode-form-input label {
   font-size: 20px;
   margin-left: 5px;
+}
+
+.flash-card-form {
+  width: 100%;
+  width: 100%;
+  background-color: rgb(232,240,254);
+  border-radius: 15px;
+}
+
+.instructions-container {
+  padding: 15px
 }

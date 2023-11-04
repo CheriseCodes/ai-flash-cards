@@ -16,10 +16,6 @@ Resources:
       KeySchema:
         - AttributeName: User
           KeyType: HASH
-        - AttributeName: TimeStamp
-          KeyType: RANGE
       AttributeDefinitions:
         - AttributeName: User
-          AttributeType: S
-        - AttributeName: TimeStamp
           AttributeType: S

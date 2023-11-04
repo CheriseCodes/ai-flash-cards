@@ -4,7 +4,7 @@ import PropTypes from "prop-types";
 import generateCard from "../utils.js";
 import Button from "react-bootstrap/esm/Button.js";
 
-const WordInput = ({ setErrors }) => {
+const WordInput = ({ setErrors, userId }) => {
   const languageLevel = useSelector((state) => state.languageLevel);
   const languageMode = useSelector((state) => state.languageMode);
   const [spinner, setSpinner] = useState(false);
@@ -29,6 +29,7 @@ const WordInput = ({ setErrors }) => {
         languageLevel,
         null,
         setErrors,
+        userId,
       );
     }
   };
@@ -67,6 +68,7 @@ const WordInput = ({ setErrors }) => {
 
 WordInput.propTypes = {
   setErrors: PropTypes.func,
+  userId: PropTypes.string,
 };
 
 export default WordInput;

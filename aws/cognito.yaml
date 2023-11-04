@@ -2,7 +2,7 @@ AWSTemplateFormatVersion: "2010-09-09"
 Description: Amazon Cognito resources for managing users
 
 # TODO: Policies? Schema? UserPoolAddOns?
-
+# Needed for limiting access to S3 items by userid
 Resources:
   FlashCardAppUserPool:
     Type: AWS::Cognito::UserPool

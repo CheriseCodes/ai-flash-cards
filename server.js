@@ -1,12 +1,16 @@
 import express from "express";
-//import axios from "axios";
+import bodyParser from "body-parser";
 import OpenAI from "openai";
 import cors from "cors";
 
 import { open } from "node:fs/promises";
 
 import { PutObjectCommand, S3Client } from "@aws-sdk/client-s3";
-import { DynamoDBClient, ListTablesCommand } from "@aws-sdk/client-dynamodb";
+import {
+  DynamoDBClient,
+  PutItemCommand,
+  UpdateItemCommand,
+} from "@aws-sdk/client-dynamodb";
 import { fromSSO } from "@aws-sdk/credential-providers";
 
 import appConfig from "./src/config.js";
@@ -23,19 +27,27 @@ const dynamoDbClient = new DynamoDBClient({
 const PORT = 8000;
 const app = express();
 app.use(cors());
+app.use(bodyParser.urlencoded({ extended: true }));
+app.use(bodyParser.json());
 
 // TODO: Store generated responses in a database
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
 });
 
-app.get("/openai/test/text", async (req, res) => {
+// TODO: 3rd endpoint to store image in S3 and replace the ImageLink in the DynamoDB table
+//       with the s3 url
+app.post("/openai/test/text", async (req, res) => {
   try {
     const wordsToSearch = Array.isArray(req.query.word)
       ? req.query.word
       : [req.query.word];
     const targetLanguage = req.query.lang_mode;
     let targetLevel = req.query.lang_level;
+    const userId = req.body.userId;
+    const cardId = req.body.cardId;
+    const timeStamp = req.body.timeStamp;
+    console.log("userid", userId, "cardid", cardId, "timeStamp", timeStamp);
     const messages = [];
     let cert = " ";
     if (targetLanguage === appConfig.languageModes.SPANISH) {
@@ -69,10 +81,31 @@ app.get("/openai/test/text", async (req, res) => {
       temperature: 1,
       messages,
     });
-    if (response?.id) {
+    console.log(response.choices[0].message.content);
+    if (response.id) {
       console.log(response.choices[0].message.content);
-      // res.send(response.choices[0].message.content);
       res.send(response);
+      const awsInput = {
+        Item: {
+          User: { S: userId },
+          TimeStamp: { S: new String(timeStamp) },
+          FlashCard: { S: cardId },
+          TextCompletionCreated: { N: new String(response.created) },
+          TextPrompt: { S: messages[0].content },
+          TextModel: { S: "gpt-3.5-turbo" },
+          Content: { S: response.choices[0].message.content },
+          FinishReason: { S: response.choices[0].finish_reason },
+          PromptTokens: { N: new String(response.usage.prompt_tokens) },
+          CompletionTokens: { N: new String(response.usage.completion_tokens) },
+          TotalTokens: { N: new String(response.usage.total_tokens) },
+        },
+        TableName: "FlashCardGenAITable",
+      };
+
+      console.log(awsInput);
+      const awsCommand = new PutItemCommand(awsInput);
+      const awsResponse = await dynamoDbClient.send(awsCommand);
+      console.log(awsResponse);
     }
   } catch (err) {
     console.error(err);
@@ -80,24 +113,50 @@ app.get("/openai/test/text", async (req, res) => {
 });
 
 // TODO: Store images in database because can't access them without being signed into OpenAI
-app.get("/openai/test/imagine", async (req, res) => {
+app.post("/openai/test/imagine", async (req, res) => {
   try {
     const sentenceToVisualize = req.query.sentence;
+    const userId = req.body.userId;
+    const cardId = req.body.cardId;
     console.log("visualizing...", sentenceToVisualize);
     // TODO: Try add more American illustrators - https://www.christies.com/en/stories/that-s-america-a-collector-s-guide-to-american-il-a870d242cd3a4c6784cd603427d4d83a
+    const prompt = `${sentenceToVisualize}, Norman Rockwell illustration style, Claude Monet painting style, vibrant colors, realistic, London, Toronto, Melbourne, Cape Town, Shanghai`;
     const response = await openai.images.generate({
-      prompt: `${sentenceToVisualize}, Norman Rockwell illustration style, Claude Monet painting style, vibrant colors, realistic, London, Toronto, Melbourne, Cape Town, Shanghai`,
+      prompt: prompt,
       n: 1,
       size: "256x256",
     });
     console.log(response);
     if (response?.created) {
       res.send(response);
+      const input = {
+        Key: { User: { S: userId } },
+        // Item: {
+        //   User: userId,
+        //   ImageCreated: response.created,
+        //   ImagePrompt: prompt,
+        //   ImageModel: "DALLE2",
+        //   ImageLink: response.data[0].url,
+        // },
+        ConditionExpression: `attribute_exists(FlashCard) AND FlashCard = '${cardId}'`,
+        TableName: "FlashCardGenAITable",
+        UpdateExpression:
+          "SET ImageCreated = :imgc, ImagePrompt = :imgp, ImageModel = :imgm, ImageLink = :imgl",
+        ExpressionAttributeValues: {
+          ":imgc": { N: new String(response.created) },
+          ":imgp": { S: prompt },
+          ":imgm": { S: "DALLE2" },
+          ":imgl": { S: response.data[0].url },
+        },
+        ReturnValues: "ALL_NEW",
+      };
+      const command = new UpdateItemCommand(input);
+      const awsResponse = await dynamoDbClient.send(command);
     }
   } catch (e) {
     console.error(e);
     res.send({
-      created: 1698357296,
+      created: 400,
       data: [
         {
           url: "https://m.media-amazon.com/images/I/418Jmnejj8L.jpg",

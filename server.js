@@ -130,7 +130,7 @@ app.post("/openai/test/imagine", async (req, res) => {
     if (response?.created) {
       res.send(response);
       const input = {
-        Key: { User: { S: userId } },
+        Key: { FlashCard: { S: cardId } },
         // Item: {
         //   User: userId,
         //   ImageCreated: response.created,
@@ -138,7 +138,7 @@ app.post("/openai/test/imagine", async (req, res) => {
         //   ImageModel: "DALLE2",
         //   ImageLink: response.data[0].url,
         // },
-        ConditionExpression: `attribute_exists(FlashCard) AND FlashCard = '${cardId}'`,
+        // ConditionExpression: `attribute_exists(FlashCard) AND FlashCard = '${cardId}'`,
         TableName: "FlashCardGenAITable",
         UpdateExpression:
           "SET ImageCreated = :imgc, ImagePrompt = :imgp, ImageModel = :imgm, ImageLink = :imgl",

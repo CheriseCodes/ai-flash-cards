@@ -19,3 +19,16 @@ Resources:
       AttributeDefinitions:
         - AttributeName: FlashCard
           AttributeType: S
+        - AttributeName: User
+          AttributeType: S
+      GlobalSecondaryIndexes:
+        - IndexName: User
+          KeySchema: 
+            - AttributeName: User
+              KeyType: HASH
+          Projection: 
+            ProjectionType: ALL
+          ProvisionedThroughput: 
+            ReadCapacityUnits: 1
+            WriteCapacityUnits: 1
+

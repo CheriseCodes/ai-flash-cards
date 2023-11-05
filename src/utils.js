@@ -9,6 +9,7 @@ const generateCard = async (
   languageLevel,
   cardData,
   setErrors,
+  userId,
 ) => {
   console.log(`App.generateCard - word: ${word}`);
   if (isNewCard) {
@@ -17,6 +18,7 @@ const generateCard = async (
         setSpinner(true);
         // add empty card with id
         const cardId = uuidv4();
+        const timeStamp = Date.now();
         dispatch({
           type: "add-card",
           cardData: {
@@ -29,8 +31,21 @@ const generateCard = async (
         try {
           const response = await fetch(
             `http://localhost:8000/openai/test/text?word=${word}&lang_mode=${languageMode}&lang_level=${languageLevel}`,
+            {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify({
+                userId: userId,
+                cardId: cardId,
+                timeStamp: timeStamp,
+              }),
+            },
           );
+          console.log("Sent request data, received:", JSON.stringify(response));
           const json = await response.json();
+          console.log("Received data");
           cardData = json.choices[0].message.content; // stringified JSON
           cardData = JSON.parse(cardData);
           cardData.wordTranslated = cardData.wordTranslated.toLowerCase();
@@ -40,6 +55,16 @@ const generateCard = async (
           dispatch({ type: "update-card", cardData: cardData, cardId: cardId });
           const imageResponse = await fetch(
             `http://localhost:8000/openai/test/imagine?sentence=${cardData.translatedSampleSentence}`,
+            {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify({
+                userId: userId,
+                cardId: cardId,
+              }),
+            },
           );
           const imageJson = await imageResponse.json();
           cardData.img = imageJson.data[0].url;
@@ -52,6 +77,7 @@ const generateCard = async (
             cardData: cardData,
             cardId: cardId,
           });
+          // TODO: 3rd fetch to persist the image in s3 and update references with persisted url
         } catch (e) {
           dispatch({ type: "delete-card", cardId: cardId });
           const errItem = { id: uuidv4(), message: e.message };
@@ -69,16 +95,30 @@ const generateCard = async (
     }
   } else {
     const cardId = cardData.id;
+    const timeStamp = Date.now();
     try {
       dispatch({ type: "toggle-generating-text", cardId: cardId });
       const textGenUrl = `http://localhost:8000/openai/test/text?word=${word}&lang_mode=${languageMode}&lang_level=${languageLevel}`;
       console.log(`FlashCard.handleRegenerateCard - ${textGenUrl}`);
       let content;
       try {
-        const response = await fetch(textGenUrl);
+        const response = await fetch(textGenUrl, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            userId: userId,
+            cardId: cardId,
+            timeStamp: timeStamp,
+          }),
+        });
+        console.log(response);
         const json = await response.json();
+        console.log(json);
         content = json.choices[0].message.content;
-        cardData = JSON.parse(cardData);
+        console.log(cardData);
+        // cardData = JSON.parse(cardData);
         const generatedCardData = JSON.parse(content);
         let newCardData = {
           id: cardId,
@@ -95,7 +135,16 @@ const generateCard = async (
           cardData: newCardData,
         });
         const imageGenUrl = `http://localhost:8000/openai/test/imagine?sentence=${generatedCardData.translatedSampleSentence}`;
-        const imageResponse = await fetch(imageGenUrl);
+        const imageResponse = await fetch(imageGenUrl, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            userId: userId,
+            cardId: cardId,
+          }),
+        });
         const imageJson = await imageResponse.json();
         console.log(
           `newCardData JSON - ${generatedCardData.sampleSentence}, ${generatedCardData.translatedSampleSentence}`,

@@ -5,7 +5,7 @@ import generateCard from "../utils.js";
 import LoadingSpinner from "./LoadingSpinner.js";
 import CloseButton from "react-bootstrap/esm/CloseButton.js";
 
-const FlashCard = ({ cardData, setErrors }) => {
+const FlashCard = ({ cardData, setErrors, userId }) => {
   const [enableEdit, setEnableEdit] = useState(false);
   const [selected, setSelected] = useState(false);
 
@@ -30,6 +30,7 @@ const FlashCard = ({ cardData, setErrors }) => {
       languageLevel,
       cardData,
       setErrors,
+      userId,
     );
   };
 
@@ -165,6 +166,7 @@ const FlashCard = ({ cardData, setErrors }) => {
 FlashCard.propTypes = {
   cardData: PropTypes.object,
   setErrors: PropTypes.func,
+  userId: PropTypes.string,
 };
 
 export default FlashCard;

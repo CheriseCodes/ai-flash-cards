@@ -9,6 +9,7 @@ import ErrorBanner from "./components/ErrorBanner.js";
 const App = () => {
   const cards = useSelector((state) => state.cards);
   const [errors, setErrors] = useState([]);
+  const userId = "default";
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -21,7 +22,7 @@ const App = () => {
       <div className="header">
         <h1 className="title">AI Generated Flashcards</h1>
       </div>
-      <WordInput setErrors={setErrors} />
+      <WordInput setErrors={setErrors} userId={userId} />
       <LanguageModeForm />
       <LanguageLevelForm />
       {errors.map((e) => (
@@ -57,6 +58,7 @@ const App = () => {
               key={JSON.parse(cardData).id}
               cardData={JSON.parse(cardData)}
               setErrors={setErrors}
+              userId={userId}
             />
           ))}
         </div>

@@ -14,12 +14,8 @@ Resources:
         AttributeName: TimeToLive
         Enabled: true
       KeySchema:
-        - AttributeName: User
+        - AttributeName: FlashCard
           KeyType: HASH
-        - AttributeName: TimeStamp
-          KeyType: RANGE
       AttributeDefinitions:
-        - AttributeName: User
-          AttributeType: S
-        - AttributeName: TimeStamp
+        - AttributeName: FlashCard
           AttributeType: S

@@ -2,6 +2,8 @@
 
 Automate the creation of flashcards for language learning using ChatGPT and DALLE.
 
+https://github.com/CheriseCodes/ai-flash-cards/assets/51966982/5490d4e2-5236-44e5-9f5a-df0df65caeb9
+
 ## Available Scripts
 
 In the project directory, you can run:

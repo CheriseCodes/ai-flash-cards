@@ -131,14 +131,6 @@ app.post("/openai/test/imagine", async (req, res) => {
       res.send(response);
       const input = {
         Key: { FlashCard: { S: cardId } },
-        // Item: {
-        //   User: userId,
-        //   ImageCreated: response.created,
-        //   ImagePrompt: prompt,
-        //   ImageModel: "DALLE2",
-        //   ImageLink: response.data[0].url,
-        // },
-        // ConditionExpression: `attribute_exists(FlashCard) AND FlashCard = '${cardId}'`,
         TableName: "FlashCardGenAITable",
         UpdateExpression:
           "SET ImageCreated = :imgc, ImagePrompt = :imgp, ImageModel = :imgm, ImageLink = :imgl",
@@ -228,5 +220,8 @@ app.get("/aws/test", async (req, res) => {
     console.error(e);
   }
 });
+
+// TODO: Add method for retrieving all the items in the database that belong to
+//       a single user
 
 app.listen(PORT, () => console.log("server is running on port " + PORT));

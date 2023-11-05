@@ -14,17 +14,17 @@ Resources:
         AttributeName: TimeToLive
         Enabled: true
       KeySchema:
-        - AttributeName: FlashCard
+        - AttributeName: FlashCardId
           KeyType: HASH
       AttributeDefinitions:
-        - AttributeName: FlashCard
+        - AttributeName: FlashCardId
           AttributeType: S
-        - AttributeName: User
+        - AttributeName: UserId
           AttributeType: S
       GlobalSecondaryIndexes:
-        - IndexName: User
+        - IndexName: UserId
           KeySchema: 
-            - AttributeName: User
+            - AttributeName: UserId
               KeyType: HASH
           Projection: 
             ProjectionType: ALL

@@ -87,9 +87,9 @@ app.post("/openai/test/text", async (req, res) => {
       res.send(response);
       const awsInput = {
         Item: {
-          User: { S: userId },
+          UserId: { S: userId },
           TimeStamp: { S: new String(timeStamp) },
-          FlashCard: { S: cardId },
+          FlashCardId: { S: cardId },
           TextCompletionCreated: { N: new String(response.created) },
           TextPrompt: { S: messages[0].content },
           TextModel: { S: "gpt-3.5-turbo" },
@@ -130,7 +130,7 @@ app.post("/openai/test/imagine", async (req, res) => {
     if (response?.created) {
       res.send(response);
       const input = {
-        Key: { FlashCard: { S: cardId } },
+        Key: { FlashCardId: { S: cardId } },
         TableName: "FlashCardGenAITable",
         UpdateExpression:
           "SET ImageCreated = :imgc, ImagePrompt = :imgp, ImageModel = :imgm, ImageLink = :imgl",

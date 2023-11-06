@@ -3,7 +3,8 @@ import bodyParser from "body-parser";
 import OpenAI from "openai";
 import cors from "cors";
 
-import { open } from "node:fs/promises";
+import { open, rm } from "node:fs/promises";
+import https from "https";
 
 import { PutObjectCommand, S3Client } from "@aws-sdk/client-s3";
 import {
@@ -186,7 +187,16 @@ app.get("/openai-test", async (req, res) => {
 });
 
 app.get("/download/dalle", async (req, res) => {
-  res.send({ Hello: "World" });
+  const imgUrl = "https://oaidalleapiprodscus.blob.core.windows.net/private/..."
+  https.get(imgUrl, async (res) => {
+    const fd = await open('download2.png','w');
+    res.pipe(fd.createWriteStream())
+    setTimeout(() => {
+      rm('download2.png');
+    }, 5000);
+  });
+  
+  res.send({status: 201})
 });
 
 app.get("/aws/test", async (req, res) => {
@@ -223,5 +233,13 @@ app.get("/aws/test", async (req, res) => {
 
 // TODO: Add method for retrieving all the items in the database that belong to
 //       a single user
+// CLI command: aws dynamodb query --table-name FlashCardGenAITable --index-name UserId --select ALL_ATTRIBUTES --key-condition-expression "UserId = :u" --expression-attribute-values '{ ":u": {"S" : "default"}}' --profile $AWS_PROFILE
+app.get("/users/:u/flashcards", async (req, res) => {
+  try {
+    console.log(req,res)
+  } catch (e) {
+    console.error(e);
+  }
+});
 
 app.listen(PORT, () => console.log("server is running on port " + PORT));

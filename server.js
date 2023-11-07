@@ -190,7 +190,7 @@ app.get("/openai-test", async (req, res) => {
 const createPresignedUrlWithClient = ({ client, bucket, key }) => {
   const command = new GetObjectCommand({ Bucket: bucket, Key: key });
   return getSignedUrl(client, command, { expiresIn: 3600 });
-}; 
+};
 
 app.get("/download/dalle", async (req, res) => {
   const imgUrl =
@@ -228,8 +228,12 @@ app.get("/aws/test", async (req, res) => {
     const command = new PutObjectCommand(input);
     const s3Response = await s3Client.send(command);
     console.log(s3Response);
-    const signedUrl = await createPresignedUrlWithClient({client: s3Client, bucket:"openai-dalle-s3-40d44616",key: "users/default/images/img.png" })
-    res.send({url: signedUrl});
+    const signedUrl = await createPresignedUrlWithClient({
+      client: s3Client,
+      bucket: "openai-dalle-s3-40d44616",
+      key: "users/default/images/img.png",
+    });
+    res.send({ url: signedUrl });
     // stream.close();
     // setTimeout(() => {
     //   rm("download2.png");

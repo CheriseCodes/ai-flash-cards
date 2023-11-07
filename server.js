@@ -4,9 +4,10 @@ import OpenAI from "openai";
 import cors from "cors";
 
 import { open, rm } from "node:fs/promises";
+import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 import https from "https";
 
-import { PutObjectCommand, S3Client } from "@aws-sdk/client-s3";
+import { GetObjectCommand, S3Client } from "@aws-sdk/client-s3";
 import {
   DynamoDBClient,
   PutItemCommand,
@@ -186,45 +187,53 @@ app.get("/openai-test", async (req, res) => {
   }
 });
 
+const createPresignedUrlWithClient = ({ client, bucket, key }) => {
+  const command = new GetObjectCommand({ Bucket: bucket, Key: key });
+  return getSignedUrl(client, command, { expiresIn: 3600 });
+}; 
+
 app.get("/download/dalle", async (req, res) => {
-  const imgUrl = "https://oaidalleapiprodscus.blob.core.windows.net/private/..."
+  const imgUrl =
+    "https://oaidalleapiprodscus.blob.core.windows.net/private/...";
   https.get(imgUrl, async (res) => {
-    const fd = await open('download2.png','w');
-    res.pipe(fd.createWriteStream())
+    const fd = await open("download2.png", "w");
+    res.pipe(fd.createWriteStream());
     setTimeout(() => {
-      rm('download2.png');
+      rm("download2.png");
     }, 5000);
   });
-  
-  res.send({status: 201})
+
+  res.send({ status: 201 });
 });
 
 app.get("/aws/test", async (req, res) => {
   try {
+    // Download image
+    const imgUrl =
+      "https://oaidalleapiprodscus.blob.core.windows.net/private/...";
+    https.get(imgUrl, async (res) => {
+      const fdWrite = await open("download2.png", "w");
+      res.pipe(fdWrite.createWriteStream());
+    });
     // Read content of downloaded file
-    const fd = await open("/home/image.png");
+    const fdRead = await open("download2.png");
     // Create a stream from some character device.
-    const stream = fd.createReadStream();
+    const stream = fdRead.createReadStream();
     const input = {
       // PutObjectRequest
       Body: stream,
       Bucket: "bucket_name", // required
-      Key: "image.png", // required
+      Key: "image-2023-11-6.png", // required
     };
-    // const command = new ListTablesCommand(input)
-    // const response = await dynamoDbClient.send(command);
     const command = new PutObjectCommand(input);
-    const response = await s3Client.send(command);
-
-    res.send(response);
-    stream.close(); // This may not close the stream.
-    // Artificially marking end-of-stream, as if the underlying resource had
-    // indicated end-of-file by itself, allows the stream to close.
-    // This does not cancel pending read operations, and if there is such an
-    // operation, the process may still not be able to exit successfully
-    // until it finishes.
-    // stream.push(null);
-    // stream.read(0);
+    const s3Response = await s3Client.send(command);
+    console.log(s3Response);
+    const signedUrl = await createPresignedUrlWithClient({client: s3Client, bucket:"openai-dalle-s3-40d44616",key: "users/default/images/img.png" })
+    res.send({url: signedUrl});
+    // stream.close();
+    // setTimeout(() => {
+    //   rm("download2.png");
+    // }, 5000);
   } catch (e) {
     res.send(e);
     console.error(e);
@@ -236,7 +245,7 @@ app.get("/aws/test", async (req, res) => {
 // CLI command: aws dynamodb query --table-name FlashCardGenAITable --index-name UserId --select ALL_ATTRIBUTES --key-condition-expression "UserId = :u" --expression-attribute-values '{ ":u": {"S" : "default"}}' --profile $AWS_PROFILE
 app.get("/users/:u/flashcards", async (req, res) => {
   try {
-    console.log(req,res)
+    console.log(req, res);
   } catch (e) {
     console.error(e);
   }

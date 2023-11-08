@@ -7,7 +7,7 @@ import { open, rm } from "node:fs/promises";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 import https from "https";
 
-import { GetObjectCommand, S3Client } from "@aws-sdk/client-s3";
+import { PutObjectCommand, GetObjectCommand, S3Client } from "@aws-sdk/client-s3";
 import {
   DynamoDBClient,
   PutItemCommand,
@@ -210,7 +210,7 @@ app.get("/aws/test", async (req, res) => {
   try {
     // Download image
     const imgUrl =
-      "https://oaidalleapiprodscus.blob.core.windows.net/private/...";
+      "https://bloximages.chicago2.vip.townnews.com/thestar.com/content/tncms/assets/v3/editorial/3/21/32144b8c-86ef-57cf-9e76-31e23c3e5a90/65497736de5cd.image.jpg?resize=1200%2C660";
     https.get(imgUrl, async (res) => {
       const fdWrite = await open("download2.png", "w");
       res.pipe(fdWrite.createWriteStream());
@@ -222,8 +222,8 @@ app.get("/aws/test", async (req, res) => {
     const input = {
       // PutObjectRequest
       Body: stream,
-      Bucket: "bucket_name", // required
-      Key: "image-2023-11-6.png", // required
+      Bucket: "openai-dalle-s3-40d44616", // required
+      Key: "users/default/images/img.png", // required
     };
     const command = new PutObjectCommand(input);
     const s3Response = await s3Client.send(command);

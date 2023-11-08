@@ -228,16 +228,14 @@ app.get("/aws/test", async (req, res) => {
     const command = new PutObjectCommand(input);
     const s3Response = await s3Client.send(command);
     console.log(s3Response);
+    stream.close();
     const signedUrl = await createPresignedUrlWithClient({
       client: s3Client,
       bucket: "openai-dalle-s3-40d44616",
       key: "users/default/images/img.png",
     });
     res.send({ url: signedUrl });
-    // stream.close();
-    // setTimeout(() => {
-    //   rm("download2.png");
-    // }, 5000);
+    rm("download2.png");
   } catch (e) {
     res.send(e);
     console.error(e);

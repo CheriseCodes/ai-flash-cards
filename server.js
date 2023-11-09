@@ -17,6 +17,7 @@ import {
 import { fromSSO } from "@aws-sdk/credential-providers";
 
 import appConfig from "./src/config.js";
+import { nextTick } from "node:process";
 
 const s3Client = new S3Client({
   credentials: fromSSO({ profile: process.env.AWS_PROFILE }),
@@ -207,36 +208,41 @@ app.get("/download/dalle", async (req, res) => {
   res.send({ status: 201 });
 });
 
-app.get("/aws/test", async (req, res) => {
+app.post("/aws/test", async (req, res) => {
   try {
     // Download image
-    const imgUrl =
-      "https://bloximages.chicago2.vip.townnews.com/thestar.com/content/tncms/assets/v3/editorial/3/21/32144b8c-86ef-57cf-9e76-31e23c3e5a90/65497736de5cd.image.jpg?resize=1200%2C660";
+    const imgUrl = req.body.imgUrl;
+    const localFileName = "./private/images/download.png";
+    const remoteFileName = "users/default/images/img3.png";
+    console.log(imgUrl);
+
     https.get(imgUrl, async (res) => {
-      const fdWrite = await open("download2.png", "w");
-      res.pipe(fdWrite.createWriteStream());
+      const fdWrite = await open(localFileName, "w");
+      const writeStream = res.pipe(fdWrite.createWriteStream());
+      writeStream.on('finish', async () => {
+        // Read content of downloaded file
+        const fdRead = await open(localFileName);
+        // Create a stream from some character device.
+        const stream = fdRead.createReadStream();
+        const input = {
+          // PutObjectRequest
+          Body: stream,
+          Bucket: "openai-dalle-s3-40d44616", // required
+          Key: remoteFileName, // required
+        };
+        const command = new PutObjectCommand(input);
+        const s3Response = await s3Client.send(command);
+        console.log(s3Response);
+        stream.close();
+      });
     });
-    // Read content of downloaded file
-    const fdRead = await open("download2.png");
-    // Create a stream from some character device.
-    const stream = fdRead.createReadStream();
-    const input = {
-      // PutObjectRequest
-      Body: stream,
-      Bucket: "openai-dalle-s3-40d44616", // required
-      Key: "users/default/images/img.png", // required
-    };
-    const command = new PutObjectCommand(input);
-    const s3Response = await s3Client.send(command);
-    console.log(s3Response);
-    stream.close();
     const signedUrl = await createPresignedUrlWithClient({
       client: s3Client,
       bucket: "openai-dalle-s3-40d44616",
-      key: "users/default/images/img.png",
+      key: remoteFileName,
     });
     res.send({ url: signedUrl });
-    rm("download2.png");
+    rm(localFileName);
   } catch (e) {
     res.send(e);
     console.error(e);

@@ -7,7 +7,11 @@ import { open, rm } from "node:fs/promises";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 import https from "https";
 
-import { PutObjectCommand, GetObjectCommand, S3Client } from "@aws-sdk/client-s3";
+import {
+  PutObjectCommand,
+  GetObjectCommand,
+  S3Client,
+} from "@aws-sdk/client-s3";
 import {
   DynamoDBClient,
   PutItemCommand,
@@ -219,7 +223,7 @@ app.post("/aws/test", async (req, res) => {
     https.get(imgUrl, async (res) => {
       const fdWrite = await open(localFileName, "w");
       const writeStream = res.pipe(fdWrite.createWriteStream());
-      writeStream.on('finish', async () => {
+      writeStream.on("finish", async () => {
         // Read content of downloaded file
         const fdRead = await open(localFileName);
         // Create a stream from some character device.
@@ -251,13 +255,13 @@ app.post("/aws/test", async (req, res) => {
 
 app.post("/flashcards", async (req, res) => {
   try {
-    const userId =  req.body.userId;
+    const userId = req.body.userId;
     const input = {
       TableName: "FlashCardGenAITable",
       IndexName: "UserId",
       Select: "ALL_ATTRIBUTES",
       KeyConditionExpression: "UserId = :u",
-      ExpressionAttributeValues: { ":u": {S : userId}}
+      ExpressionAttributeValues: { ":u": { S: userId } },
     };
     const command = new QueryCommand(input);
     const awsResponse = await dynamoDbClient.send(command);

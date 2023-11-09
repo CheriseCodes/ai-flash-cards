@@ -12,6 +12,7 @@ import {
   DynamoDBClient,
   PutItemCommand,
   UpdateItemCommand,
+  QueryCommand,
 } from "@aws-sdk/client-dynamodb";
 import { fromSSO } from "@aws-sdk/credential-providers";
 
@@ -242,12 +243,19 @@ app.get("/aws/test", async (req, res) => {
   }
 });
 
-// TODO: Add method for retrieving all the items in the database that belong to
-//       a single user
-// CLI command: aws dynamodb query --table-name FlashCardGenAITable --index-name UserId --select ALL_ATTRIBUTES --key-condition-expression "UserId = :u" --expression-attribute-values '{ ":u": {"S" : "default"}}' --profile $AWS_PROFILE
-app.get("/users/:u/flashcards", async (req, res) => {
+app.post("/flashcards", async (req, res) => {
   try {
-    console.log(req, res);
+    const userId =  req.body.userId;
+    const input = {
+      TableName: "FlashCardGenAITable",
+      IndexName: "UserId",
+      Select: "ALL_ATTRIBUTES",
+      KeyConditionExpression: "UserId = :u",
+      ExpressionAttributeValues: { ":u": {S : userId}}
+    };
+    const command = new QueryCommand(input);
+    const awsResponse = await dynamoDbClient.send(command);
+    res.send(awsResponse.Items);
   } catch (e) {
     console.error(e);
   }

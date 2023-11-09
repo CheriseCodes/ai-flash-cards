@@ -198,20 +198,6 @@ const createPresignedUrlWithClient = ({ client, bucket, key }) => {
   return getSignedUrl(client, command, { expiresIn: 3600 });
 };
 
-app.get("/download/dalle", async (req, res) => {
-  const imgUrl =
-    "https://oaidalleapiprodscus.blob.core.windows.net/private/...";
-  https.get(imgUrl, async (res) => {
-    const fd = await open("download2.png", "w");
-    res.pipe(fd.createWriteStream());
-    setTimeout(() => {
-      rm("download2.png");
-    }, 5000);
-  });
-
-  res.send({ status: 201 });
-});
-
 app.post("/aws/test", async (req, res) => {
   try {
     // Download image
@@ -259,9 +245,11 @@ app.post("/flashcards", async (req, res) => {
     const input = {
       TableName: "FlashCardGenAITable",
       IndexName: "UserId",
-      Select: "ALL_ATTRIBUTES",
+      Select: "SPECIFIC_ATTRIBUTES",
       KeyConditionExpression: "UserId = :u",
       ExpressionAttributeValues: { ":u": { S: userId } },
+      ProjectionExpression: "#T, FlashCardId, Content, ImageLink",
+      ExpressionAttributeNames: {"#T" : "TimeStamp" },
     };
     const command = new QueryCommand(input);
     const awsResponse = await dynamoDbClient.send(command);

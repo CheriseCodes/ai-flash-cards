@@ -198,7 +198,8 @@ const createPresignedUrlWithClient = ({ client, bucket, key }) => {
   return getSignedUrl(client, command, { expiresIn: 3600 });
 };
 
-app.post("/aws/test", async (req, res) => {
+// TODO: Test functionality with error image
+app.post("/upload/image", async (req, res) => {
   try {
     // Download image
     const imgUrl = req.body.imgUrl;

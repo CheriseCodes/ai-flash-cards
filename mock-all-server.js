@@ -56,6 +56,34 @@ app.post("/openai/test/imagine", async (req, res) => {
 });
 
 app.post("/flashcards", async (req, res) => {
+  res.send({data: []})
+});
+
+app.post("/upload/image", async (req, res) => {
+  try {
+    // Download image
+    const imgUrl = req.body.imgUrl;
+    const localFileName = "./private/images/download.png";
+    console.log(imgUrl);
+
+    https.get(imgUrl, async (res) => {
+      const fdWrite = await open(localFileName, "w");
+      const writeStream = res.pipe(fdWrite.createWriteStream());
+      writeStream.on("finish", async () => {
+        // Read content of downloaded file
+        const fdRead = await open(localFileName);
+        // Create a stream from some character device.
+        const stream = fdRead.createReadStream();
+        stream.close();
+      });
+    });
+    const signedUrl = imgUrl
+    res.send({ url: signedUrl });
+    rm(localFileName);
+  } catch (e) {
+    res.send(e);
+    console.error(e);
+  }
 });
 
 app.listen(PORT, () => console.log("server is running on port " + PORT));

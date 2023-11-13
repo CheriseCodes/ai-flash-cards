@@ -3,30 +3,15 @@ import bodyParser from "body-parser";
 import OpenAI from "openai";
 import cors from "cors";
 
-import { open, rm } from "node:fs/promises";
-import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
-import https from "https";
-
-import {
-  PutObjectCommand,
-  GetObjectCommand,
-  S3Client,
-} from "@aws-sdk/client-s3";
 import {
   DynamoDBClient,
   PutItemCommand,
   UpdateItemCommand,
-  QueryCommand,
 } from "@aws-sdk/client-dynamodb";
 import { fromSSO } from "@aws-sdk/credential-providers";
 
 import appConfig from "./src/config.js";
-import { nextTick } from "node:process";
 
-const s3Client = new S3Client({
-  credentials: fromSSO({ profile: process.env.AWS_PROFILE }),
-  region: "ca-central-1",
-});
 const dynamoDbClient = new DynamoDBClient({
   credentials: fromSSO({ profile: process.env.AWS_PROFILE }),
   region: "ca-central-1",
@@ -163,100 +148,6 @@ app.post("/openai/test/imagine", async (req, res) => {
         },
       ],
     });
-  }
-});
-
-app.get("/openai-test", async (req, res) => {
-  try {
-    const wordToSearch = req.query.word;
-    const mockJson = {
-      id: wordToSearch,
-      object: "chat.completion",
-      created: 1690999999,
-      model: "gpt-3.5-turbo-0613",
-      choices: [
-        {
-          index: 0,
-          message: {
-            role: "assistant",
-            content:
-              '{"word": "먹다","kr": "오늘 저녁에 친구랑 먹다가 영화를 볼 계획이에요.","en": "I plan to eat with my friend tonight and watch a movie."}',
-          },
-          finish_reason: "stop",
-        },
-      ],
-      usage: { prompt_tokens: 77, completion_tokens: 61, total_tokens: 138 },
-    };
-    res.json(mockJson);
-  } catch (e) {
-    console.error(e);
-  }
-});
-
-const createPresignedUrlWithClient = ({ client, bucket, key }) => {
-  const command = new GetObjectCommand({ Bucket: bucket, Key: key });
-  return getSignedUrl(client, command, { expiresIn: 3600 });
-};
-
-// TODO: Test functionality with error image
-app.post("/upload/image", async (req, res) => {
-  try {
-    // Download image
-    const imgUrl = req.body.imgUrl;
-    const localFileName = "./private/images/download.png";
-    const remoteFileName = "users/default/images/img3.png";
-    console.log(imgUrl);
-
-    https.get(imgUrl, async (res) => {
-      const fdWrite = await open(localFileName, "w");
-      const writeStream = res.pipe(fdWrite.createWriteStream());
-      writeStream.on("finish", async () => {
-        // Read content of downloaded file
-        const fdRead = await open(localFileName);
-        // Create a stream from some character device.
-        const stream = fdRead.createReadStream();
-        const input = {
-          // PutObjectRequest
-          Body: stream,
-          Bucket: "openai-dalle-s3-40d44616", // required
-          Key: remoteFileName, // required
-        };
-        const command = new PutObjectCommand(input);
-        const s3Response = await s3Client.send(command);
-        console.log(s3Response);
-        stream.close();
-      });
-    });
-    const signedUrl = await createPresignedUrlWithClient({
-      client: s3Client,
-      bucket: "openai-dalle-s3-40d44616",
-      key: remoteFileName,
-    });
-    res.send({ url: signedUrl });
-    rm(localFileName);
-  } catch (e) {
-    res.send(e);
-    console.error(e);
-  }
-});
-
-app.post("/flashcards", async (req, res) => {
-  try {
-    const userId = req.body.userId;
-    const input = {
-      TableName: "FlashCardGenAITable",
-      IndexName: "UserId",
-      Select: "SPECIFIC_ATTRIBUTES",
-      KeyConditionExpression: "UserId = :u",
-      ExpressionAttributeValues: { ":u": { S: userId } },
-      ProjectionExpression: "#T, FlashCardId, Content, ImageLink",
-      ExpressionAttributeNames: {"#T" : "TimeStamp" },
-    };
-    const command = new QueryCommand(input);
-    const awsResponse = await dynamoDbClient.send(command);
-    res.send(awsResponse.Items);
-  } catch (e) {
-    console.error(e);
   }
 });
 

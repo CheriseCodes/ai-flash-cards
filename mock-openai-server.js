@@ -1,17 +1,30 @@
 import express from "express";
 import bodyParser from "body-parser";
-import OpenAI from "openai";
 import cors from "cors";
 
+import { open, rm } from "node:fs/promises";
+import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
+import https from "https";
+
+import {
+  PutObjectCommand,
+  GetObjectCommand,
+  S3Client,
+} from "@aws-sdk/client-s3";
 import {
   DynamoDBClient,
   PutItemCommand,
   UpdateItemCommand,
+  QueryCommand,
 } from "@aws-sdk/client-dynamodb";
 import { fromSSO } from "@aws-sdk/credential-providers";
 
 import appConfig from "./src/config.js";
 
+const s3Client = new S3Client({
+  credentials: fromSSO({ profile: process.env.AWS_PROFILE }),
+  region: "ca-central-1",
+});
 const dynamoDbClient = new DynamoDBClient({
   credentials: fromSSO({ profile: process.env.AWS_PROFILE }),
   region: "ca-central-1",
@@ -23,11 +36,6 @@ app.use(cors());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 
-// TODO: Store generated responses in a database
-const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY,
-});
-
 // TODO: 3rd endpoint to store image in S3 and replace the ImageLink in the DynamoDB table
 //       with the s3 url
 app.post("/openai/test/text", async (req, res) => {
@@ -35,6 +43,7 @@ app.post("/openai/test/text", async (req, res) => {
     const wordsToSearch = Array.isArray(req.query.word)
       ? req.query.word
       : [req.query.word];
+    const wordToSearch = wordsToSearch
     const targetLanguage = req.query.lang_mode;
     let targetLevel = req.query.lang_level;
     const userId = req.body.userId;
@@ -60,23 +69,8 @@ app.post("/openai/test/text", async (req, res) => {
       }
       targetLevel = `(${targetLevel})`;
     }
-    for (let wordToSearch of wordsToSearch) {
-      messages.push({
-        role: "user",
-        content: `Please create 1 example sentence under 100 words in length showing how the word ${wordToSearch} is commonly used in ${targetLanguage}. Use${
-          cert === " " ? "" : cert
-        } ${targetLevel} vocabulary and grammar points. Return the sentence in the following JSON format {"word": "${wordToSearch}","sampleSentence": "Example sentence using ${wordToSearch}","translatedSampleSentence":"English translation of the example sentence","wordTranslated": "English translation of ${wordToSearch}"}.`,
-      });
-    }
-    console.log("promt for text:", messages[0].content);
-    const response = await openai.chat.completions.create({
-      model: "gpt-3.5-turbo",
-      temperature: 1,
-      messages,
-    });
-    console.log(response.choices[0].message.content);
+    const response = {id: 123, choices:[{ message: {content: JSON.stringify({word: `${wordToSearch}`,sampleSentence: `Example sentence using ${wordToSearch} in ${targetLanguage} at level ${targetLevel}`,translatedSampleSentence:"English translation of the example sentence",wordTranslated: `English translation of ${wordToSearch}`})}}]}
     if (response.id) {
-      console.log(response.choices[0].message.content);
       res.send(response);
       const awsInput = {
         Item: {
@@ -105,20 +99,20 @@ app.post("/openai/test/text", async (req, res) => {
   }
 });
 
-// TODO: Store images in database because can't access them without being signed into OpenAI
 app.post("/openai/test/imagine", async (req, res) => {
   try {
     const sentenceToVisualize = req.query.sentence;
     const userId = req.body.userId;
     const cardId = req.body.cardId;
     console.log("visualizing...", sentenceToVisualize);
-    // TODO: Try add more American illustrators - https://www.christies.com/en/stories/that-s-america-a-collector-s-guide-to-american-il-a870d242cd3a4c6784cd603427d4d83a
-    const prompt = `${sentenceToVisualize}, Norman Rockwell illustration style, Claude Monet painting style, vibrant colors, realistic, London, Toronto, Melbourne, Cape Town, Shanghai`;
-    const response = await openai.images.generate({
-      prompt: prompt,
-      n: 1,
-      size: "256x256",
-    });
+    const response = {
+      created: Date.now(),
+      data: [
+        {
+          url: "https://picsum.photos/256.jpg"
+        }
+      ]
+    }
     console.log(response);
     if (response?.created) {
       res.send(response);
@@ -148,6 +142,72 @@ app.post("/openai/test/imagine", async (req, res) => {
         },
       ],
     });
+  }
+});
+
+const createPresignedUrlWithClient = ({ client, bucket, key }) => {
+  const command = new GetObjectCommand({ Bucket: bucket, Key: key });
+  return getSignedUrl(client, command, { expiresIn: 3600 });
+};
+
+app.post("/upload/image", async (req, res) => {
+  try {
+    // Download image
+    const imgUrl = req.body.imgUrl;
+    const localFileName = "./private/images/download.png";
+    const remoteFileName = "users/default/images/img3.png";
+    console.log(imgUrl);
+
+    https.get(imgUrl, async (res) => {
+      const fdWrite = await open(localFileName, "w");
+      const writeStream = res.pipe(fdWrite.createWriteStream());
+      writeStream.on("finish", async () => {
+        // Read content of downloaded file
+        const fdRead = await open(localFileName);
+        // Create a stream from some character device.
+        const stream = fdRead.createReadStream();
+        const input = {
+          // PutObjectRequest
+          Body: stream,
+          Bucket: "openai-dalle-s3-40d44616", // required
+          Key: remoteFileName, // required
+        };
+        const command = new PutObjectCommand(input);
+        const s3Response = await s3Client.send(command);
+        console.log(s3Response);
+        stream.close();
+      });
+    });
+    const signedUrl = await createPresignedUrlWithClient({
+      client: s3Client,
+      bucket: "openai-dalle-s3-40d44616",
+      key: remoteFileName,
+    });
+    res.send({ url: signedUrl });
+    rm(localFileName);
+  } catch (e) {
+    res.send(e);
+    console.error(e);
+  }
+});
+
+app.post("/flashcards", async (req, res) => {
+  try {
+    const userId = req.body.userId;
+    const input = {
+      TableName: "FlashCardGenAITable",
+      IndexName: "UserId",
+      Select: "SPECIFIC_ATTRIBUTES",
+      KeyConditionExpression: "UserId = :u",
+      ExpressionAttributeValues: { ":u": { S: userId } },
+      ProjectionExpression: "#T, FlashCardId, Content, ImageLink",
+      ExpressionAttributeNames: {"#T" : "TimeStamp" },
+    };
+    const command = new QueryCommand(input);
+    const awsResponse = await dynamoDbClient.send(command);
+    res.send(awsResponse.Items);
+  } catch (e) {
+    console.error(e);
   }
 });
 

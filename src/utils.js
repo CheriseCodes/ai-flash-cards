@@ -64,6 +64,8 @@ const generateCard = async (
                 userId: userId,
                 cardId: cardId,
               }),
+              mode: 'cors',
+              cache: 'no-store'
             },
           );
           const imageJson = await imageResponse.json();
@@ -78,6 +80,27 @@ const generateCard = async (
             cardId: cardId,
           });
           // TODO: 3rd fetch to persist the image in s3 and update references with persisted url
+          const uploadResponse = await fetch(
+            `http://localhost:8000/upload/image`,
+            {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify({
+                imgUrl: cardData.img,
+                imgName: `${cardId}-${word}-${languageMode}-${languageLevel}-${Date.now()}`
+              }),
+            },
+          );
+          console.log("uploadResponse", uploadResponse);
+          const uploadJson = await uploadResponse.json();
+          cardData.img = uploadJson.url;
+          dispatch({
+            type: "update-card",
+            cardData: cardData,
+            cardId: cardId,
+          });
         } catch (e) {
           dispatch({ type: "delete-card", cardId: cardId });
           const errItem = { id: uuidv4(), message: e.message };

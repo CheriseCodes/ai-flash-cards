@@ -10,4 +10,14 @@ Resources:
     Type: AWS::S3::Bucket
     Properties:
       BucketName: openai-dalle-s3-40d44616
+      CorsConfiguration:
+        CorsRules:
+          - AllowedHeaders: 
+              - "*"
+            AllowedMethods: 
+              - "GET"
+            AllowedOrigins: 
+              - "*"
+            Id: ShareImages
+
       

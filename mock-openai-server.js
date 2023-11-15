@@ -69,7 +69,19 @@ app.post("/openai/test/text", async (req, res) => {
       }
       targetLevel = `(${targetLevel})`;
     }
-    const response = {id: 123, choices:[{ message: {content: JSON.stringify({word: `${wordToSearch}`,sampleSentence: `Example sentence using ${wordToSearch} in ${targetLanguage} at level ${targetLevel}`,translatedSampleSentence:"English translation of the example sentence",wordTranslated: `English translation of ${wordToSearch}`})}}]}
+    for (let wordToSearch of wordsToSearch) {
+      messages.push({
+        role: "user",
+        content: `Please create 1 example sentence under 100 words in length showing how the word ${wordToSearch} is commonly used in ${targetLanguage}. Use${
+          cert === " " ? "" : cert
+        } ${targetLevel} vocabulary and grammar points. Return the sentence in the following JSON format {"word": "${wordToSearch}","sampleSentence": "Example sentence using ${wordToSearch}","translatedSampleSentence":"English translation of the example sentence","wordTranslated": "English translation of ${wordToSearch}"}.`,
+      });
+    }
+    const response = {id: 123, created: 123, usage: {
+      prompt_tokens: 123,
+      completion_tokens: 123,
+      total_tokens: 123
+    }, choices:[{ finish_reason: "stop", message: {content: JSON.stringify({word: `${wordToSearch}`,sampleSentence: `Example sentence using ${wordToSearch} in ${targetLanguage} at level ${targetLevel}`,translatedSampleSentence:"English translation of the example sentence",wordTranslated: `English translation of ${wordToSearch}`})}}]}
     if (response.id) {
       res.send(response);
       const awsInput = {
@@ -105,6 +117,7 @@ app.post("/openai/test/imagine", async (req, res) => {
     const userId = req.body.userId;
     const cardId = req.body.cardId;
     console.log("visualizing...", sentenceToVisualize);
+    const prompt = `${sentenceToVisualize}, Georges Seurat, Bradshaw Crandell, vibrant colors, realistic`;
     const response = {
       created: Date.now(),
       data: [
@@ -130,7 +143,7 @@ app.post("/openai/test/imagine", async (req, res) => {
         ReturnValues: "ALL_NEW",
       };
       const command = new UpdateItemCommand(input);
-      const awsResponse = await dynamoDbClient.send(command);
+      await dynamoDbClient.send(command);
     }
   } catch (e) {
     console.error(e);
@@ -146,7 +159,7 @@ app.post("/openai/test/imagine", async (req, res) => {
 });
 
 const createPresignedUrlWithClient = ({ client, bucket, key }) => {
-  const command = new GetObjectCommand({ Bucket: bucket, Key: key });
+  const command = new GetObjectCommand({ Bucket: bucket, Key: key, ResponseContentType: "image/png" });
   return getSignedUrl(client, command, { expiresIn: 3600 });
 };
 
@@ -154,10 +167,9 @@ app.post("/upload/image", async (req, res) => {
   try {
     // Download image
     const imgUrl = req.body.imgUrl;
-    const localFileName = "./private/images/download.png";
-    const remoteFileName = "users/default/images/img3.png";
-    console.log(imgUrl);
-
+    const imgName = req.body.imgName;
+    const localFileName = `./private/images/${imgName}.png`;
+    const remoteFileName = `users/default/images/${imgName}.png`;
     https.get(imgUrl, async (res) => {
       const fdWrite = await open(localFileName, "w");
       const writeStream = res.pipe(fdWrite.createWriteStream());
@@ -183,8 +195,9 @@ app.post("/upload/image", async (req, res) => {
       bucket: "openai-dalle-s3-40d44616",
       key: remoteFileName,
     });
+    console.log(signedUrl);
     res.send({ url: signedUrl });
-    rm(localFileName);
+    //rm(localFileName);
   } catch (e) {
     res.send(e);
     console.error(e);

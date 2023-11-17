@@ -2,15 +2,15 @@ AWSTemplateFormatVersion: "2010-09-09"
 Description: Amazon Cloudfront resources for serving static resources (CDN)
 
 Resources:
-  OriginAccessControl:
-    Type: AWS::CloudFront::OriginAccessControl
-    Properties:
-      OriginAccessControlConfig: 
-        Description: "Allow users to retrieve images from the OpenAI S3 bucket"
-        Name: OpenAIS3OAC
-        OriginAccessControlOriginType: s3
-        SigningBehavior: always
-        SigningProtocol: sigv4
+  # OriginAccessControl:
+  #   Type: AWS::CloudFront::OriginAccessControl
+  #   Properties:
+  #     OriginAccessControlConfig: 
+  #       Description: "Allow users to retrieve images from the OpenAI S3 bucket"
+  #       Name: OpenAIS3OAC
+  #       OriginAccessControlOriginType: mediastore
+  #       SigningBehavior: always
+  #       SigningProtocol: sigv4
   CloudFrontDistribution:
     Type: AWS::CloudFront::Distribution
     Properties:
@@ -26,17 +26,19 @@ Resources:
           Compress: true
           OriginRequestPolicyId: 216adef6-5c7f-47e4-b989-5492eafa07d3
           SmoothStreaming: false
-          TargetOriginId: E10NVADM2BSGBO
+          TargetOriginId: OpenAIS3
           ViewerProtocolPolicy: allow-all
         Comment: "Distribute OpenAI S3 image objects"
         Enabled: true
         PriceClass: PriceClass_100
         Origins:
-          - CustomOriginConfig: 
+          - Id: OpenAIS3
+            CustomOriginConfig: 
+              HTTPPort: 80
+              HTTPSPort: 443
               OriginProtocolPolicy: match-viewer
-            DomainName: openai-dalle-s3-40d44616.s3.ca-central-1.amazonaws.com
-            Id: OpenAIS3
-            OriginAccessControlId: E10NVADM2BSGBO
+            DomainName: openai-dalle-s3-40d44616.s3-website.ca-central-1.amazonaws.com
+            # OriginAccessControlId: E10NVADM2BSGBO
       Tags:
         - Key: Purpose
           Value: Testing

@@ -10,6 +10,9 @@ Resources:
     Type: AWS::S3::Bucket
     Properties:
       BucketName: openai-dalle-s3-40d44616
+      # WebsiteConfiguration:
+      #   ErrorDocument: "error.html"
+      #   IndexDocument: "index.html"
       CorsConfiguration:
         CorsRules:
           - AllowedHeaders: 
@@ -19,5 +22,26 @@ Resources:
             AllowedOrigins: 
               - "*"
             Id: ShareImages
-
+  BucketPolicy:
+    Type: AWS::S3::BucketPolicy
+    Properties:
+      Bucket: openai-dalle-s3-40d44616
+      PolicyDocument: {
+          "Version": "2012-10-17",
+          "Statement": {
+              "Sid": "AllowCloudFrontServicePrincipalReadOnly",
+              "Effect": "Allow",
+              "Principal": {
+                  "Service": "cloudfront.amazonaws.com"
+              },
+              "Action": "s3:GetObject",
+              "Resource": "arn:aws:s3:::openai-dalle-s3-40d44616/*",
+              "Condition": {
+                  "StringEquals": {
+                      "AWS:SourceArn": "arn:aws:cloudfront::0000000000:distribution/EEISGI42Q3NAK"
+                  }
+              }
+          }
+      }
+      
       

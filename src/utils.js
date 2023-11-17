@@ -64,8 +64,6 @@ const generateCard = async (
                 userId: userId,
                 cardId: cardId,
               }),
-              mode: 'cors',
-              cache: 'no-store'
             },
           );
           const imageJson = await imageResponse.json();
@@ -89,7 +87,8 @@ const generateCard = async (
               },
               body: JSON.stringify({
                 imgUrl: cardData.img,
-                imgName: `${cardId}-${word}-${languageMode}-${languageLevel}-${Date.now()}`
+                imgName: `${cardId}-${languageMode}-${languageLevel}-${Date.now()}`,
+              mode: 'cors',
               }),
             },
           );

@@ -1,47 +1,28 @@
 AWSTemplateFormatVersion: "2010-09-09"
 Description: S3 resources to store data for GenAI flash card application
-# TODO: AWS::S3::BucketPolicy
 
-# TODO: AccelerateConfiguration, AnalyticsConfigurations, BucketEncryption, IntelligentTieringConfigurations, LifecycleConfiguration
-# TODO: LoggingConfiguration, MetricsConfigurations, NotificationConfiguration, OwnershipControls, PublicAccessBlockConfiguration
-# TODO: Move infrequently accessed images to a glacier bucket
+Parameters:
+  BucketName:
+    Type: String
+    Description: Bucket to store DALLE images
+
 Resources:
   OpenAIDalleSBucket:
     Type: AWS::S3::Bucket
     Properties:
-      BucketName: openai-dalle-s3-40d44616
-      # WebsiteConfiguration:
-      #   ErrorDocument: "error.html"
-      #   IndexDocument: "index.html"
+      BucketName: !Ref BucketName
       CorsConfiguration:
         CorsRules:
-          - AllowedHeaders: 
-              - "*"
-            AllowedMethods: 
+          - AllowedMethods: 
               - "GET"
             AllowedOrigins: 
               - "*"
             Id: ShareImages
-  BucketPolicy:
-    Type: AWS::S3::BucketPolicy
-    Properties:
-      Bucket: openai-dalle-s3-40d44616
-      PolicyDocument: {
-          "Version": "2012-10-17",
-          "Statement": {
-              "Sid": "AllowCloudFrontServicePrincipalReadOnly",
-              "Effect": "Allow",
-              "Principal": {
-                  "Service": "cloudfront.amazonaws.com"
-              },
-              "Action": "s3:GetObject",
-              "Resource": "arn:aws:s3:::openai-dalle-s3-40d44616/*",
-              "Condition": {
-                  "StringEquals": {
-                      "AWS:SourceArn": "arn:aws:cloudfront::0000000000:distribution/EEISGI42Q3NAK"
-                  }
-              }
-          }
-      }
-      
-      
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: false
+        BlockPublicPolicy: false
+        IgnorePublicAcls: false
+        RestrictPublicBuckets: false
+      OwnershipControls:
+        Rules:
+          - ObjectOwnership: BucketOwnerPreferred

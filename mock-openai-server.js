@@ -158,18 +158,15 @@ app.post("/openai/test/imagine", async (req, res) => {
   }
 });
 
-const createPresignedUrlWithClient = ({ client, bucket, key }) => {
-  const command = new GetObjectCommand({ Bucket: bucket, Key: key, ResponseContentType: "image/png" });
-  return getSignedUrl(client, command, { expiresIn: 3600 });
-};
-
 app.post("/upload/image", async (req, res) => {
   try {
     // Download image
+    console.log("starting download..")
     const imgUrl = req.body.imgUrl;
     const imgName = req.body.imgName;
     const localFileName = `./private/images/${imgName}.png`;
     const remoteFileName = `users/default/images/${imgName}.png`;
+
     https.get(imgUrl, async (res) => {
       const fdWrite = await open(localFileName, "w");
       const writeStream = res.pipe(fdWrite.createWriteStream());
@@ -181,23 +178,22 @@ app.post("/upload/image", async (req, res) => {
         const input = {
           // PutObjectRequest
           Body: stream,
-          Bucket: "openai-dalle-s3-40d44616", // required
+          Bucket: process.env.BUCKET_NAME, // required
           Key: remoteFileName, // required
+          ACL: "public-read",
         };
         const command = new PutObjectCommand(input);
         const s3Response = await s3Client.send(command);
-        console.log(s3Response);
         stream.close();
+        console.log("s3 upload response", s3Response);
       });
     });
-    const signedUrl = await createPresignedUrlWithClient({
-      client: s3Client,
-      bucket: "openai-dalle-s3-40d44616",
-      key: remoteFileName,
-    });
-    console.log(signedUrl);
-    res.send({ url: signedUrl });
-    //rm(localFileName);
+    res.send({ url: `${process.env.CLOUDFRONT_URL}/${remoteFileName}`});
+      // try {
+      //   rm(localFileName);
+      // } catch (e) {
+      //   console.error(e)
+      // }
   } catch (e) {
     res.send(e);
     console.error(e);

@@ -88,13 +88,13 @@ const generateCard = async (
               body: JSON.stringify({
                 imgUrl: cardData.img,
                 imgName: `${cardId}-${languageMode}-${languageLevel}-${Date.now()}`,
-              mode: 'cors',
               }),
             },
           );
           console.log("uploadResponse", uploadResponse);
           const uploadJson = await uploadResponse.json();
           cardData.img = uploadJson.url;
+          console.log("after upload", uploadJson.url, cardData.img)
           dispatch({
             type: "update-card",
             cardData: cardData,

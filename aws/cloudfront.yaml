@@ -1,21 +1,25 @@
 AWSTemplateFormatVersion: "2010-09-09"
 Description: Amazon Cloudfront resources for serving static resources (CDN)
 
+Parameters:
+  BucketDomain:
+    Type: String
+    Description: Bucket that stores DALLE images
+
 Resources:
-  OriginAccessControl:
-    Type: AWS::CloudFront::OriginAccessControl
-    Properties:
-      OriginAccessControlConfig: 
-        Description: "Allow users to retrieve images from the OpenAI S3 bucket"
-        Name: OpenAIS3OAC
-        OriginAccessControlOriginType: s3
-        SigningBehavior: always
-        SigningProtocol: sigv4
+  # OriginAccessControl:
+  #   Type: AWS::CloudFront::OriginAccessControl
+  #   Properties:
+  #     OriginAccessControlConfig: 
+  #       Description: "Allow users to retrieve images from the OpenAI S3 bucket"
+  #       Name: OpenAIS3OAC
+  #       OriginAccessControlOriginType: s3
+  #       SigningBehavior: always
+  #       SigningProtocol: sigv4
   CloudFrontDistribution:
     Type: AWS::CloudFront::Distribution
     Properties:
       DistributionConfig: 
-        DefaultRootObject: index.html
         DefaultCacheBehavior: 
           AllowedMethods: 
             - GET
@@ -23,12 +27,10 @@ Resources:
           CachedMethods: 
             - GET
             - HEAD
-          CachePolicyId: 658327ea-f89d-4fab-a63d-7e88639e58f6
           Compress: true
-          OriginRequestPolicyId: 88a5eaf4-2fd4-4709-b370-b4c650ea3fcf
-          SmoothStreaming: false
           TargetOriginId: OpenAIS3
           ViewerProtocolPolicy: allow-all
+          CachePolicyId: 658327ea-f89d-4fab-a63d-7e88639e58f6
         Comment: "Distribute OpenAI S3 image objects"
         Enabled: true
         PriceClass: PriceClass_100
@@ -36,8 +38,8 @@ Resources:
           - Id: OpenAIS3
             S3OriginConfig: 
               OriginAccessIdentity: ''
-            DomainName: openai-dalle-s3-40d44616.s3.ca-central-1.amazonaws.com
-            OriginAccessControlId: E1I3UJ9TG0DQYP
+            DomainName: !Ref BucketDomain
+            # OriginAccessControlId: 000000000
       Tags:
         - Key: Purpose
           Value: Testing

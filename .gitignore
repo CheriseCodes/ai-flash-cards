@@ -11,6 +11,7 @@
 notes.txt
 sample_sentences_data.json
 test_import.txt
+/aws/ignore/
 
 # production
 /build

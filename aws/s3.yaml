@@ -1,13 +1,28 @@
 AWSTemplateFormatVersion: "2010-09-09"
 Description: S3 resources to store data for GenAI flash card application
-# TODO: AWS::S3::BucketPolicy
 
-# TODO: AccelerateConfiguration, AnalyticsConfigurations, BucketEncryption, IntelligentTieringConfigurations, LifecycleConfiguration
-# TODO: LoggingConfiguration, MetricsConfigurations, NotificationConfiguration, OwnershipControls, PublicAccessBlockConfiguration
-# TODO: Move infrequently accessed images to a glacier bucket
+Parameters:
+  BucketName:
+    Type: String
+    Description: Bucket to store DALLE images
+
 Resources:
   OpenAIDalleSBucket:
     Type: AWS::S3::Bucket
     Properties:
-      BucketName: openai-dalle-s3-40d44616
-      
+      BucketName: !Ref BucketName
+      CorsConfiguration:
+        CorsRules:
+          - AllowedMethods: 
+              - "GET"
+            AllowedOrigins: 
+              - "*"
+            Id: ShareImages
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: false
+        BlockPublicPolicy: false
+        IgnorePublicAcls: false
+        RestrictPublicBuckets: false
+      OwnershipControls:
+        Rules:
+          - ObjectOwnership: BucketOwnerPreferred

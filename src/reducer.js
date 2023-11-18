@@ -56,6 +56,19 @@ const reducer = (state, action) => {
         }),
       };
     }
+    case "set-generating-image": {
+      return {
+        ...state,
+        cards: state.cards.map((item) => {
+          if (item.includes(action.cardId)) {
+            const cardJson = JSON.parse(item);
+            cardJson.generatingImage = action.isGenerating;
+            return JSON.stringify(cardJson);
+          }
+          return item;
+        }),
+      };
+    }
     case "update-language-level": {
       console.log(`update-language-level state: ${JSON.stringify(state)}`);
       return {

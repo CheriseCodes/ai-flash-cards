@@ -3,6 +3,16 @@ import bodyParser from "body-parser";
 import OpenAI from "openai";
 import cors from "cors";
 
+import { open, rm } from "node:fs/promises";
+import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
+import https from "https";
+
+import {
+  PutObjectCommand,
+  GetObjectCommand,
+  S3Client,
+} from "@aws-sdk/client-s3";
+
 import {
   DynamoDBClient,
   PutItemCommand,
@@ -11,6 +21,11 @@ import {
 import { fromSSO } from "@aws-sdk/credential-providers";
 
 import appConfig from "./src/config.js";
+
+const s3Client = new S3Client({
+  credentials: fromSSO({ profile: process.env.AWS_PROFILE }),
+  region: "ca-central-1",
+});
 
 const dynamoDbClient = new DynamoDBClient({
   credentials: fromSSO({ profile: process.env.AWS_PROFILE }),
@@ -74,9 +89,9 @@ app.post("/openai/test/text", async (req, res) => {
       temperature: 1,
       messages,
     });
-    console.log(response.choices[0].message.content);
+    // console.log(response.choices[0].message.content);
     if (response.id) {
-      console.log(response.choices[0].message.content);
+      // console.log(response.choices[0].message.content);
       res.send(response);
       const awsInput = {
         Item: {
@@ -95,21 +110,18 @@ app.post("/openai/test/text", async (req, res) => {
         TableName: "FlashCardGenAITable",
       };
 
-      console.log(awsInput);
+      // console.log(awsInput);
       const awsCommand = new PutItemCommand(awsInput);
       const awsResponse = await dynamoDbClient.send(awsCommand);
-      console.log(awsResponse);
+      // console.log(awsResponse);
     }
   } catch (err) {
     console.error(err);
   }
 });
-
-// TODO: Store images in database because can't access them without being signed into OpenAI
 app.post("/openai/test/imagine", async (req, res) => {
   try {
     const sentenceToVisualize = req.query.sentence;
-    const userId = req.body.userId;
     const cardId = req.body.cardId;
     console.log("visualizing...", sentenceToVisualize);
     // TODO: Try add more American illustrators - https://www.christies.com/en/stories/that-s-america-a-collector-s-guide-to-american-il-a870d242cd3a4c6784cd603427d4d83a
@@ -119,7 +131,7 @@ app.post("/openai/test/imagine", async (req, res) => {
       n: 1,
       size: "256x256",
     });
-    console.log(response);
+    // console.log(response);
     if (response?.created) {
       res.send(response);
       const input = {
@@ -136,7 +148,7 @@ app.post("/openai/test/imagine", async (req, res) => {
         ReturnValues: "ALL_NEW",
       };
       const command = new UpdateItemCommand(input);
-      const awsResponse = await dynamoDbClient.send(command);
+      await dynamoDbClient.send(command);
     }
   } catch (e) {
     console.error(e);
@@ -151,4 +163,46 @@ app.post("/openai/test/imagine", async (req, res) => {
   }
 });
 
+app.post("/upload/image", async (req, res) => {
+  try {
+    // Download image
+    console.log("starting download..")
+    const imgUrl = req.body.imgUrl;
+    const imgName = req.body.imgName;
+    const localFileName = `./private/images/${imgName}.png`;
+    const remoteFileName = `users/default/images/${imgName}.png`;
+
+    https.get(imgUrl, async (res) => {
+      const fdWrite = await open(localFileName, "w");
+      const writeStream = res.pipe(fdWrite.createWriteStream());
+      writeStream.on("finish", async () => {
+        // Read content of downloaded file
+        const fdRead = await open(localFileName);
+        // Create a stream from some character device.
+        const stream = fdRead.createReadStream();
+        const input = {
+          // PutObjectRequest
+          Body: stream,
+          Bucket: process.env.BUCKET_NAME, // required
+          Key: remoteFileName, // required
+          ACL: "public-read",
+        };
+        const command = new PutObjectCommand(input);
+        const s3Response = await s3Client.send(command);
+        stream.close();
+        console.log("s3 upload response", s3Response);
+      });
+    });
+    res.send({ url: `${process.env.CLOUDFRONT_URL}/${remoteFileName}`});
+    // try {
+    //   rm(localFileName);
+    // } catch (e) {
+    //   console.error(e)
+    // }
+  } catch (e) {
+    res.send(e);
+    console.error(e);
+  }
+});
+   
 app.listen(PORT, () => console.log("server is running on port " + PORT));

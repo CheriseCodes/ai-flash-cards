@@ -1,0 +1,45 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Description: Amazon Cloudfront resources for serving static resources (CDN)
+
+Parameters:
+  BucketDomain:
+    Type: String
+    Description: Bucket that stores DALLE images
+
+Resources:
+  # OriginAccessControl:
+  #   Type: AWS::CloudFront::OriginAccessControl
+  #   Properties:
+  #     OriginAccessControlConfig: 
+  #       Description: "Allow users to retrieve images from the OpenAI S3 bucket"
+  #       Name: OpenAIS3OAC
+  #       OriginAccessControlOriginType: s3
+  #       SigningBehavior: always
+  #       SigningProtocol: sigv4
+  CloudFrontDistribution:
+    Type: AWS::CloudFront::Distribution
+    Properties:
+      DistributionConfig: 
+        DefaultCacheBehavior: 
+          AllowedMethods: 
+            - GET
+            - HEAD
+          CachedMethods: 
+            - GET
+            - HEAD
+          Compress: true
+          TargetOriginId: OpenAIS3
+          ViewerProtocolPolicy: allow-all
+          CachePolicyId: 658327ea-f89d-4fab-a63d-7e88639e58f6
+        Comment: "Distribute OpenAI S3 image objects"
+        Enabled: true
+        PriceClass: PriceClass_100
+        Origins:
+          - Id: OpenAIS3
+            S3OriginConfig: 
+              OriginAccessIdentity: ''
+            DomainName: !Ref BucketDomain
+            # OriginAccessControlId: 000000000
+      Tags:
+        - Key: Purpose
+          Value: Testing

@@ -8,6 +8,7 @@ import CloseButton from "react-bootstrap/esm/CloseButton.js";
 const FlashCard = ({ cardData, setErrors, userId }) => {
   const [enableEdit, setEnableEdit] = useState(false);
   const [selected, setSelected] = useState(false);
+  const [imageError, setImageError] = useState(false);
 
   const wordRef = useRef(null);
   const wordTranslatedRef = useRef(null);
@@ -16,6 +17,8 @@ const FlashCard = ({ cardData, setErrors, userId }) => {
 
   const languageLevel = useSelector((state) => state.languageLevel);
   const languageMode = useSelector((state) => state.languageMode);
+
+  
 
   const dispatch = useDispatch();
 
@@ -60,9 +63,7 @@ const FlashCard = ({ cardData, setErrors, userId }) => {
     console.log(e);
   };
 
-  const handleSelectCard = (e) => {
-    console.log("e before:", e);
-
+  const handleSelectCard = () => {
     if (selected) {
       // remove from selected cards
       dispatch({
@@ -77,9 +78,22 @@ const FlashCard = ({ cardData, setErrors, userId }) => {
       });
     }
     setSelected((curr) => !curr);
-    console.log("e after:", e);
   };
 
+  const reloadImage = (e) => {
+    e.target.src = e.target.src + `?nocache=${Date.now()}`
+    e.target.hidden = true;
+    if (!imageError) {
+      setImageError((curr) => !curr);
+    }
+  }
+
+  const loadedImage = (e) => {
+    e.target.hidden = false;
+    if (imageError) {
+      setImageError((curr) => !curr);
+    }
+  }
   return (
     <>
       <div
@@ -104,10 +118,11 @@ const FlashCard = ({ cardData, setErrors, userId }) => {
               ></textarea>
               <div className="image-container">
                 {!cardData.generatingImage ? (
-                  <img height={250} width={250} src={cardData.img}></img>
+                  <img height={250} width={250} src={cardData.img} crossOrigin="anonymous" onError={reloadImage} onLoad={loadedImage} hidden></img>
                 ) : (
                   <LoadingSpinner />
                 )}
+                {imageError && <LoadingSpinner />}
               </div>
               <input
                 ref={wordTranslatedRef}

@@ -20,14 +20,14 @@ Resources:
             AllowedOrigins: 
               - "http://localhost:3000"
             Id: ShareImages
-      # PublicAccessBlockConfiguration:
-      #   BlockPublicAcls: false
-      #   BlockPublicPolicy: false
-      #   IgnorePublicAcls: false
-      #   RestrictPublicBuckets: false
-      # OwnershipControls:
-      #   Rules:
-      #     - ObjectOwnership: BucketOwnerPreferred
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: true
+        BlockPublicPolicy: true
+        IgnorePublicAcls: true
+        RestrictPublicBuckets: true
+      OwnershipControls:
+        Rules:
+          - ObjectOwnership: BucketOwnerEnforced #  BucketOwnerPreferred w/o OAC
   DalleBucketPolicy:
     Type: AWS::S3::BucketPolicy
     Properties:
@@ -35,6 +35,7 @@ Resources:
       PolicyDocument:
         Version: "2012-10-17"
         Statement:
+          # w/o OAC:
           # - Effect: Allow
           #   Principal: "*"
           #   Action: "s3:GetObject"

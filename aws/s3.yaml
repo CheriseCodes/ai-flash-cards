@@ -5,7 +5,9 @@ Parameters:
   BucketName:
     Type: String
     Description: Bucket to store DALLE images
-
+  DistributionId:
+    Type: String
+    Description: Cloudfront distribution Id
 Resources:
   OpenAIDalleSBucket:
     Type: AWS::S3::Bucket
@@ -16,13 +18,33 @@ Resources:
           - AllowedMethods: 
               - "GET"
             AllowedOrigins: 
-              - "*"
+              - "http://localhost:3000"
             Id: ShareImages
-      PublicAccessBlockConfiguration:
-        BlockPublicAcls: false
-        BlockPublicPolicy: false
-        IgnorePublicAcls: false
-        RestrictPublicBuckets: false
-      OwnershipControls:
-        Rules:
-          - ObjectOwnership: BucketOwnerPreferred
+      # PublicAccessBlockConfiguration:
+      #   BlockPublicAcls: false
+      #   BlockPublicPolicy: false
+      #   IgnorePublicAcls: false
+      #   RestrictPublicBuckets: false
+      # OwnershipControls:
+      #   Rules:
+      #     - ObjectOwnership: BucketOwnerPreferred
+  DalleBucketPolicy:
+    Type: AWS::S3::BucketPolicy
+    Properties:
+      Bucket: !Ref BucketName
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          # - Effect: Allow
+          #   Principal: "*"
+          #   Action: "s3:GetObject"
+          #   Resource: !Sub "arn:aws:s3:::${BucketName}/*"
+          - Sid: AllowCloudFrontServicePrincipalReadOnly
+            Effect: Allow
+            Principal: 
+              Service: cloudfront.amazonaws.com
+            Action: "s3:GetObject"
+            Resource: !Sub "arn:aws:s3:::${BucketName}/*"
+            Condition:
+              StringEquals:
+                AWS:SourceArn: !Sub "arn:aws:cloudfront::${AWS::AccountId}:distribution/${DistributionId}"

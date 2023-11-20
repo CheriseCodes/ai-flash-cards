@@ -5,17 +5,20 @@ Parameters:
   BucketDomain:
     Type: String
     Description: Bucket that stores DALLE images
+  LogBucketName:
+    Type: String
+    Description: Where logs will be stored
 
 Resources:
-  # OriginAccessControl:
-  #   Type: AWS::CloudFront::OriginAccessControl
-  #   Properties:
-  #     OriginAccessControlConfig: 
-  #       Description: "Allow users to retrieve images from the OpenAI S3 bucket"
-  #       Name: OpenAIS3OAC
-  #       OriginAccessControlOriginType: s3
-  #       SigningBehavior: always
-  #       SigningProtocol: sigv4
+  OriginAccessControl:
+    Type: AWS::CloudFront::OriginAccessControl
+    Properties:
+      OriginAccessControlConfig: 
+        Description: "Allow users to retrieve images from the OpenAI S3 bucket"
+        Name: OpenAIS3OAC
+        OriginAccessControlOriginType: s3
+        SigningBehavior: always
+        SigningProtocol: sigv4
   CloudFrontDistribution:
     Type: AWS::CloudFront::Distribution
     Properties:
@@ -31,6 +34,12 @@ Resources:
           TargetOriginId: OpenAIS3
           ViewerProtocolPolicy: allow-all
           CachePolicyId: 658327ea-f89d-4fab-a63d-7e88639e58f6
+          ForwardedValues:
+            QueryString: true
+            Cookies:
+              Forward: none
+            Headers:
+              - Cache-Control
         Comment: "Distribute OpenAI S3 image objects"
         Enabled: true
         PriceClass: PriceClass_100
@@ -39,7 +48,11 @@ Resources:
             S3OriginConfig: 
               OriginAccessIdentity: ''
             DomainName: !Ref BucketDomain
-            # OriginAccessControlId: 000000000
+            OriginAccessControlId: !Ref OriginAccessControl
+        Logging:
+          Bucket: !Sub "${LogBucketName}.s3.amazonaws.com"
+          IncludeCookies: true
+          Prefix: cloudfront
       Tags:
         - Key: Purpose
           Value: Testing

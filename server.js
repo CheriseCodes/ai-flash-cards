@@ -185,7 +185,7 @@ app.post("/upload/image", async (req, res) => {
           Body: stream,
           Bucket: process.env.BUCKET_NAME, // required
           Key: remoteFileName, // required
-          // ACL: "public-read",
+          // ACL: "public-read", // w/o OAC
           ContentType: "image/png",
           CacheControl: "public, max-age=31536000",
         };

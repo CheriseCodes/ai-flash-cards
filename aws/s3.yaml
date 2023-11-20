@@ -27,7 +27,7 @@ Resources:
         RestrictPublicBuckets: true
       OwnershipControls:
         Rules:
-          - ObjectOwnership: BucketOwnerEnforced
+          - ObjectOwnership: BucketOwnerEnforced #  BucketOwnerPreferred w/o OAC
   DalleBucketPolicy:
     Type: AWS::S3::BucketPolicy
     Properties:
@@ -35,6 +35,7 @@ Resources:
       PolicyDocument:
         Version: "2012-10-17"
         Statement:
+          # w/o OAC:
           # - Effect: Allow
           #   Principal: "*"
           #   Action: "s3:GetObject"

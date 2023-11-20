@@ -185,7 +185,9 @@ app.post("/upload/image", async (req, res) => {
           Body: stream,
           Bucket: process.env.BUCKET_NAME, // required
           Key: remoteFileName, // required
-          ACL: "public-read",
+          // ACL: "public-read",
+          ContentType: "image/png",
+          CacheControl: "public, max-age=31536000",
         };
         const command = new PutObjectCommand(input);
         const s3Response = await s3Client.send(command);
@@ -193,7 +195,9 @@ app.post("/upload/image", async (req, res) => {
         console.log("s3 upload response", s3Response);
       });
     });
-    res.send({ url: `${process.env.CLOUDFRONT_URL}/${remoteFileName}`});
+    const domainName = process.env.CLOUDFRONT_URL;
+    // const domainName = `https://${process.env.BUCKET_NAME}.s3.ca-central-1.amazonaws.com`
+    res.send({ url: `${domainName}/${remoteFileName}`});
     // try {
     //   rm(localFileName);
     // } catch (e) {

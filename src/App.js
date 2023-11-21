@@ -16,7 +16,9 @@ const App = () => {
     console.log();
   };
 
-  console.log("errors:", errors);
+  // TODO: fetch flashcards for current user on first load
+  
+  
   return (
     <div className="App">
       <div className="header">
@@ -28,7 +30,6 @@ const App = () => {
       {errors.map((e) => (
         <ErrorBanner key={e.id} e={e} setErrors={setErrors} />
       ))}
-      {/* TODO: use loading button boostrap component */}
       <form className="flash-card-form" onSubmit={handleSubmit}>
         {cards.length == 0 && (
           <div className="instructions-container">

@@ -9,7 +9,7 @@ const FlashCard = ({ cardData, setErrors, userId }) => {
   const [enableEdit, setEnableEdit] = useState(false);
   const [selected, setSelected] = useState(false);
   const [imageError, setImageError] = useState(false);
-  // const [reloadCount, setReloadCount] = useState(0);
+  const [reloadCount, setReloadCount] = useState(0);
 
   const wordRef = useRef(null);
   const wordTranslatedRef = useRef(null);
@@ -82,13 +82,20 @@ const FlashCard = ({ cardData, setErrors, userId }) => {
   };
 
   const reloadImage = (e) => {
-    // setReloadCount((curr) => curr + 1);
-    e.target.src = e.target.src + `?nocache=${Date.now()}`
-    e.target.hidden = true;
-    if (!imageError) {
-      setImageError((curr) => !curr);
+    // TODO: if error indicates that the image was deleted (404), change the image to OOPS image
+    if (reloadCount > 29) {
+      // don't reload if hit max reloads of 30
+      console.log("Hit max reloads:", reloadCount)
+      e.target.src = "https://m.media-amazon.com/images/I/418Jmnejj8L.jpg";
+      e.target.hidden = false;
+    } else {
+      setReloadCount((curr) => curr + 1);
+      e.target.src = e.target.src + `?nocache=${Date.now()}`
+      e.target.hidden = true;
+      if (!imageError) {
+        setImageError((curr) => !curr);
+      }
     }
-    // console.log("Reload count:", reloadCount);
   }
 
   const loadedImage = (e) => {

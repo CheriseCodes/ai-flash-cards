@@ -1,0 +1,1 @@
+aws cloudformation update-stack --stack-name flash-card-app-cloudfront --template-body file://templates/cloudfront.yaml

@@ -77,7 +77,7 @@ const generateCard = async (
             cardData: cardData,
             cardId: cardId,
           });
-          // TODO: 3rd fetch to persist the image in s3 and update references with persisted url
+          // 3rd fetch to persist the image in s3 then update references with persisted url
           const uploadResponse = await fetch(
             `http://localhost:8000/upload/image`,
             {

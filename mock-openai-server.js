@@ -34,8 +34,6 @@ app.use(cors());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 
-// TODO: 3rd endpoint to store image in S3 and replace the ImageLink in the DynamoDB table
-//       with the s3 url
 app.post("/openai/test/text", async (req, res) => {
   try {
     const wordsToSearch = Array.isArray(req.query.word)
@@ -191,6 +189,7 @@ app.post("/upload/image", async (req, res) => {
     const domainName = process.env.CLOUDFRONT_URL;
     // const domainName = `https://${process.env.BUCKET_NAME}.s3.ca-central-1.amazonaws.com` // test bucket config
     res.send({ url: `${domainName}/${remoteFileName}`});
+    // TODO: Replace dynamodb image url with cloudfront url and s3 key
     // try {
     //   rm(localFileName);
     // } catch (e) {

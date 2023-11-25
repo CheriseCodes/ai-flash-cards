@@ -1,7 +1,7 @@
 import React, { useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import PropTypes from "prop-types";
-import generateCard from "../utils.js";
+import { generateNextCard  } from "../utils.js";
 import LoadingSpinner from "./LoadingSpinner.js";
 import CloseButton from "react-bootstrap/esm/CloseButton.js";
 
@@ -25,10 +25,8 @@ const FlashCard = ({ cardData, setErrors, userId }) => {
 
   const handleRegenerateCard = async () => {
     const currWord = wordRef.current.value;
-    generateCard(
+    generateNextCard(
       dispatch,
-      null,
-      false,
       currWord,
       languageMode,
       languageLevel,

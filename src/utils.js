@@ -1,21 +1,18 @@
 import { v4 as uuidv4 } from "uuid";
 
-const generateCard = async (
+export const generateNewCard = async (
   dispatch,
-  setSpinner,
-  isNewCard,
+  // setSpinner, // needed for new cards (generate button spinner)
   word,
   languageMode,
   languageLevel,
-  cardData,
   setErrors,
   userId,
 ) => {
   console.log(`App.generateCard - word: ${word}`);
-  if (isNewCard) {
     try {
       if (word) {
-        setSpinner(true);
+        // setSpinner(true);
         // add empty card with id
         const cardId = uuidv4();
         const timeStamp = Date.now();
@@ -27,7 +24,7 @@ const generateCard = async (
             generatingImage: false,
           },
         });
-        let cardData;
+        
         try {
           const response = await fetch(
             `http://localhost:8000/openai/test/text?word=${word}&lang_mode=${languageMode}&lang_level=${languageLevel}`,
@@ -46,6 +43,7 @@ const generateCard = async (
           console.log("Sent request data, received:", JSON.stringify(response));
           const json = await response.json();
           console.log("Received data");
+          let cardData;
           cardData = json.choices[0].message.content; // stringified JSON
           cardData = JSON.parse(cardData);
           cardData.wordTranslated = cardData.wordTranslated.toLowerCase();
@@ -100,13 +98,13 @@ const generateCard = async (
             cardData: cardData,
             cardId: cardId,
           });
+          // setSpinner(false);
         } catch (e) {
           dispatch({ type: "delete-card", cardId: cardId });
           const errItem = { id: uuidv4(), message: e.message };
           setErrors((errs) => [...errs, errItem]);
           console.error("The first error is:", errItem);
         }
-        setSpinner(false);
         //   console.log(`App.generateCard - allCardData: ${cards}`);
       }
     } catch (e) {
@@ -115,7 +113,19 @@ const generateCard = async (
       setErrors((errs) => [...errs, errItem]);
       console.error("The second error is:", e);
     }
-  } else {
+};
+
+
+export const generateNextCard = async (
+  dispatch,
+  word,
+  languageMode,
+  languageLevel,
+  cardData,
+  setErrors,
+  userId,
+) => {
+  console.log(`App.generateCard - word: ${word}`);
     const cardId = cardData.id;
     const timeStamp = Date.now();
     try {
@@ -195,7 +205,4 @@ const generateCard = async (
       setErrors((errs) => [...errs, errItem]);
       console.error(e);
     }
-  }
 };
-
-export default generateCard;

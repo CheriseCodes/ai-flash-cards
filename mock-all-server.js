@@ -39,7 +39,7 @@ app.post("/openai/test/imagine", async (req, res) => {
       created: Date.now(),
       data: [
         {
-          url: "https://picsum.photos/256.jpg"
+          url: "https://images.crunchbase.com/image/upload/c_lpad,h_256,w_256,f_auto,q_auto:eco,dpr_1/gavygdwhilk8d2cytkeq"
         }
       ]
     }

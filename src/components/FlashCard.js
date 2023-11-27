@@ -86,6 +86,7 @@ const FlashCard = ({ cardData, setErrors, userId }) => {
       console.log("Hit max reloads:", reloadCount)
       e.target.src = "https://m.media-amazon.com/images/I/418Jmnejj8L.jpg";
       e.target.hidden = false;
+      setReloadCount(0);
     } else {
       setReloadCount((curr) => curr + 1);
       e.target.src = e.target.src + `?nocache=${Date.now()}`

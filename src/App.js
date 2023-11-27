@@ -34,7 +34,11 @@ const App = () => {
       );
       const json = await response.json()
       console.log("/flashcards", JSON.stringify(json))
-      // TODO: union retrieved flashcard data with existing flashcard data
+      // TODO: check if the ids of the returned results don't match what is currently shown
+
+      // TODO: If there isn't a with ID, add the data to card data list
+
+      // TODO: If the ID mathes cut the data doesn't overwrite backend data with frontend data
     } catch (e) {
       const errItem = { id: uuidv4(), message: e.message };
       setErrors((errs) => [...errs, errItem]);

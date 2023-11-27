@@ -1,7 +1,7 @@
 import React, { useRef, useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import PropTypes from "prop-types";
-import generateCard from "../utils.js";
+import { generateNewCard } from "../utils.js";
 import Button from "react-bootstrap/esm/Button.js";
 
 const WordInput = ({ setErrors, userId }) => {
@@ -20,17 +20,20 @@ const WordInput = ({ setErrors, userId }) => {
       console.log(
         `WordInput.handleSubmit - \${index}:\${word.trim()}: ${index}:${word.trim()}`,
       );
-      generateCard(
-        dispatch,
-        setSpinner,
-        true,
-        word,
-        languageMode,
-        languageLevel,
-        null,
-        setErrors,
-        userId,
-      );
+      setSpinner(true)
+      try {
+        generateNewCard(
+          dispatch,
+          word,
+          languageMode,
+          languageLevel,
+          setErrors,
+          userId,
+        );
+      } catch (e) {
+        console.error(e)
+      }
+      setSpinner(false)
     }
   };
 

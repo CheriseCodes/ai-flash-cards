@@ -1,0 +1,1 @@
+aws cloudformation create-stack --stack-name flash-card-app-dynamodb --template-body file://templates/dynamodb.yaml

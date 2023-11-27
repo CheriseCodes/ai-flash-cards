@@ -1,10 +1,12 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useSelector } from "react-redux";
 import WordInput from "./components/WordInput.js";
 import FlashCard from "./components/FlashCard.js";
 import LanguageModeForm from "./components/LanguageModeForm.js";
 import LanguageLevelForm from "./components/LanguageLevelForm.js";
 import ErrorBanner from "./components/ErrorBanner.js";
+
+import { v4 as uuidv4 } from "uuid";
 
 const App = () => {
   const cards = useSelector((state) => state.cards);
@@ -16,7 +18,38 @@ const App = () => {
     console.log();
   };
 
-  console.log("errors:", errors);
+  const fetchAllFlashcards = async () => {
+    try {
+      const response = await fetch(
+        `http://localhost:8000/flashcards`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            userId: userId,
+          }),
+        },
+      );
+      const json = await response.json()
+      console.log("/flashcards", JSON.stringify(json))
+      // TODO: check if the ids of the returned results don't match what is currently shown
+
+      // TODO: If there isn't a with ID, add the data to card data list
+
+      // TODO: If the ID mathes cut the data doesn't overwrite backend data with frontend data
+    } catch (e) {
+      const errItem = { id: uuidv4(), message: e.message };
+      setErrors((errs) => [...errs, errItem]);
+    }
+  }
+
+  // TODO: fetch flashcards for current user on first load
+  useEffect(() => {
+    fetchAllFlashcards()
+  },[])
+
   return (
     <div className="App">
       <div className="header">
@@ -28,7 +61,6 @@ const App = () => {
       {errors.map((e) => (
         <ErrorBanner key={e.id} e={e} setErrors={setErrors} />
       ))}
-      {/* TODO: use loading button boostrap component */}
       <form className="flash-card-form" onSubmit={handleSubmit}>
         {cards.length == 0 && (
           <div className="instructions-container">

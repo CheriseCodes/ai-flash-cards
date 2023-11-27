@@ -1,7 +1,7 @@
 import React, { useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import PropTypes from "prop-types";
-import generateCard from "../utils.js";
+import { generateNextCard  } from "../utils.js";
 import LoadingSpinner from "./LoadingSpinner.js";
 import CloseButton from "react-bootstrap/esm/CloseButton.js";
 
@@ -9,7 +9,7 @@ const FlashCard = ({ cardData, setErrors, userId }) => {
   const [enableEdit, setEnableEdit] = useState(false);
   const [selected, setSelected] = useState(false);
   const [imageError, setImageError] = useState(false);
-  // const [reloadCount, setReloadCount] = useState(0);
+  const [reloadCount, setReloadCount] = useState(0);
 
   const wordRef = useRef(null);
   const wordTranslatedRef = useRef(null);
@@ -25,10 +25,8 @@ const FlashCard = ({ cardData, setErrors, userId }) => {
 
   const handleRegenerateCard = async () => {
     const currWord = wordRef.current.value;
-    generateCard(
+    generateNextCard(
       dispatch,
-      null,
-      false,
       currWord,
       languageMode,
       languageLevel,
@@ -82,13 +80,21 @@ const FlashCard = ({ cardData, setErrors, userId }) => {
   };
 
   const reloadImage = (e) => {
-    // setReloadCount((curr) => curr + 1);
-    e.target.src = e.target.src + `?nocache=${Date.now()}`
-    e.target.hidden = true;
-    if (!imageError) {
-      setImageError((curr) => !curr);
+    // TODO: if error indicates that the image was deleted (404), change the image to OOPS image
+    if (reloadCount > 29) {
+      // don't reload if hit max reloads of 30
+      console.log("Hit max reloads:", reloadCount)
+      e.target.src = "https://m.media-amazon.com/images/I/418Jmnejj8L.jpg";
+      e.target.hidden = false;
+      setReloadCount(0);
+    } else {
+      setReloadCount((curr) => curr + 1);
+      e.target.src = e.target.src + `?nocache=${Date.now()}`
+      e.target.hidden = true;
+      if (!imageError) {
+        setImageError((curr) => !curr);
+      }
     }
-    // console.log("Reload count:", reloadCount);
   }
 
   const loadedImage = (e) => {

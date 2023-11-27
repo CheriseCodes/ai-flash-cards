@@ -10,6 +10,8 @@ app.use(cors());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 
+// NOTE: Internet must still be on to load resources from the internet
+
 app.post("/openai/test/text", async (req, res) => {
   try {
     const wordsToSearch = Array.isArray(req.query.word)
@@ -39,7 +41,7 @@ app.post("/openai/test/imagine", async (req, res) => {
       created: Date.now(),
       data: [
         {
-          url: "https://picsum.photos/256.jpg"
+          url: "https://images.crunchbase.com/image/upload/c_lpad,h_256,w_256,f_auto,q_auto:eco,dpr_1/gavygdwhilk8d2cytkeq"
         }
       ]
     }
@@ -81,7 +83,7 @@ app.post("/upload/image", async (req, res) => {
     });
     const signedUrl = imgUrl
     res.send({ url: signedUrl });
-    rm(localFileName);
+    // rm(localFileName);
   } catch (e) {
     res.send(e);
     console.error(e);

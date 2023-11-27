@@ -179,6 +179,9 @@ app.post("/upload/image", async (req, res) => {
         const fdRead = await open(localFileName);
         // Create a stream from some character device.
         const stream = fdRead.createReadStream();
+        stream.on("close", () => {
+          rm(localFileName);
+        });
         const input = {
           // PutObjectRequest
           Body: stream,
@@ -190,18 +193,13 @@ app.post("/upload/image", async (req, res) => {
         };
         const command = new PutObjectCommand(input);
         const s3Response = await s3Client.send(command);
-        stream.close();
         console.log("s3 upload response", s3Response);
+        stream.close()
       });
     });
     const domainName = process.env.CLOUDFRONT_URL;
     // const domainName = `https://${process.env.BUCKET_NAME}.s3.ca-central-1.amazonaws.com`
     res.send({ url: `${domainName}/${remoteFileName}`});
-    // try {
-    //   rm(localFileName);
-    // } catch (e) {
-    //   console.error(e)
-    // }
   } catch (e) {
     res.send(e);
     console.error(e);

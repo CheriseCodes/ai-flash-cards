@@ -4,17 +4,16 @@ import OpenAI from "openai";
 import cors from "cors";
 
 import { open, rm } from "node:fs/promises";
-import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 import https from "https";
 
 import {
   PutObjectCommand,
-  GetObjectCommand,
   S3Client,
 } from "@aws-sdk/client-s3";
 
 import {
   DynamoDBClient,
+  QueryCommand,
   PutItemCommand,
   UpdateItemCommand,
 } from "@aws-sdk/client-dynamodb";
@@ -205,6 +204,26 @@ app.post("/upload/image", async (req, res) => {
     // }
   } catch (e) {
     res.send(e);
+    console.error(e);
+  }
+});
+
+app.post("/flashcards", async (req, res) => {
+  try {
+    const userId = req.body.userId;
+    const input = {
+      TableName: "FlashCardGenAITable",
+      IndexName: "UserId",
+      Select: "SPECIFIC_ATTRIBUTES",
+      KeyConditionExpression: "UserId = :u",
+      ExpressionAttributeValues: { ":u": { S: userId } },
+      ProjectionExpression: "#T, FlashCardId, Content, ImageLink",
+      ExpressionAttributeNames: {"#T" : "TimeStamp" },
+    };
+    const command = new QueryCommand(input);
+    const awsResponse = await dynamoDbClient.send(command);
+    res.send(awsResponse.Items);
+  } catch (e) {
     console.error(e);
   }
 });

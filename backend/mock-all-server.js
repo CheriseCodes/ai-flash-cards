@@ -78,6 +78,9 @@ app.post("/upload/image", async (req, res) => {
         const fdRead = await open(localFileName);
         // Create a stream from some character device.
         const stream = fdRead.createReadStream();
+        stream.on("close", () => {
+          rm(localFileName);
+        });
         stream.close();
       });
     });

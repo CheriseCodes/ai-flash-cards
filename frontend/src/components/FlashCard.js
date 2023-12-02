@@ -81,15 +81,33 @@ const FlashCard = ({ cardData, setErrors, userId }) => {
 
   const reloadImage = (e) => {
     // TODO: if error indicates that the image was deleted (404), change the image to OOPS image
-    if (reloadCount > 29) {
-      // don't reload if hit max reloads of 30
+    if (reloadCount > 3) {
       console.log("Hit max reloads:", reloadCount)
       e.target.src = "https://m.media-amazon.com/images/I/418Jmnejj8L.jpg";
       e.target.hidden = false;
       setReloadCount(0);
+    } else if (reloadCount > 2) {
+        const windowReloads = localStorage.getItem("globalreloads");
+        if (windowReloads == null) {
+          localStorage.setItem("globalreloads", 1);
+          window.location.reload();
+        } else {
+          console.log("Hit max reloads:", reloadCount)
+          e.target.src = "https://m.media-amazon.com/images/I/418Jmnejj8L.jpg";
+          e.target.hidden = false;
+          localStorage.removeItem("globalreloads");
+          setReloadCount(0);
+        }
+        // don't reload if hit max reloads of 30
+        // setReloadCount((curr) => curr + 1);
+        
     } else {
       setReloadCount((curr) => curr + 1);
-      e.target.src = e.target.src + `?nocache=${Date.now()}`
+      if (e.target.src.includes("?nocache")) {
+        e.target.src = e.target.src.replace(/\?nocache=[0-9]/,"")
+      } else {
+        e.target.src = e.target.src + `?nocache=${reloadCount}`
+      }
       e.target.hidden = true;
       if (!imageError) {
         setImageError((curr) => !curr);

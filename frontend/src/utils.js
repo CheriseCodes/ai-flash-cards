@@ -1,5 +1,6 @@
 import { v4 as uuidv4 } from "uuid";
 
+// TODO: Stop updating card data object directly... only update with update-card reducer
 
 const getNewCardText = async (word, languageMode, languageLevel, userId, cardId, timeStamp) => {
   console.log("start getNewCardText");
@@ -46,13 +47,6 @@ const getNewCardImage = async (dispatch, cardData, languageMode, languageLevel, 
       },
     );
     const imageJson = await imageResponse.json();
-    // cardData.img = imageJson.data[0].url;
-    
-    // dispatch({
-    //   type: "update-card",
-    //   cardData: cardData,
-    //   cardId: cardId,
-    // });
     // 3rd fetch to persist the image in s3 then update references with persisted url
     const uploadResponse = await fetch(
       `http://localhost:8000/upload/image`,

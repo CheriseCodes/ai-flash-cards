@@ -14,7 +14,7 @@ test_import.txt
 /aws/ignore/
 
 # production
-/build
+build
 
 # misc
 .DS_Store

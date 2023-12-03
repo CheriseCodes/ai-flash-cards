@@ -24,7 +24,8 @@
     "start:v2": "nodemon mock-openai-server.js",
     "start:v3": "nodemon mock-all-server.js",
     "lint:fix": "npx eslint --fix --ext .js,.jsx,.ts .",
-    "lint": "npx eslint --ext .js,.jsx,.ts ."
+    "lint": "npx eslint --ext .js,.jsx,.ts .",
+    "test": "node --test"
   },
   "browserslist": {
     "production": [

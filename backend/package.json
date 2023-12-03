@@ -19,14 +19,13 @@
     "openai": "^4.6.0"
   },
   "scripts": {
-    "start": "nodemon server.js",
-    "start:mockopenai": "nodemon mock-openai-server.js",
-    "start:mockall": "nodemon mock-all-server.js",
+    "start": "node server.js",
+    "start:v1": "nodemon server.js",
+    "start:v2": "nodemon mock-openai-server.js",
+    "start:v3": "nodemon mock-all-server.js",
     "lint:fix": "npx eslint --fix --ext .js,.jsx,.ts .",
     "lint": "npx eslint --ext .js,.jsx,.ts .",
-    "build": "nodemon build",
-    "test": "nodemon test",
-    "eject": "nodemon eject"
+    "test": "node --test"
   },
   "browserslist": {
     "production": [

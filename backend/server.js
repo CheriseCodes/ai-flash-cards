@@ -41,6 +41,10 @@ const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
 });
 
+// app.get("/", async (req, res) => {
+//   res.send({message: "app is alive"});
+// });
+
 app.post("/openai/test/text", async (req, res) => {
   try {
     const wordsToSearch = Array.isArray(req.query.word)

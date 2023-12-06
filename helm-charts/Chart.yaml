@@ -1,0 +1,5 @@
+apiVersion: v2
+name: ai_flash_cards_app
+description: A Helm chart for a generating flashcards for language learnnig 
+version: 0.1.0
+appVersion: "1.0.0"

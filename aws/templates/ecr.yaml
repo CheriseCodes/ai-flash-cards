@@ -1,0 +1,7 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Description: DynamoDB resources to store data for GenAI flash card application
+Resources:
+  AIFlashCardsRepo:
+    Type: AWS::ECR::Repository
+    Properties:
+      RepositoryName: ai-flash-cards

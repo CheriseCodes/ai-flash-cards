@@ -1,3 +1,2 @@
-aws cloudformation create-stack --stack-name flash-card-app-s3 --template-body file://templates/s3.yaml \
-    --parameters ParameterKey=BucketName,ParameterValue=$BUCKET_NAME \
-    ParameterKey=DistributionId,ParameterValue=$DISTRIBUTION_ID
+aws cloudformation deploy --stack-name flash-card-app-s3 --template-file templates/s3.yaml \
+    --parameter-overrides BucketName=$BUCKET_NAME DistributionId=$DISTRIBUTION_ID

@@ -1,3 +1,4 @@
-sh update_dynamodb.sh
-sh update_s3.sh
-sh update_cloudfront.sh
+sh deploy_dynamodb.sh
+sh deploy_s3.sh
+sh deploy_cloudfront.sh
+sh deploy_ecr.sh

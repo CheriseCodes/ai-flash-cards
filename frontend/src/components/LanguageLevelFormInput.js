@@ -1,6 +1,6 @@
 import React from "react";
 import PropTypes from "prop-types";
-import appConfig from "../config.js";
+import appConfig from "../config";
 
 import { useSelector, useDispatch } from "react-redux";
 

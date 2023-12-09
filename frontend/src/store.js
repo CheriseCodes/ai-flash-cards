@@ -1,7 +1,7 @@
-import reducer from "./reducer.js";
-import appConfig from "./config.js";
+import reducer from "./reducer";
+import appConfig from "./config";
 import { configureStore } from "@reduxjs/toolkit";
-import storage from "redux-persist/es/storage/index.js";
+import storage from "redux-persist/storage/index";
 import {
   persistReducer,
   FLUSH,

@@ -1,9 +1,9 @@
 import React, { useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import PropTypes from "prop-types";
-import { generateNextCard  } from "../utils.js";
-import LoadingSpinner from "./LoadingSpinner.js";
-import CloseButton from "react-bootstrap/esm/CloseButton.js";
+import { generateNextCard  } from "../utils";
+import LoadingSpinner from "./LoadingSpinner";
+import CloseButton from "react-bootstrap/CloseButton";
 
 const FlashCard = ({ cardData, setErrors, userId }) => {
   const [enableEdit, setEnableEdit] = useState(false);

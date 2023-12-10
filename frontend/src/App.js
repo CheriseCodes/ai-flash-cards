@@ -8,6 +8,8 @@ import ErrorBanner from "./components/ErrorBanner";
 
 import { v4 as uuidv4 } from "uuid";
 
+const PORT = (process.env.NODE_ENV == "development") ? 3000 : 8000;
+
 const App = () => {
   const cards = useSelector((state) => state.cards);
   const [errors, setErrors] = useState([]);
@@ -21,7 +23,7 @@ const App = () => {
   const fetchAllFlashcards = async () => {
     try {
       const response = await fetch(
-        `http://localhost:8000/flashcards`,
+        `http://localhost:${PORT}/flashcards`,
         {
           method: "POST",
           headers: {

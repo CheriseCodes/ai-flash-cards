@@ -2,7 +2,7 @@ import { HttpResponse, http } from "msw"
 
 export const handlers = [
     http.post("/flashcards",() => {
-        return new HttpResponse.json({data: []})
+        return HttpResponse.json({"data": [{"Content":{"S":"{\"word\": \"blanche\",\"sampleSentence\": \"Ma mère a préparé une sauce blanche pour accompagner les pâtes.\",\"translatedSampleSentence\":\"My mother made a white sauce to accompany the pasta.\",\"wordTranslated\": \"white\"}"},"TimeStamp":{"S":"1701047496686"},"FlashCardId":{"S":"f552286a-4780-4a36-8500-326d3ce6785f"}}]})
     }),
     http.post("/openai/test/text", ({request}) => {
         const url = new URL(request.url)
@@ -16,7 +16,7 @@ export const handlers = [
           }, choices:[{ finish_reason: "stop", message: {content: JSON.stringify({word: `${word}`,sampleSentence: `Example sentence using ${word} in ${langMode} at level ${langLevel}`,translatedSampleSentence:"English translation of the example sentence",wordTranslated: `English translation of ${word}`})}}]})
     }),
     http.post("/openai/test/imagine", () => {
-        return new HttpResponse.json({
+        return HttpResponse.json({
             created: Date.now(),
             data: [
               {
@@ -28,7 +28,7 @@ export const handlers = [
     http.post("/upload/image",({request}) => {
         const url = new URL(request.url)
         const imgUrl = url.searchParams.get("imgUrl")
-        return new HttpResponse.json(
+        return HttpResponse.json(
             { url: imgUrl }
         )
     })

@@ -1,11 +1,12 @@
 import { v4 as uuidv4 } from "uuid";
 
 // TODO: Stop updating card data object directly... only update with update-card reducer
+const PORT = (process.env.NODE_ENV == "development") ? 3000 : 8000
 
 const getNewCardText = async (word, languageMode, languageLevel, userId, cardId, timeStamp) => {
   console.log("start getNewCardText");
   const response = await fetch(
-    `http://localhost:8000/openai/test/text?word=${word}&lang_mode=${languageMode}&lang_level=${languageLevel}`,
+    `http://localhost:${PORT}/openai/test/text?word=${word}&lang_mode=${languageMode}&lang_level=${languageLevel}`,
     {
       method: "POST",
       headers: {
@@ -34,7 +35,7 @@ const getNewCardImage = async (dispatch, cardData, languageMode, languageLevel, 
     cardData.generatingImage = true;
     dispatch({ type: "update-card", cardData: cardData, cardId: cardId });
     const imageResponse = await fetch(
-      `http://localhost:8000/openai/test/imagine?sentence=${cardData.translatedSampleSentence}`,
+      `http://localhost:${PORT}/openai/test/imagine?sentence=${cardData.translatedSampleSentence}`,
       {
         method: "POST",
         headers: {
@@ -49,7 +50,7 @@ const getNewCardImage = async (dispatch, cardData, languageMode, languageLevel, 
     const imageJson = await imageResponse.json();
     // 3rd fetch to persist the image in s3 then update references with persisted url
     const uploadResponse = await fetch(
-      `http://localhost:8000/upload/image`,
+      `http://localhost:${PORT}/upload/image`,
       {
         method: "POST",
         headers: {

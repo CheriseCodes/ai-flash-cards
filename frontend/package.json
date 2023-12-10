@@ -1,6 +1,5 @@
 {
   "name": "ai-flash-cards",
-  "type": "module",
   "version": "0.1.0",
   "private": true,
   "dependencies": {
@@ -23,6 +22,7 @@
     "lint": "npx eslint --ext .js,.jsx,.ts .",
     "build": "react-scripts build",
     "test": "react-scripts test",
+    "jest": "jest",
     "eject": "react-scripts eject"
   },
   "browserslist": {
@@ -38,10 +38,27 @@
     ]
   },
   "devDependencies": {
+    "@babel/core": "^7.23.5",
     "@babel/plugin-proposal-private-property-in-object": "^7.21.11",
+    "@babel/preset-env": "^7.23.5",
+    "@babel/preset-react": "^7.23.3",
+    "@testing-library/react": "^14.1.2",
+    "babel-jest": "^29.7.0",
     "eslint": "^8.53.0",
     "eslint-plugin-prettier": "^5.0.1",
     "eslint-plugin-react": "^7.33.2",
-    "prettier": "^3.0.3"
+    "jest": "^27.5.1",
+    "msw": "^2.0.10",
+    "prettier": "^3.0.3",
+    "react-test-renderer": "^18.2.0"
+  },
+  "msw": {
+    "workerDirectory": "public"
+  },
+  "eslintConfig": {
+    "extends": [
+      "react-app",
+      "react-app/jest"
+    ]
   }
 }

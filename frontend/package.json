@@ -1,6 +1,5 @@
 {
   "name": "ai-flash-cards",
-  "type": "commonjs",
   "version": "0.1.0",
   "private": true,
   "dependencies": {
@@ -49,7 +48,17 @@
     "eslint-plugin-prettier": "^5.0.1",
     "eslint-plugin-react": "^7.33.2",
     "jest": "^27.5.1",
+    "msw": "^2.0.10",
     "prettier": "^3.0.3",
     "react-test-renderer": "^18.2.0"
+  },
+  "msw": {
+    "workerDirectory": "public"
+  },
+  "eslintConfig": {
+    "extends": [
+      "react-app",
+      "react-app/jest"
+    ]
   }
 }

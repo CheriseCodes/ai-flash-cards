@@ -17,6 +17,9 @@ helm
 # production
 build
 
+# typescript
+built
+
 # misc
 .DS_Store
 .env.local

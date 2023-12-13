@@ -5,7 +5,12 @@ import cors from "cors";
 
 import { open, rm } from "node:fs/promises";
 // import { mock } from 'node:test';
-import https from "https";
+let https;
+try {
+  https = async () => { return await import('node:https')};
+} catch (err) {
+  console.error('https support is disabled!');
+}
 
 // import { mockClient } from "aws-sdk-client-mock";
 
@@ -16,6 +21,11 @@ import {
   QueryCommand,
   PutItemCommand,
   UpdateItemCommand,
+  DynamoDB,
+  DynamoDBClientConfigType,
+  PutItemCommandInput,
+  UpdateItemCommandInput,
+  QueryCommandInput,
 } from "@aws-sdk/client-dynamodb";
 import { fromSSO } from "@aws-sdk/credential-providers";
 
@@ -52,19 +62,19 @@ const openAIChatCompletion = async (model, temperature, messages) => {
 }
 
 const putItemFlashCardTable = async (userId, timeStamp, cardId, response, messages) => {
-  const awsInput = {
+  const awsInput: PutItemCommandInput = {
     Item: {
       UserId: { S: userId },
-      TimeStamp: { S: new String(timeStamp) },
+      TimeStamp: { S: new String(timeStamp).toString() },
       FlashCardId: { S: cardId },
-      TextCompletionCreated: { N: new String(response.created) },
+      TextCompletionCreated: { N: new String(response.created).toString() },
       TextPrompt: { S: messages[0].content },
       TextModel: { S: "gpt-3.5-turbo" },
       Content: { S: response.choices[0].message.content },
       FinishReason: { S: response.choices[0].finish_reason },
-      PromptTokens: { N: new String(response.usage.prompt_tokens) },
-      CompletionTokens: { N: new String(response.usage.completion_tokens) },
-      TotalTokens: { N: new String(response.usage.total_tokens) },
+      PromptTokens: { N: new String(response.usage.prompt_tokens).toString() },
+      CompletionTokens: { N: new String(response.usage.completion_tokens).toString() },
+      TotalTokens: { N: new String(response.usage.total_tokens).toString() },
     },
     TableName: "FlashCardGenAITable",
   };
@@ -167,13 +177,13 @@ app.post("/openai/test/imagine", async (req, res) => {
     // console.log(response);
     if (response?.created) {
       res.send(response);
-      const input = {
+      const input: UpdateItemCommandInput = {
         Key: { FlashCardId: { S: cardId } },
         TableName: "FlashCardGenAITable",
         UpdateExpression:
           "SET ImageCreated = :imgc, ImagePrompt = :imgp, ImageModel = :imgm, ImageLink = :imgl",
         ExpressionAttributeValues: {
-          ":imgc": { N: new String(response.created) },
+          ":imgc": { N: new String(response.created).toString() },
           ":imgp": { S: prompt },
           ":imgm": { S: "DALLE2" },
           ":imgl": { S: response.data[0].url },
@@ -183,7 +193,7 @@ app.post("/openai/test/imagine", async (req, res) => {
       const command = new UpdateItemCommand(input);
       await dynamoDbClient.send(command);
     }
-  } catch (e) {
+  } catch (err) {
     console.error(err);
     res.status(500).send({error: err, created: 400,
       data: [
@@ -232,7 +242,7 @@ app.post("/upload/image", async (req, res) => {
     const domainName = process.env.CLOUDFRONT_URL;
     // const domainName = `https://${process.env.BUCKET_NAME}.s3.ca-central-1.amazonaws.com`
     res.send({ url: `${domainName}/${remoteFileName}` });
-  } catch (e) {
+  } catch (err) {
     console.error(err);
     res.status(500).send({error: err})
   }
@@ -241,7 +251,7 @@ app.post("/upload/image", async (req, res) => {
 app.post("/flashcards", async (req, res) => {
   try {
     const userId = req.body.userId;
-    const input = {
+    const input: QueryCommandInput = {
       TableName: "FlashCardGenAITable",
       IndexName: "UserId",
       Select: "SPECIFIC_ATTRIBUTES",

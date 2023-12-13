@@ -1,6 +1,5 @@
 {
   "name": "ai-flash-cards",
-  "type": "module",
   "version": "0.1.0",
   "private": true,
   "dependencies": {
@@ -8,6 +7,7 @@
     "@aws-sdk/client-s3": "^3.436.0",
     "@aws-sdk/credential-providers": "^3.436.0",
     "@aws-sdk/s3-request-presigner": "^3.441.0",
+    "@aws-sdk/types": "^3.468.0",
     "@aws-sdk/util-format-url": "^3.433.0",
     "@smithy/hash-node": "^2.0.12",
     "@smithy/protocol-http": "^3.0.8",
@@ -46,6 +46,7 @@
     "aws-sdk-client-mock": "^3.0.0",
     "eslint": "^8.53.0",
     "eslint-plugin-prettier": "^5.0.1",
-    "prettier": "^3.0.3"
+    "prettier": "^3.0.3",
+    "typescript": "^5.3.3"
   }
 }

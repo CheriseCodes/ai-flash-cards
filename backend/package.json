@@ -1,5 +1,6 @@
 {
   "name": "ai-flash-cards",
+  "type": "module",
   "version": "0.1.0",
   "private": true,
   "dependencies": {
@@ -20,14 +21,12 @@
   },
   "scripts": {
     "start": "node server.js",
-    "start:v1": "nodemon server.js",
-    "start:v2": "nodemon mock-openai-server.js",
-    "start:v3": "nodemon mock-all-server.js",
+    "start:dev": "nodemon ./built/src/server.js",
     "lint:fix": "npx eslint --fix --ext .js,.jsx,.ts .",
     "lint": "npx eslint --ext .js,.jsx,.ts .",
     "test": "node --test",
-    "test:server": "node --test ./__test__/test-server.js",
-    "test:server-helpers": "node --test ./__test__/test-server-helpers.js"
+    "test:server": "node --test ./built/__test__/test-server.js",
+    "test:server-helpers": "node --test ./built/__test__/test-server-helpers.js"
   },
   "browserslist": {
     "production": [

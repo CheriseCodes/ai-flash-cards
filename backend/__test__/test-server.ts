@@ -140,7 +140,7 @@ describe("POST /openai/test/text", () => {
             timeStamp: timeStamp,
           }),
         },
-      ).catch((err) => {return {error: err}});
+      ).catch((err) => {return new Response(new Blob(), {status: err.status, statusText: err.message})});
       const json = await response.json().catch((err) => {return {error: err.error}});
       assert.notStrictEqual(json.content, "");
       const parsedContent = JSON.parse(json.content);

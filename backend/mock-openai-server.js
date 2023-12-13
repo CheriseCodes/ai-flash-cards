@@ -3,12 +3,10 @@ import bodyParser from "body-parser";
 import cors from "cors";
 
 import { open, rm } from "node:fs/promises";
-import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 import https from "https";
 
 import {
   PutObjectCommand,
-  GetObjectCommand,
   S3Client,
 } from "@aws-sdk/client-s3";
 import {
@@ -19,7 +17,7 @@ import {
 } from "@aws-sdk/client-dynamodb";
 import { fromSSO } from "@aws-sdk/credential-providers";
 
-import appConfig from "./src/config.js";
+import appConfig from "./config.js";
 
 const s3Client = new S3Client({
   credentials: fromSSO({ profile: process.env.AWS_PROFILE }),
@@ -36,8 +34,6 @@ app.use(cors());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 
-// TODO: 3rd endpoint to store image in S3 and replace the ImageLink in the DynamoDB table
-//       with the s3 url
 app.post("/openai/test/text", async (req, res) => {
   try {
     const wordsToSearch = Array.isArray(req.query.word)
@@ -114,7 +110,6 @@ app.post("/openai/test/text", async (req, res) => {
 app.post("/openai/test/imagine", async (req, res) => {
   try {
     const sentenceToVisualize = req.query.sentence;
-    const userId = req.body.userId;
     const cardId = req.body.cardId;
     console.log("visualizing...", sentenceToVisualize);
     const prompt = `${sentenceToVisualize}, Georges Seurat, Bradshaw Crandell, vibrant colors, realistic`;
@@ -122,7 +117,7 @@ app.post("/openai/test/imagine", async (req, res) => {
       created: Date.now(),
       data: [
         {
-          url: "https://picsum.photos/256.jpg"
+          url: "https://images.crunchbase.com/image/upload/c_lpad,h_256,w_256,f_auto,q_auto:eco,dpr_1/gavygdwhilk8d2cytkeq"
         }
       ]
     }
@@ -175,29 +170,49 @@ app.post("/upload/image", async (req, res) => {
         const fdRead = await open(localFileName);
         // Create a stream from some character device.
         const stream = fdRead.createReadStream();
+        stream.on("close", () => {
+          rm(localFileName);
+        });
         const input = {
           // PutObjectRequest
           Body: stream,
           Bucket: process.env.BUCKET_NAME, // required
           Key: remoteFileName, // required
-          ACL: "public-read",
+          // ACL: "public-read", // w/o OAC
+          ContentType: "image/png",
+          CacheControl: "public, max-age=31536000",
         };
         const command = new PutObjectCommand(input);
         const s3Response = await s3Client.send(command);
-        stream.close();
         console.log("s3 upload response", s3Response);
+        stream.close();
       });
     });
-    res.send({ url: `${process.env.CLOUDFRONT_URL}/${remoteFileName}`});
-      // try {
-      //   rm(localFileName);
-      // } catch (e) {
-      //   console.error(e)
-      // }
+    const domainName = process.env.CLOUDFRONT_URL;
+    // const domainName = `https://${process.env.BUCKET_NAME}.s3.ca-central-1.amazonaws.com`
+    res.send({ url: `${domainName}/${remoteFileName}`});
   } catch (e) {
     res.send(e);
     console.error(e);
   }
+});
+
+// TODO: Make deletion and update endpoints
+app.post("/delete/flashcard", async (req, res) => {
+  // delete dynamodb item with text
+  // delete image
+});
+
+app.post("/delete/image", async (req, res) => {
+  // delete dynamodb item with text
+  // delete image
+});
+
+app.post("/update/flashcard", async (req, res) => {
+  // update dynamodb item with text
+  // delete old image
+  // upload new image
+  // update dynamodb item with new image
 });
 
 app.post("/flashcards", async (req, res) => {

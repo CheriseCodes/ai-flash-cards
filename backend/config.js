@@ -67,7 +67,4 @@ const allowedKoreanWords = [
   '무엇보다', '불행히도', '다행히도', '일찍', '아마'
 ];
 
-
-
-
 export default appConfig;

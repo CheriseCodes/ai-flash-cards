@@ -1,0 +1,15 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Description: DynamoDB resources to store data for GenAI flash card application
+Resources:
+  FrontendRepo:
+    Type: AWS::ECR::Repository
+    Properties:
+      RepositoryName: ai-flash-cards/frontend
+  BackendRepo:
+    Type: AWS::ECR::Repository
+    Properties:
+      RepositoryName: ai-flash-cards/backend
+  ReverseProxyRepo:
+    Type: AWS::ECR::Repository
+    Properties:
+      RepositoryName: ai-flash-cards/reverse-proxy

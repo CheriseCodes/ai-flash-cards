@@ -1,0 +1,51 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Description: S3 resources to store data for GenAI flash card application
+
+Parameters:
+  BucketName:
+    Type: String
+    Description: Bucket to store DALLE images
+  DistributionId:
+    Type: String
+    Description: Cloudfront distribution Id
+Resources:
+  OpenAIDalleSBucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: !Ref BucketName
+      CorsConfiguration:
+        CorsRules:
+          - AllowedMethods: 
+              - "GET"
+            AllowedOrigins: 
+              - "http://localhost:3000"
+            Id: ShareImages
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: true
+        BlockPublicPolicy: true
+        IgnorePublicAcls: true
+        RestrictPublicBuckets: true
+      OwnershipControls:
+        Rules:
+          - ObjectOwnership: BucketOwnerEnforced #  BucketOwnerPreferred w/o OAC
+  DalleBucketPolicy:
+    Type: AWS::S3::BucketPolicy
+    Properties:
+      Bucket: !Ref BucketName
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          # w/o OAC:
+          # - Effect: Allow
+          #   Principal: "*"
+          #   Action: "s3:GetObject"
+          #   Resource: !Sub "arn:aws:s3:::${BucketName}/*"
+          - Sid: AllowCloudFrontServicePrincipalReadOnly
+            Effect: Allow
+            Principal: 
+              Service: cloudfront.amazonaws.com
+            Action: "s3:GetObject"
+            Resource: !Sub "arn:aws:s3:::${BucketName}/*"
+            Condition:
+              StringEquals:
+                AWS:SourceArn: !Sub "arn:aws:cloudfront::${AWS::AccountId}:distribution/${DistributionId}"

@@ -14,7 +14,7 @@ import {
 } from "@aws-sdk/client-dynamodb";
 import { fromSSO } from "@aws-sdk/credential-providers";
 
-import appConfig from "./config.js";
+import appConfig from "./config";
 
 const s3Client = new S3Client({
   credentials: fromSSO({ profile: process.env.AWS_PROFILE }),

@@ -6,10 +6,7 @@ import cors from "cors";
 import { open, rm } from "node:fs/promises";
 import https from "https";
 
-import {
-  PutObjectCommand,
-  S3Client,
-} from "@aws-sdk/client-s3";
+import { PutObjectCommand, S3Client } from "@aws-sdk/client-s3";
 
 import {
   DynamoDBClient,
@@ -165,7 +162,7 @@ app.post("/openai/test/imagine", async (req, res) => {
 app.post("/upload/image", async (req, res) => {
   try {
     // Download image
-    console.log("starting download..")
+    console.log("starting download..");
     const imgUrl = req.body.imgUrl;
     const imgName = req.body.imgName;
     const localFileName = `./private/images/${imgName}.png`;
@@ -194,12 +191,12 @@ app.post("/upload/image", async (req, res) => {
         const command = new PutObjectCommand(input);
         const s3Response = await s3Client.send(command);
         console.log("s3 upload response", s3Response);
-        stream.close()
+        stream.close();
       });
     });
     const domainName = process.env.CLOUDFRONT_URL;
     // const domainName = `https://${process.env.BUCKET_NAME}.s3.ca-central-1.amazonaws.com`
-    res.send({ url: `${domainName}/${remoteFileName}`});
+    res.send({ url: `${domainName}/${remoteFileName}` });
   } catch (e) {
     res.send(e);
     console.error(e);
@@ -216,7 +213,7 @@ app.post("/flashcards", async (req, res) => {
       KeyConditionExpression: "UserId = :u",
       ExpressionAttributeValues: { ":u": { S: userId } },
       ProjectionExpression: "#T, FlashCardId, Content, ImageLink",
-      ExpressionAttributeNames: {"#T" : "TimeStamp" },
+      ExpressionAttributeNames: { "#T": "TimeStamp" },
     };
     const command = new QueryCommand(input);
     const awsResponse = await dynamoDbClient.send(command);
@@ -225,5 +222,5 @@ app.post("/flashcards", async (req, res) => {
     console.error(e);
   }
 });
-   
+
 app.listen(PORT, () => console.log("server is running on port " + PORT));

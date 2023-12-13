@@ -5,10 +5,7 @@ import cors from "cors";
 import { open, rm } from "node:fs/promises";
 import https from "https";
 
-import {
-  PutObjectCommand,
-  S3Client,
-} from "@aws-sdk/client-s3";
+import { PutObjectCommand, S3Client } from "@aws-sdk/client-s3";
 import {
   DynamoDBClient,
   PutItemCommand,
@@ -39,7 +36,7 @@ app.post("/openai/test/text", async (req, res) => {
     const wordsToSearch = Array.isArray(req.query.word)
       ? req.query.word
       : [req.query.word];
-    const wordToSearch = wordsToSearch
+    const wordToSearch = wordsToSearch;
     const targetLanguage = req.query.lang_mode;
     let targetLevel = req.query.lang_level;
     const userId = req.body.userId;
@@ -73,11 +70,29 @@ app.post("/openai/test/text", async (req, res) => {
         } ${targetLevel} vocabulary and grammar points. Return the sentence in the following JSON format {"word": "${wordToSearch}","sampleSentence": "Example sentence using ${wordToSearch}","translatedSampleSentence":"English translation of the example sentence","wordTranslated": "English translation of ${wordToSearch}"}.`,
       });
     }
-    const response = {id: 123, created: 123, usage: {
-      prompt_tokens: 123,
-      completion_tokens: 123,
-      total_tokens: 123
-    }, choices:[{ finish_reason: "stop", message: {content: JSON.stringify({word: `${wordToSearch}`,sampleSentence: `Example sentence using ${wordToSearch} in ${targetLanguage} at level ${targetLevel}`,translatedSampleSentence:"English translation of the example sentence",wordTranslated: `English translation of ${wordToSearch}`})}}]}
+    const response = {
+      id: 123,
+      created: 123,
+      usage: {
+        prompt_tokens: 123,
+        completion_tokens: 123,
+        total_tokens: 123,
+      },
+      choices: [
+        {
+          finish_reason: "stop",
+          message: {
+            content: JSON.stringify({
+              word: `${wordToSearch}`,
+              sampleSentence: `Example sentence using ${wordToSearch} in ${targetLanguage} at level ${targetLevel}`,
+              translatedSampleSentence:
+                "English translation of the example sentence",
+              wordTranslated: `English translation of ${wordToSearch}`,
+            }),
+          },
+        },
+      ],
+    };
     if (response.id) {
       res.send(response);
       const awsInput = {
@@ -117,10 +132,10 @@ app.post("/openai/test/imagine", async (req, res) => {
       created: Date.now(),
       data: [
         {
-          url: "https://images.crunchbase.com/image/upload/c_lpad,h_256,w_256,f_auto,q_auto:eco,dpr_1/gavygdwhilk8d2cytkeq"
-        }
-      ]
-    }
+          url: "https://images.crunchbase.com/image/upload/c_lpad,h_256,w_256,f_auto,q_auto:eco,dpr_1/gavygdwhilk8d2cytkeq",
+        },
+      ],
+    };
     console.log(response);
     if (response?.created) {
       res.send(response);
@@ -156,7 +171,7 @@ app.post("/openai/test/imagine", async (req, res) => {
 app.post("/upload/image", async (req, res) => {
   try {
     // Download image
-    console.log("starting download..")
+    console.log("starting download..");
     const imgUrl = req.body.imgUrl;
     const imgName = req.body.imgName;
     const localFileName = `./private/images/${imgName}.png`;
@@ -190,7 +205,7 @@ app.post("/upload/image", async (req, res) => {
     });
     const domainName = process.env.CLOUDFRONT_URL;
     // const domainName = `https://${process.env.BUCKET_NAME}.s3.ca-central-1.amazonaws.com`
-    res.send({ url: `${domainName}/${remoteFileName}`});
+    res.send({ url: `${domainName}/${remoteFileName}` });
   } catch (e) {
     res.send(e);
     console.error(e);
@@ -225,7 +240,7 @@ app.post("/flashcards", async (req, res) => {
       KeyConditionExpression: "UserId = :u",
       ExpressionAttributeValues: { ":u": { S: userId } },
       ProjectionExpression: "#T, FlashCardId, Content, ImageLink",
-      ExpressionAttributeNames: {"#T" : "TimeStamp" },
+      ExpressionAttributeNames: { "#T": "TimeStamp" },
     };
     const command = new QueryCommand(input);
     const awsResponse = await dynamoDbClient.send(command);

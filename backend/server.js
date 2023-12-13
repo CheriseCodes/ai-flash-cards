@@ -4,7 +4,10 @@ import OpenAI from "openai";
 import cors from "cors";
 
 import { open, rm } from "node:fs/promises";
+// import { mock } from 'node:test';
 import https from "https";
+
+// import { mockClient } from "aws-sdk-client-mock";
 
 import { PutObjectCommand, S3Client } from "@aws-sdk/client-s3";
 
@@ -16,7 +19,8 @@ import {
 } from "@aws-sdk/client-dynamodb";
 import { fromSSO } from "@aws-sdk/credential-providers";
 
-import appConfig from "./config";
+import appConfig from "./config.js";
+import * as sh from "./server-helpers.js"
 
 const s3Client = new S3Client({
   credentials: fromSSO({ profile: process.env.AWS_PROFILE }),
@@ -38,6 +42,39 @@ const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
 });
 
+const openAIChatCompletion = async (model, temperature, messages) => {
+  const response = await openai.chat.completions.create({
+    model: model,
+    temperature: temperature,
+    messages,
+  });
+  return response
+}
+
+const putItemFlashCardTable = async (userId, timeStamp, cardId, response, messages) => {
+  const awsInput = {
+    Item: {
+      UserId: { S: userId },
+      TimeStamp: { S: new String(timeStamp) },
+      FlashCardId: { S: cardId },
+      TextCompletionCreated: { N: new String(response.created) },
+      TextPrompt: { S: messages[0].content },
+      TextModel: { S: "gpt-3.5-turbo" },
+      Content: { S: response.choices[0].message.content },
+      FinishReason: { S: response.choices[0].finish_reason },
+      PromptTokens: { N: new String(response.usage.prompt_tokens) },
+      CompletionTokens: { N: new String(response.usage.completion_tokens) },
+      TotalTokens: { N: new String(response.usage.total_tokens) },
+    },
+    TableName: "FlashCardGenAITable",
+  };
+
+  // console.log(awsInput);
+  const awsCommand = new PutItemCommand(awsInput);
+  const awsResponse = await dynamoDbClient.send(awsCommand);
+  console.log("putItemFlashCardTable", awsResponse);
+}
+
 // app.get("/", async (req, res) => {
 //   res.send({message: "app is alive"});
 // });
@@ -48,7 +85,27 @@ app.post("/openai/test/text", async (req, res) => {
       ? req.query.word
       : [req.query.word];
     const targetLanguage = req.query.lang_mode;
+    if (!sh.validateLang(targetLanguage)) {
+      res.status(400).send({status: 400, message: `Unsupported language: ${targetLanguage}`})
+      return
+    }
+    let invalidWords = "";
+    for (let word of wordsToSearch) {
+      console.log(sh.validateWord(word, targetLanguage))
+      if (!(sh.validateWord(word, targetLanguage))) {
+        invalidWords = invalidWords + ` ${word}`;
+      }
+    }
+    console.log(invalidWords);
+    if (invalidWords !== "") {
+      res.status(400).send({status: 400, message: `Invalid words:${invalidWords}`})
+      return
+    }
     let targetLevel = req.query.lang_level;
+    if (!(sh.validateLangLevel(targetLanguage, targetLevel))) {
+      res.status(400).send({status: 400, message: `Invalid language level: ${targetLevel}`})
+      return
+    }
     const userId = req.body.userId;
     const cardId = req.body.cardId;
     const timeStamp = req.body.timeStamp;
@@ -81,39 +138,19 @@ app.post("/openai/test/text", async (req, res) => {
       });
     }
     console.log("promt for text:", messages[0].content);
-    const response = await openai.chat.completions.create({
-      model: "gpt-3.5-turbo",
-      temperature: 1,
-      messages,
-    });
+    const response = await openAIChatCompletion("gpt-3.5-turbo", 1, messages);
     // console.log(response.choices[0].message.content);
     if (response.id) {
       // console.log(response.choices[0].message.content);
-      res.send(response);
-      const awsInput = {
-        Item: {
-          UserId: { S: userId },
-          TimeStamp: { S: new String(timeStamp) },
-          FlashCardId: { S: cardId },
-          TextCompletionCreated: { N: new String(response.created) },
-          TextPrompt: { S: messages[0].content },
-          TextModel: { S: "gpt-3.5-turbo" },
-          Content: { S: response.choices[0].message.content },
-          FinishReason: { S: response.choices[0].finish_reason },
-          PromptTokens: { N: new String(response.usage.prompt_tokens) },
-          CompletionTokens: { N: new String(response.usage.completion_tokens) },
-          TotalTokens: { N: new String(response.usage.total_tokens) },
-        },
-        TableName: "FlashCardGenAITable",
-      };
-
-      // console.log(awsInput);
-      const awsCommand = new PutItemCommand(awsInput);
-      const awsResponse = await dynamoDbClient.send(awsCommand);
-      // console.log(awsResponse);
+      res.send({content: response.choices[0].message.content});
+      // console.log(process.env.NODE_ENV)
+      // const putItemFn = process.env.NODE_ENV === "TEST" ? mock.fn(putItemFlashCardTable) : putItemFlashCardTable
+      // await putItemFn(userId, timeStamp, cardId, response, messages)
+      return
     }
   } catch (err) {
     console.error(err);
+    res.status(500).send({error: err})
   }
 });
 app.post("/openai/test/imagine", async (req, res) => {
@@ -147,15 +184,13 @@ app.post("/openai/test/imagine", async (req, res) => {
       await dynamoDbClient.send(command);
     }
   } catch (e) {
-    console.error(e);
-    res.send({
-      created: 400,
+    console.error(err);
+    res.status(500).send({error: err, created: 400,
       data: [
         {
           url: "https://m.media-amazon.com/images/I/418Jmnejj8L.jpg",
         },
-      ],
-    });
+      ]});
   }
 });
 
@@ -198,8 +233,8 @@ app.post("/upload/image", async (req, res) => {
     // const domainName = `https://${process.env.BUCKET_NAME}.s3.ca-central-1.amazonaws.com`
     res.send({ url: `${domainName}/${remoteFileName}` });
   } catch (e) {
-    res.send(e);
-    console.error(e);
+    console.error(err);
+    res.status(500).send({error: err})
   }
 });
 
@@ -217,9 +252,11 @@ app.post("/flashcards", async (req, res) => {
     };
     const command = new QueryCommand(input);
     const awsResponse = await dynamoDbClient.send(command);
-    res.send(awsResponse.Items);
-  } catch (e) {
-    console.error(e);
+    console.log(awsResponse);
+    res.send({"cards": awsResponse.Items});
+  } catch (err) {
+    console.error(err);
+    res.status(500).send({error: err})
   }
 });
 

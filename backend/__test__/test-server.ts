@@ -1,25 +1,33 @@
-import { describe, test } from 'node:test';
+import { describe, test, beforeEach, afterEach, mock, before, after } from 'node:test';
 import assert from 'node:assert';
-// import {
-//   DynamoDBClient,
-//   QueryCommand,
-//   PutItemCommand,
-//   UpdateItemCommand,
-// } from "@aws-sdk/client-dynamodb";
-// import { PutObjectCommand, S3Client } from "@aws-sdk/client-s3";
-// import { mockClient } from "aws-sdk-client-mock";
+import { mockClient } from "aws-sdk-client-mock";
+import { dynamoDbClient, s3Client, openai, app } from '../src/server';
 
 const PORT = 8000;
 
-// const mockS3 = mockClient(PutObjectCommand);
-// const mockDdb = mockClient(DynamoDBClient);
+const ddbMock = mockClient(dynamoDbClient);
+const s3Mock = mockClient(s3Client);
 
 describe("POST /flashcards", () => {
-    test("existent user should have cards cards", async () => {
-        setTimeout(async () => {
-          const queryResult = [];
-          // const queryResult = [{"Content":{"S":"{\"word\":\"hello\",\"sampleSentence\":\"Example sentence using hello in French at level B2\",\"translatedSampleSentence\":\"English translation of the example sentence\",\"wordTranslated\":\"English translation of hello\"}"},"ImageLink":{"S":"https://picsum.photos/256"},"TimeStamp":{"S":"1700536327774"},"FlashCardId":{"S":"15685288-110f-4ce0-8bfb-edd18489b6eb"}}]
-          // mockDdb.on(QueryCommand).resolves({Items: queryResult})
+    let server;
+    beforeEach(() => {
+      ddbMock.reset()
+      s3Mock.reset()
+    })
+    afterEach(() => {
+      ddbMock.restore()
+      s3Mock.restore()
+    })
+    before(() => {
+      server = app.listen(PORT, () => console.log("server is running on port " + PORT));
+    })
+    after(() => {
+      server.close()
+    })
+    test("existent user should have non-empty cards response", async () => {
+          const queryResult = {Items: [{"Content":{"S":"{\"word\":\"hello\",\"sampleSentence\":\"Example sentence using hello in French at level B2\",\"translatedSampleSentence\":\"English translation of the example sentence\",\"wordTranslated\":\"English translation of hello\"}"},"ImageLink":{"S":"https://picsum.photos/256"},"TimeStamp":{"S":"1700536327774"},"FlashCardId":{"S":"15685288-110f-4ce0-8bfb-edd18489b6eb"}}]};
+          ddbMock.onAnyCommand().resolves(queryResult)
+          s3Mock.onAnyCommand().resolves({})
           const userId = "default";
           const response = await fetch(
             `http://localhost:${PORT}/flashcards`,
@@ -34,20 +42,55 @@ describe("POST /flashcards", () => {
             },
           );
           const json = await response.json()
-          assert.deepStrictEqual(json, {cards: queryResult})
-        }, 1000);
+          assert.deepStrictEqual(json, {cards: queryResult.Items})
       });
 });
 
 describe("POST /openai/test/text", () => {
-  test("invalid word should return an empty response", () => {
-    setTimeout(async () => {
+    let server;
+    beforeEach(() => {
+      ddbMock.reset()
+      s3Mock.reset()
+    })
+    before(()=> {
+      server = app.listen(PORT, () => console.log("server is running on port " + PORT));
+    })
+    after(() => {
+      server.close()
+    })
+  
+  test("invalid word should return an empty response", async () => {
+      ddbMock.onAnyCommand().resolves({})
+      s3Mock.onAnyCommand().resolves({})
       const word = "hello"; // invalid word
       const userId = "default";
       const cardId = "93960a65-ce5e-4d4d-ba2a-8d9e8eeb57d9"
       const languageMode = "French";
       const languageLevel = "A1";
       const timeStamp = Date.now()
+      mock.method(openai.chat.completions, 'create', () => {return {
+        id: 123,
+        created: 123,
+        usage: {
+          prompt_tokens: 123,
+          completion_tokens: 123,
+          total_tokens: 123,
+        },
+        choices: [
+          {
+            finish_reason: "stop",
+            message: {
+              content: JSON.stringify({
+                word: `${word}`,
+                sampleSentence: `Example sentence using ${word} in ${languageMode}} at level ${languageLevel}`,
+                translatedSampleSentence:
+                  "English translation of the example sentence",
+                wordTranslated: `English translation of ${word}`,
+              }),
+            },
+          },
+        ],
+      };})
       const response = await fetch(
         `http://localhost:${PORT}/openai/test/text?word=${word}&lang_mode=${languageMode}&lang_level=${languageLevel}`,
         {
@@ -64,11 +107,10 @@ describe("POST /openai/test/text", () => {
       );
       const json = await response.json()
       assert.deepStrictEqual(json, {status: 400, message: 'Invalid words: hello'})
-      
-    }, 1000);
   });
-  test("unsupported language should return an empty response", () => {
-    setTimeout(async () => {
+  test("unsupported language should return an empty response", async () => {
+      // ddbMock.onAnyCommand().resolves({})
+      // s3Mock.onAnyCommand().resolves({})
       const word = "viikko"; // invalid word
       const userId = "default";
       const cardId = "93960a65-ce5e-4d4d-ba2a-8d9e8eeb57d9"
@@ -91,10 +133,10 @@ describe("POST /openai/test/text", () => {
       );
       const json = await response.json()
       assert.deepStrictEqual(json, {status: 400, message: 'Unsupported language: Finnish'})
-    }, 1000);
   });
-  test("invalid language level should return an empty response", () => {
-    setTimeout(async () => {
+  test("invalid language level should return an empty response", async () => {
+      // ddbMock.onAnyCommand().resolves({})
+      // s3Mock.onAnyCommand().resolves({})
       const word = "être";
       const userId = "default";
       const cardId = "93960a65-ce5e-4d4d-ba2a-8d9e8eeb57d9"
@@ -116,11 +158,9 @@ describe("POST /openai/test/text", () => {
         },
       );
       const json = await response.json()
-      assert.deepStrictEqual(json, {status: 400, message: 'Invalid language level: G2'})
-    }, 1000);
+      assert.deepStrictEqual(json, {status: 400, message: 'Invalid language level: G2'});
   });
-  test("valid input should return JSON stringified response with correct key values", () => {
-    setTimeout(async () => {
+  test("valid input should return JSON stringified response with correct key values", async () => {
       const word = "être";
       const userId = "default";
       const cardId = "93960a65-ce5e-4d4d-ba2a-8d9e8eeb57d9"
@@ -148,7 +188,5 @@ describe("POST /openai/test/text", () => {
       assert.notStrictEqual(parsedContent.sampleSentence, "");
       assert.notStrictEqual(parsedContent.translatedSampleSentence, "");
       assert.notStrictEqual(parsedContent.wordTranslated, "");
-    }, 1000);
   });
 });
-

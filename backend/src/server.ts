@@ -12,8 +12,6 @@ try {
   console.error('https support is disabled!');
 }
 
-// import { mockClient } from "aws-sdk-client-mock";
-
 import { PutObjectCommand, S3Client } from "@aws-sdk/client-s3";
 
 import {
@@ -21,8 +19,6 @@ import {
   QueryCommand,
   PutItemCommand,
   UpdateItemCommand,
-  DynamoDB,
-  DynamoDBClientConfigType,
   PutItemCommandInput,
   UpdateItemCommandInput,
   QueryCommandInput,
@@ -30,25 +26,24 @@ import {
 import { fromSSO } from "@aws-sdk/credential-providers";
 
 import appConfig from "./config.js";
-import * as sh from "./server-helpers.js"
+import * as sh from "./server-helpers.js";
 
-const s3Client = new S3Client({
+export const s3Client: S3Client = new S3Client({
   credentials: fromSSO({ profile: process.env.AWS_PROFILE }),
   region: "ca-central-1",
 });
 
-const dynamoDbClient = new DynamoDBClient({
+export const dynamoDbClient: DynamoDBClient = new DynamoDBClient({
   credentials: fromSSO({ profile: process.env.AWS_PROFILE }),
   region: "ca-central-1",
 });
 
-const PORT = 8000;
 export const app = express();
 app.use(cors());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 
-const openai = new OpenAI({
+export const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
 });
 
@@ -58,6 +53,7 @@ const openAIChatCompletion = async (model, temperature, messages) => {
     temperature: temperature,
     messages,
   });
+  console.log(response);
   return response
 }
 
@@ -153,9 +149,7 @@ app.post("/openai/test/text", async (req, res) => {
     if (response.id) {
       // console.log(response.choices[0].message.content);
       res.send({content: response.choices[0].message.content});
-      // console.log(process.env.NODE_ENV)
-      // const putItemFn = process.env.NODE_ENV === "TEST" ? mock.fn(putItemFlashCardTable) : putItemFlashCardTable
-      // await putItemFn(userId, timeStamp, cardId, response, messages)
+      await putItemFlashCardTable(userId, timeStamp, cardId, response, messages)
       return
     }
   } catch (err) {
@@ -269,5 +263,3 @@ app.post("/flashcards", async (req, res) => {
     res.status(500).send({error: err})
   }
 });
-
-app.listen(PORT, () => console.log("server is running on port " + PORT));

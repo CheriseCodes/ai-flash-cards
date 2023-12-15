@@ -336,7 +336,7 @@ const appConfig = {
   },
   allowedFrenchWords: allowedFrenchWords,
   allowedSpanishWords: allowedSpanishWords,
-  allowedKoreanWords: allowedKoreanWords
+  allowedKoreanWords: allowedKoreanWords,
 };
 
 export default appConfig;

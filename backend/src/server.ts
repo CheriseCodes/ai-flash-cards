@@ -4,13 +4,7 @@ import OpenAI from "openai";
 import cors from "cors";
 
 import { open, rm } from "node:fs/promises";
-// import { mock } from 'node:test';
-let https;
-try {
-  https = async () => { return await import('node:https')};
-} catch (err) {
-  console.error('https support is disabled!');
-}
+const https = require('node:https');
 
 import { PutObjectCommand, S3Client } from "@aws-sdk/client-s3";
 

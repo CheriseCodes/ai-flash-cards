@@ -15,9 +15,8 @@ const PORT = 8000;
 
 const ddbMock = mockClient(dynamoDbClient);
 const s3Mock = mockClient(s3Client);
-
+let server;
 describe("POST /flashcards", () => {
-  let server;
   beforeEach(() => {
     ddbMock.reset();
     s3Mock.reset();
@@ -29,10 +28,7 @@ describe("POST /flashcards", () => {
   before(() => {
     server = app.listen(PORT, () =>
       console.log("server is running on port " + PORT),
-    );
-  });
-  after(() => {
-    server.close();
+    ); // IMPORTANT: First test should start the server
   });
   test("existent user should have non-empty cards response", async () => {
     const queryResult = {
@@ -62,26 +58,117 @@ describe("POST /flashcards", () => {
     const json = await response.json();
     assert.deepStrictEqual(json, { cards: queryResult.Items });
   });
+  test("non-existent user should have non-empty cards response", async () => {
+    const queryResult = {
+      Items: [],
+    };
+    ddbMock.onAnyCommand().resolves(queryResult);
+    s3Mock.onAnyCommand().resolves({});
+    const userId = "default";
+    const response = await fetch(`http://localhost:${PORT}/flashcards`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        userId: userId,
+      }),
+    });
+    const json = await response.json();
+    assert.deepStrictEqual(json, { cards: queryResult.Items });
+  });
 });
 
-describe("POST /openai/test/text", () => {
-  let server;
+describe("POST /openai/test/imagine", () => {
   beforeEach(() => {
     ddbMock.reset();
     s3Mock.reset();
+    mock.reset();
   });
-  before(() => {
-    server = app.listen(PORT, () =>
-      console.log("server is running on port " + PORT),
-    );
+  afterEach(() => {
+    ddbMock.restore();
+    s3Mock.restore();
+    mock.restoreAll()
   });
-  after(() => {
-    server.close();
-  });
-
-  test("invalid word should return an empty response", async () => {
+  test("Allowed word should return a valid image", async () => {
+    const word = "trouver";
+    const langMode = "French";
+    const sentence = "Je ne trouve pas mes lunettes.";
+    const userId = "default";
+    const cardId = "93960a65-ce5e-4d4d-ba2a-8d9e8eeb57d9";
+    const expectedResult = {
+      created: 123,
+      data: [
+        {
+          url: "https://images.crunchbase.com/image/upload/c_lpad,h_256,w_256,f_auto,q_auto:eco,dpr_1/gavygdwhilk8d2cytkeq",
+        },
+      ],
+    };
+    mock.method(openai.images, "generate", () => {
+      return expectedResult
+    });
     ddbMock.onAnyCommand().resolves({});
-    s3Mock.onAnyCommand().resolves({});
+    const response = await fetch(
+      `http://localhost:${PORT}/openai/test/imagine?sentence=${sentence}&lang_mode=${langMode}&word=${word}`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          userId: userId,
+          cardId: cardId,
+        }),
+      },
+    );
+    const json = await response.json();
+    assert.deepStrictEqual(json, expectedResult);
+  })
+  test("Unallowed word should return a error image", async () => {
+    const word = "rentrée";
+    const langMode = "French";
+    const sentence = "Courage, c'est la rentrée!";
+    const userId = "default";
+    const cardId = "93960a65-ce5e-4d4d-ba2a-8d9e8eeb57d9";
+    ddbMock.onAnyCommand().resolves({});
+    mock.method(openai.images, "generate", () => {
+      return {}});
+    const response = await fetch(
+      `http://localhost:${PORT}/openai/test/imagine?sentence=${sentence}&lang_mode=${langMode}&word=${word}`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          userId: userId,
+          cardId: cardId,
+        }),
+      },
+    );
+    const json = await response.json();
+    assert.deepStrictEqual(json, {
+      status: 400,
+      message: "Unsupported word: rentrée",
+    });
+  })
+});
+
+describe("POST /openai/test/text", () => {
+  after(() => {
+    server.close(); // IMPORTANT: Last test should close the server
+  });
+  beforeEach(() => {
+    ddbMock.reset();
+    s3Mock.reset();
+    mock.reset();
+  });
+  afterEach(() => {
+    ddbMock.restore();
+    s3Mock.restore();
+    mock.restoreAll()
+  });
+  test("invalid word should return an empty response", async () => {
     const word = "hello"; // invalid word
     const userId = "default";
     const cardId = "93960a65-ce5e-4d4d-ba2a-8d9e8eeb57d9";
@@ -134,8 +221,6 @@ describe("POST /openai/test/text", () => {
     });
   });
   test("unsupported language should return an empty response", async () => {
-    // ddbMock.onAnyCommand().resolves({})
-    // s3Mock.onAnyCommand().resolves({})
     const word = "viikko"; // invalid word
     const userId = "default";
     const cardId = "93960a65-ce5e-4d4d-ba2a-8d9e8eeb57d9";
@@ -163,8 +248,6 @@ describe("POST /openai/test/text", () => {
     });
   });
   test("invalid language level should return an empty response", async () => {
-    // ddbMock.onAnyCommand().resolves({})
-    // s3Mock.onAnyCommand().resolves({})
     const word = "être";
     const userId = "default";
     const cardId = "93960a65-ce5e-4d4d-ba2a-8d9e8eeb57d9";
@@ -198,6 +281,32 @@ describe("POST /openai/test/text", () => {
     const languageMode = "French";
     const languageLevel = "C2";
     const timeStamp = Date.now();
+    const expectedResult = {
+      word: `${word}`,
+      sampleSentence: `Example sentence using ${word} in ${languageMode}} at level ${languageLevel}`,
+      translatedSampleSentence:
+        "English translation of the example sentence",
+      wordTranslated: `English translation of ${word}`,
+    }
+    mock.method(openai.chat.completions, "create", () => {
+      return {
+        id: 123,
+        created: 123,
+        usage: {
+          prompt_tokens: 123,
+          completion_tokens: 123,
+          total_tokens: 123,
+        },
+        choices: [
+          {
+            finish_reason: "stop",
+            message: {
+              content: JSON.stringify(expectedResult),
+            },
+          },
+        ],
+      };
+    });
     const response = await fetch(
       `http://localhost:${PORT}/openai/test/text?word=${word}&lang_mode=${languageMode}&lang_level=${languageLevel}`,
       {
@@ -222,9 +331,6 @@ describe("POST /openai/test/text", () => {
     });
     assert.notStrictEqual(json.content, "");
     const parsedContent = JSON.parse(json.content);
-    assert.notStrictEqual(parsedContent.word, "");
-    assert.notStrictEqual(parsedContent.sampleSentence, "");
-    assert.notStrictEqual(parsedContent.translatedSampleSentence, "");
-    assert.notStrictEqual(parsedContent.wordTranslated, "");
+    assert.deepStrictEqual(parsedContent, expectedResult);
   });
 });

@@ -159,6 +159,28 @@ app.post("/openai/test/text", async (req, res) => {
 });
 app.post("/openai/test/imagine", async (req, res) => {
   try {
+    const word = req.query.word;
+    const langMode = req.query.lang_mode;
+    // not a fool-proof check but good for learning purposes
+    if (langMode == "Korean") {
+      if (!(appConfig.allowedKoreanWords.includes(word))) {
+        res.status(400).send({status: 400, message: `Unsupported word: ${word}`})
+        return
+      }
+    } else if (langMode == "French") {
+      if (!(appConfig.allowedFrenchWords.includes(word))) {
+        res.status(400).send({status: 400, message: `Unsupported word: ${word}`})
+        return
+      }
+    } else if (langMode == "Spanish") {
+      if (!(appConfig.allowedSpanishWords.includes(word))) {
+        res.status(400).send({status: 400, message: `Unsupported word: ${word}`})
+        return
+      }
+    } else {
+      res.status(400).send({status: 400, message: `Unsupported language: ${langMode}`})
+      return
+    }
     const sentenceToVisualize = req.query.sentence;
     const cardId = req.body.cardId;
     console.log("visualizing...", sentenceToVisualize);
@@ -168,7 +190,6 @@ app.post("/openai/test/imagine", async (req, res) => {
       n: 1,
       size: "256x256",
     });
-    // console.log(response);
     if (response?.created) {
       res.send(response);
       const input: UpdateItemCommandInput = {

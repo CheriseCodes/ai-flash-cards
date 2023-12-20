@@ -9,7 +9,7 @@ import {
   after,
 } from "node:test";
 import assert from "node:assert";
-import { existsSync } from 'node:fs';
+import { existsSync } from "node:fs";
 import { mockClient } from "aws-sdk-client-mock";
 import { dynamoDbClient, s3Client, openai, app } from "../src/server";
 
@@ -90,7 +90,7 @@ describe("POST /openai/test/imagine", () => {
   afterEach(() => {
     ddbMock.restore();
     s3Mock.restore();
-    mock.restoreAll()
+    mock.restoreAll();
   });
   test("Allowed word should return a valid image", async () => {
     const word = "trouver";
@@ -107,7 +107,7 @@ describe("POST /openai/test/imagine", () => {
       ],
     };
     mock.method(openai.images, "generate", () => {
-      return expectedResult
+      return expectedResult;
     });
     ddbMock.onAnyCommand().resolves({});
     const response = await fetch(
@@ -125,7 +125,7 @@ describe("POST /openai/test/imagine", () => {
     );
     const json = await response.json();
     assert.deepStrictEqual(json, expectedResult);
-  })
+  });
   test("Unallowed word should return a error image", async () => {
     const word = "rentrée";
     const langMode = "French";
@@ -134,7 +134,8 @@ describe("POST /openai/test/imagine", () => {
     const cardId = "93960a65-ce5e-4d4d-ba2a-8d9e8eeb57d9";
     ddbMock.onAnyCommand().resolves({});
     mock.method(openai.images, "generate", () => {
-      return {}});
+      return {};
+    });
     const response = await fetch(
       `http://localhost:${PORT}/openai/test/imagine?sentence=${sentence}&lang_mode=${langMode}&word=${word}`,
       {
@@ -153,7 +154,7 @@ describe("POST /openai/test/imagine", () => {
       status: 400,
       message: "Unsupported word: rentrée",
     });
-  })
+  });
 });
 
 describe("POST /upload/image", () => {
@@ -169,49 +170,47 @@ describe("POST /upload/image", () => {
     const cardId = "93960a65-ce5e-4d4d-ba2a-8d9e8eeb57d9";
     const languageMode = "French";
     const languageLevel = "C2";
-    const imgUrl = "https://images.crunchbase.com/image/upload/c_lpad,h_256,w_256,f_auto,q_auto:eco,dpr_1/gavygdwhilk8d2cytkeq";
+    const imgUrl =
+      "https://images.crunchbase.com/image/upload/c_lpad,h_256,w_256,f_auto,q_auto:eco,dpr_1/gavygdwhilk8d2cytkeq";
     const imgName = `${cardId}-${languageMode}-${languageLevel}-123`;
     s3Mock.onAnyCommand().resolves({});
-    const response = await fetch(
-      `http://localhost:${PORT}/upload/image`,
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          imgUrl: imgUrl,
-          imgName: imgName,
-        }),
+    const response = await fetch(`http://localhost:${PORT}/upload/image`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
       },
-    );
+      body: JSON.stringify({
+        imgUrl: imgUrl,
+        imgName: imgName,
+      }),
+    });
     await response.json();
     const imgPath = `private/images/${imgName}.png`;
     const exists = existsSync(`${__dirname}/../../${imgPath}`);
-    assert.strictEqual(exists, false)
+    assert.strictEqual(exists, false);
   });
   test("image should be uploaded successfully", async () => {
     const cardId = "93960a65-ce5e-4d4d-ba2a-8d9e8eeb57d9";
     const languageMode = "French";
     const languageLevel = "C2";
-    const imgUrl = "https://images.crunchbase.com/image/upload/c_lpad,h_256,w_256,f_auto,q_auto:eco,dpr_1/gavygdwhilk8d2cytkeq";
+    const imgUrl =
+      "https://images.crunchbase.com/image/upload/c_lpad,h_256,w_256,f_auto,q_auto:eco,dpr_1/gavygdwhilk8d2cytkeq";
     const imgName = `${cardId}-${languageMode}-${languageLevel}-123`;
     s3Mock.onAnyCommand().resolves({});
-    const response = await fetch(
-      `http://localhost:${PORT}/upload/image`,
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          imgUrl: imgUrl,
-          imgName: imgName,
-        }),
+    const response = await fetch(`http://localhost:${PORT}/upload/image`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
       },
-    );
+      body: JSON.stringify({
+        imgUrl: imgUrl,
+        imgName: imgName,
+      }),
+    });
     const json = await response.json();
-    assert.deepStrictEqual(json, { url: `${process.env.CLOUDFRONT_URL}/users/default/images/${imgName}.png` })
+    assert.deepStrictEqual(json, {
+      url: `${process.env.CLOUDFRONT_URL}/users/default/images/${imgName}.png`,
+    });
   });
 });
 
@@ -227,7 +226,7 @@ describe("POST /openai/test/text", () => {
   afterEach(() => {
     ddbMock.restore();
     s3Mock.restore();
-    mock.restoreAll()
+    mock.restoreAll();
   });
   test("invalid word should return an empty response", async () => {
     const word = "hello"; // invalid word
@@ -345,10 +344,9 @@ describe("POST /openai/test/text", () => {
     const expectedResult = {
       word: `${word}`,
       sampleSentence: `Example sentence using ${word} in ${languageMode}} at level ${languageLevel}`,
-      translatedSampleSentence:
-        "English translation of the example sentence",
+      translatedSampleSentence: "English translation of the example sentence",
       wordTranslated: `English translation of ${word}`,
-    }
+    };
     mock.method(openai.chat.completions, "create", () => {
       return {
         id: 123,

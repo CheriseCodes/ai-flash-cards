@@ -278,3 +278,21 @@ app.post("/flashcards", async (req, res) => {
     res.status(500).send({error: err})
   }
 });
+
+// TODO: Make deletion and update endpoints
+app.post("/delete/flashcard", async (req, res) => {
+  // delete dynamodb item with text
+  // delete image
+});
+
+app.post("/delete/image", async (req, res) => {
+  // delete dynamodb item with text
+  // delete image
+});
+
+app.post("/update/flashcard", async (req, res) => {
+  // update dynamodb item with text
+  // delete old image
+  // upload new image
+  // update dynamodb item with new image
+});

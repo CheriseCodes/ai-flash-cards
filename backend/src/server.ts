@@ -244,8 +244,8 @@ app.post("/upload/image", async (req, res) => {
         };
         const command = new PutObjectCommand(input);
         const s3Response = await s3Client.send(command);
-        stream.close();
         console.log("s3 upload response", s3Response);
+        stream.close();
       });
     });
     const domainName = process.env.CLOUDFRONT_URL;

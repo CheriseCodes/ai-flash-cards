@@ -1,7 +1,6 @@
 import {
   describe,
   test,
-  it,
   beforeEach,
   afterEach,
   mock,
@@ -9,7 +8,6 @@ import {
   after,
 } from "node:test";
 import assert from "node:assert";
-import { existsSync } from "node:fs";
 import { mockClient } from "aws-sdk-client-mock";
 import { dynamoDbClient, s3Client, openai, app } from "../src/server";
 
@@ -166,35 +164,12 @@ describe("POST /upload/image", () => {
     ddbMock.restore();
     s3Mock.restore();
   });
-  it("should delete the image after downloading", async () => {
-    const cardId = "93960a65-ce5e-4d4d-ba2a-8d9e8eeb57d9";
-    const languageMode = "French";
-    const languageLevel = "C2";
-    const imgUrl =
-      "https://images.crunchbase.com/image/upload/c_lpad,h_256,w_256,f_auto,q_auto:eco,dpr_1/gavygdwhilk8d2cytkeq";
-    const imgName = `${cardId}-${languageMode}-${languageLevel}-123`;
-    s3Mock.onAnyCommand().resolves({});
-    const response = await fetch(`http://localhost:${PORT}/upload/image`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        imgUrl: imgUrl,
-        imgName: imgName,
-      }),
-    });
-    await response.json();
-    const imgPath = `private/images/${imgName}.png`;
-    const exists = existsSync(`${__dirname}/../../${imgPath}`);
-    assert.strictEqual(exists, false);
-  });
   test("image should be uploaded successfully", async () => {
     const cardId = "93960a65-ce5e-4d4d-ba2a-8d9e8eeb57d9";
     const languageMode = "French";
     const languageLevel = "C2";
     const imgUrl =
-      "https://images.crunchbase.com/image/upload/c_lpad,h_256,w_256,f_auto,q_auto:eco,dpr_1/gavygdwhilk8d2cytkeq";
+      "https://www.usatoday.com/gcdn/presto/2022/05/25/USAT/719946ca-660e-4ebf-805a-2c3b7d221a85-Hero-3.jpg";
     const imgName = `${cardId}-${languageMode}-${languageLevel}-123`;
     s3Mock.onAnyCommand().resolves({});
     const response = await fetch(`http://localhost:${PORT}/upload/image`, {

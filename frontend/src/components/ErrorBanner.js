@@ -1,6 +1,6 @@
 import React from "react";
 import PropTypes from "prop-types";
-import Alert from "react-bootstrap/esm/Alert.js";
+import Alert from "react-bootstrap/Alert";
 
 const ErrorBanner = ({ e, setErrors }) => {
   return (

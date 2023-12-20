@@ -1,4 +1,4 @@
-import appConfig from "./config.js";
+import appConfig from "./config";
 
 const reducer = (state, action) => {
   switch (action.type) {

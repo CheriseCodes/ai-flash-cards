@@ -1,23 +1,43 @@
 import React from "react";
 import ReactDOM from "react-dom/client";
 import { Provider } from "react-redux";
-import { PersistGate } from "redux-persist/es/integration/react.js";
+import { PersistGate } from "redux-persist/lib/integration/react";
 import { persistStore } from "redux-persist";
 
-import store from "./store.js";
+import store from "./store";
 import "./index.css";
 import "bootstrap/dist/css/bootstrap.css";
-import App from "./App.js";
+import App from "./App";
 
-const persistor = persistStore(store);
-const root = ReactDOM.createRoot(document.getElementById("root"));
-root.render(
-  <Provider store={store}>
-    <PersistGate loading={<div>Loading...</div>} persistor={persistor}>
-      <App />
-    </PersistGate>
-  </Provider>,
-);
+async function enableMocking() {
+  console.log(`NODE_ENV is ${process.env.NODE_ENV}`)
+  if (process.env.NODE_ENV !== 'development') {
+    return
+  }
+ 
+  const { worker } = await import('./mocks/browser')
+ 
+  // `worker.start()` returns a Promise that resolves
+  // once the Service Worker is up and ready to intercept requests.
+  return worker.start()
+}
+
+const renderApp = () => {
+  const persistor = persistStore(store);
+  const root = ReactDOM.createRoot(document.getElementById("root"));
+  root.render(
+    <Provider store={store}>
+      <PersistGate loading={<div>Loading...</div>} persistor={persistor}>
+        <App />
+      </PersistGate>
+    </Provider>,
+  );
+}
+
+enableMocking().then(() => renderApp())
+
+
+
 
 // If you want to start measuring performance in your app, pass a function
 // to log results (for example: reportWebVitals(console.log))

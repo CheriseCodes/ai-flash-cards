@@ -187,7 +187,7 @@ describe("POST /upload/image", () => {
     );
     await response.json();
     const imgPath = `private/images/${imgName}.png`;
-    const exists = existsSync(`${__dirname}/../../${imgPath}`)
+    const exists = existsSync(`${__dirname}/../../${imgPath}`);
     assert.strictEqual(exists, false)
   });
   test("image should be uploaded successfully", async () => {

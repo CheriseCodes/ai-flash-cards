@@ -4,7 +4,7 @@ import OpenAI from "openai";
 import cors from "cors";
 
 import { open, rm } from "node:fs/promises";
-const https = require('node:https');
+import https from "https";
 
 import { PutObjectCommand, S3Client } from "@aws-sdk/client-s3";
 
@@ -244,8 +244,8 @@ app.post("/upload/image", async (req, res) => {
         };
         const command = new PutObjectCommand(input);
         const s3Response = await s3Client.send(command);
-        console.log("s3 upload response", s3Response);
         stream.close();
+        console.log("s3 upload response", s3Response);
       });
     });
     const domainName = process.env.CLOUDFRONT_URL;

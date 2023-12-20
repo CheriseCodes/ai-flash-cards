@@ -1,4 +1,4 @@
-const allowedFrenchWords = [
+const allowedFrenchWords: string[] = [
   "aller",
   "avoir",
   "être",
@@ -207,7 +207,7 @@ const allowedSpanishWords = [
   "probablemente",
 ];
 
-const allowedKoreanWords = [
+const allowedKoreanWords: string[] = [
   "하다",
   "있다",
   "되다",

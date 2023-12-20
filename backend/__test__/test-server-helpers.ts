@@ -4,7 +4,7 @@ import {
   validateLang,
   validateLangLevel,
   validateWord,
-} from "../server-helpers.js";
+} from "../src/server-helpers";
 
 describe("validateWord input validation", () => {
   it("invalid French word should return false", () => {
@@ -68,7 +68,7 @@ describe("validateLangLevel input validation", () => {
   it("unsupported language should return false", () => {
     const langMode = "Finnish";
     const langLevel = "YKI1";
-    const res = validateLang(langMode, langLevel);
+    const res = validateLangLevel(langMode, langLevel);
     assert.strictEqual(res, false);
   });
   it("valid French language level should return true", () => {

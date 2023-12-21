@@ -143,7 +143,7 @@ const FlashCard = ({ cardData, setErrors, userId }) => {
               ></textarea>
               <div className="image-container">
                 {!cardData.generatingImage ? (
-                  <img height={250} width={250} src={cardData.img} crossOrigin="anonymous" onError={process.env.NODE_ENV == "development" ? () => {} : reloadImage} onLoad={loadedImage} hidden></img>
+                  <img height={250} width={250} src={cardData.img} crossOrigin="anonymous" alt={`Visualization of "${cardData.translatedSampleSentence}"`} onError={process.env.NODE_ENV == "development" ? () => {} : reloadImage} onLoad={loadedImage} hidden></img>
                 ) : (
                   <LoadingSpinner />
                 )}

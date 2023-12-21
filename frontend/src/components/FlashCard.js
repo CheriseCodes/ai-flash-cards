@@ -19,8 +19,6 @@ const FlashCard = ({ cardData, setErrors, userId }) => {
   const languageLevel = useSelector((state) => state.languageLevel);
   const languageMode = useSelector((state) => state.languageMode);
 
-  
-
   const dispatch = useDispatch();
 
   const handleRegenerateCard = async () => {

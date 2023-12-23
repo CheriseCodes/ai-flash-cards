@@ -4,6 +4,7 @@
 node_modules
 /.pnp
 .pnp.js
+built
 
 # testing
 /coverage
@@ -12,6 +13,7 @@ notes.txt
 sample_sentences_data.json
 test_import.txt
 /aws/ignore/
+/helm
 
 # production
 build

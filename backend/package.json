@@ -1,6 +1,6 @@
 {
   "name": "ai-flash-cards",
-  "type": "module",
+  "type": "commonjs",
   "version": "0.1.0",
   "private": true,
   "dependencies": {
@@ -19,13 +19,14 @@
     "openai": "^4.6.0"
   },
   "scripts": {
-    "start": "node server.js",
-    "start:v1": "nodemon server.js",
-    "start:v2": "nodemon mock-openai-server.js",
-    "start:v3": "nodemon mock-all-server.js",
+    "tsc": "tsc",
+    "start": "node ./built/src/main.js",
+    "start:dev": "nodemon ./built/src/main.js",
     "lint:fix": "npx eslint --fix --ext .js,.jsx,.ts .",
     "lint": "npx eslint --ext .js,.jsx,.ts .",
-    "test": "node --test"
+    "test": "node --test",
+    "test:server": "node --test ./built/__test__/test-server.js",
+    "test:server-helpers": "node --test ./built/__test__/test-server-helpers.js"
   },
   "browserslist": {
     "production": [
@@ -40,7 +41,10 @@
     ]
   },
   "devDependencies": {
+    "@aws-sdk/types": "^3.468.0",
     "@babel/plugin-proposal-private-property-in-object": "^7.21.11",
+    "@smithy/types": "^2.7.0",
+    "aws-sdk-client-mock": "^3.0.0",
     "eslint": "^8.53.0",
     "eslint-plugin-prettier": "^5.0.1",
     "eslint-plugin-react": "^7.33.2",

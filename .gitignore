@@ -13,10 +13,13 @@ notes.txt
 sample_sentences_data.json
 test_import.txt
 /aws/ignore/
-/helm
+helm
 
 # production
 build
+
+# typescript
+built
 
 # misc
 .DS_Store

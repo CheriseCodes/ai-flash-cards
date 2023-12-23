@@ -21,6 +21,8 @@ jobs:
 
     steps:
     - uses: actions/checkout@v3
+    - run: ls -a
+    - run: pwd
     - run: cd frontend
     - run: ls -a
     - name: Use Node.js ${{ matrix.node-version }}

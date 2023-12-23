@@ -21,7 +21,7 @@
     "lint:fix": "npx eslint --fix --ext .js,.jsx,.ts .",
     "lint": "npx eslint --ext .js,.jsx,.ts .",
     "build": "react-scripts build",
-    "test": "react-scripts test",
+    "test": "react-scripts test --passWithNoTests",
     "jest": "jest",
     "eject": "react-scripts eject"
   },

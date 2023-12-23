@@ -1,7 +1,7 @@
 import React from "react";
-import appConfig from "../config.js";
+import appConfig from "../config";
 
-import LanguageModeFormInput from "./LanguageModeFormInput.js";
+import LanguageModeFormInput from "./LanguageModeFormInput";
 
 const LanguageModeForm = () => {
   return (

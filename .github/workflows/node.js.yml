@@ -21,12 +21,12 @@ jobs:
 
     steps:
     - uses: actions/checkout@v3
+    - run: cd backend
     - name: Use Node.js ${{ matrix.node-version }}
       uses: actions/setup-node@v3
       with:
         node-version: ${{ matrix.node-version }}
         cache: 'npm'
-    - run: cd backend
     - run: npm ci
     - run: npx tsc
     - run: npm run build --if-present

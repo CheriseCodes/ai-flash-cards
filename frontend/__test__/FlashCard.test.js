@@ -5,10 +5,11 @@ import React from 'react';
 import FlashCard from '../src/components/FlashCard.js';
 import { renderWithProviders } from './test-utils.js';
 import { screen } from '@testing-library/react';
+import App from "../src/App.js";
 
 it("should have the correct values for a valid flashcard", () => {
     const id = "abc123";
-    const setErrors = (x) => {return [x]; };
+    const setErrors = App.setErrors;
     const cardData = {
                         id: id, 
                         generatingText: false,
@@ -31,7 +32,7 @@ it("should have the correct values for a valid flashcard", () => {
 });
 it("should display loading spinner when image is being generated", () => {
     const id = "abc123";
-    const setErrors = (x) => {return [x]; };
+    const setErrors = App.setErrors;
     const cardData = {
                         id: id, 
                         generatingText: false,
@@ -49,7 +50,7 @@ it("should display loading spinner when image is being generated", () => {
 });
 it("should display loading spinner when text is being generated", () => {
     const id = "abc123";
-    const setErrors = (x) => {return [x]; };
+    const setErrors = App.setErrors;
     const cardData = {
                         id: id, 
                         generatingText: true,

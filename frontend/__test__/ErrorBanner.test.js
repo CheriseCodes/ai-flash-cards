@@ -2,7 +2,6 @@
  * @jest-environment jsdom
  */
 import React from 'react';
-import FlashCard from '../src/components/FlashCard.js';
 import { renderWithProviders } from './test-utils.js';
 import { screen } from '@testing-library/react';
 import App from "../src/App.js";

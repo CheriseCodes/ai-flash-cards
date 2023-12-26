@@ -14,7 +14,6 @@ it("should have correct listed language", () => {
         languageLevel: appConfig.cferLanguageLevels.TOPIK1,
         selectedCards: [],
     }});
-    console.log(container.outerHTML)
     const labelEl = container.querySelector("label");
     expect(labelEl.innerHTML).toBe("Korean")
 });

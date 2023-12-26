@@ -3,7 +3,6 @@
  */
 import React from 'react';
 import { renderWithProviders } from './test-utils.js';
-import { screen } from '@testing-library/react';
 import App from "../src/App.js";
 import ErrorBanner from '../src/components/ErrorBanner.js';
 

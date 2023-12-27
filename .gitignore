@@ -4,17 +4,22 @@
 node_modules
 /.pnp
 .pnp.js
+built
 
 # testing
 /coverage
-/private
+private
 notes.txt
 sample_sentences_data.json
 test_import.txt
 /aws/ignore/
+helm
 
 # production
 build
+
+# typescript
+built
 
 # misc
 .DS_Store

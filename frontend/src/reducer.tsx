@@ -1,6 +1,6 @@
 import appConfig from "./config";
 
-const reducer = (state, action) => {
+const reducer = (state: any, action: any) => {
   switch (action.type) {
     case "add-card": {
       console.log(`add-card state: ${JSON.stringify(state)}`);
@@ -13,7 +13,7 @@ const reducer = (state, action) => {
       console.log(`update-card state: ${JSON.stringify(state)}`);
       return {
         ...state,
-        cards: state.cards.map((item) => {
+        cards: state.cards.map((item: string) => {
           if (item.includes(action.cardId)) {
             return JSON.stringify(action.cardData);
           }
@@ -25,7 +25,7 @@ const reducer = (state, action) => {
       console.log(`delete-card state: ${JSON.stringify(state)}`);
       return {
         ...state,
-        cards: state.cards.filter((prevCardData) => {
+        cards: state.cards.filter((prevCardData: string) => {
           return !prevCardData.includes(action.cardId);
         }),
       };
@@ -33,7 +33,7 @@ const reducer = (state, action) => {
     case "toggle-generating-text": {
       return {
         ...state,
-        cards: state.cards.map((item) => {
+        cards: state.cards.map((item: string) => {
           if (item.includes(action.cardId)) {
             const cardJson = JSON.parse(item);
             cardJson.generatingText = !cardJson.generatingText;
@@ -46,7 +46,7 @@ const reducer = (state, action) => {
     case "toggle-generating-image": {
       return {
         ...state,
-        cards: state.cards.map((item) => {
+        cards: state.cards.map((item: string) => {
           if (item.includes(action.cardId)) {
             const cardJson = JSON.parse(item);
             cardJson.generatingImage = !cardJson.generatingImage;
@@ -59,7 +59,7 @@ const reducer = (state, action) => {
     case "set-generating-image": {
       return {
         ...state,
-        cards: state.cards.map((item) => {
+        cards: state.cards.map((item: string) => {
           if (item.includes(action.cardId)) {
             const cardJson = JSON.parse(item);
             cardJson.generatingImage = action.isGenerating;
@@ -72,7 +72,7 @@ const reducer = (state, action) => {
     case "set-generating-text": {
       return {
         ...state,
-        cards: state.cards.map((item) => {
+        cards: state.cards.map((item: string) => {
           if (item.includes(action.cardId)) {
             const cardJson = JSON.parse(item);
             cardJson.generatingText = action.isGenerating;
@@ -110,7 +110,7 @@ const reducer = (state, action) => {
     case "remove-selected-card": {
       return {
         ...state,
-        selectedCards: state.selectedCards.filter((currId) => {
+        selectedCards: state.selectedCards.filter((currId: string) => {
           return currId != action.cardId;
         }),
       };

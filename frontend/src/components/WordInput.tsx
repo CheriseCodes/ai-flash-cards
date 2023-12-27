@@ -1,21 +1,22 @@
-import React, { useRef, useState } from "react";
+import React, { useRef, useState, Dispatch, SetStateAction } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import PropTypes from "prop-types";
 import { generateNewCard } from "../utils";
-import Button from "react-bootstrap/Button";
+import { Button } from "react-bootstrap";
 
-const WordInput = ({ setErrors, userId }) => {
-  const languageLevel = useSelector((state) => state.languageLevel);
-  const languageMode = useSelector((state) => state.languageMode);
+const WordInput = ({ setErrors, userId }: { setErrors: Dispatch<SetStateAction<Array<ErrorMessage>>>, userId: string }) => {
+  const languageLevel = useSelector((state: LanguageState) => state.languageLevel);
+  const languageMode = useSelector((state: LanguageState) => state.languageMode);
   const [spinner, setSpinner] = useState(false);
-  const cards = useSelector((state) => state.cards);
-  const selectedCards = useSelector((state) => state.selectedCards);
+  const cards = useSelector((state: CardState) => state.cards);
+  const selectedCards = useSelector((state: CardState) => state.selectedCards);
   const dispatch = useDispatch();
-  const textAreaRef = useRef(null);
+  const textAreaRef = useRef<HTMLInputElement>(null);
 
-  const handleSubmit = (e) => {
+  const handleSubmit = (e: any) => {
     e.preventDefault();
-    const wordList = textAreaRef.current.value;
+    if (textAreaRef.current != null) {
+      const wordList = textAreaRef.current.value;
     for (const [index, word] of wordList.split(",").entries()) {
       console.log(
         `WordInput.handleSubmit - \${index}:\${word.trim()}: ${index}:${word.trim()}`,
@@ -34,6 +35,7 @@ const WordInput = ({ setErrors, userId }) => {
         console.error(e)
       }
       setSpinner(false)
+      }
     }
   };
 

@@ -2,11 +2,11 @@ import React from "react";
 import PropTypes from "prop-types";
 import { useSelector, useDispatch } from "react-redux";
 
-const LanguageModeFormInput = ({ languageModeID }) => {
-  const languageMode = useSelector((state) => state.languageMode);
+const LanguageModeFormInput = ({ languageModeID } : { languageModeID: string }) => {
+  const languageMode = useSelector((state: LanguageState) => state.languageMode);
   const dispatch = useDispatch();
 
-  const handleChange = (e) => {
+  const handleChange = (e: any) => {
     console.log(e);
     console.log(`LanguageModeFormInput.handleChange - ${languageMode}`);
     if (languageMode !== e.target.value) {

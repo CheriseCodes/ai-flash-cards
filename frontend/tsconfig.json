@@ -1,11 +1,23 @@
 {
+  "$schema": "https://json.schemastore.org/tsconfig",
+  "display": "Create React App",
+  "_version": "2.0.0",
+  "include": ["src/**/*", "types/**/*.d.ts"],
   "compilerOptions": {
-    "outDir": "./built",
+    "lib": ["dom", "dom.iterable", "esnext"],
+    "module": "esnext",
+    "moduleResolution": "bundler",
+    "target": "es2015",
     "allowJs": true,
-    "target": "es6",
+    "allowSyntheticDefaultImports": true,
+    "esModuleInterop": true,
+    "forceConsistentCasingInFileNames": true,
+    "isolatedModules": true,
+    "jsx": "react-jsx",
+    "noEmit": true,
+    "noFallthroughCasesInSwitch": true,
+    "resolveJsonModule": true,
     "skipLibCheck": true,
-    "module": "CommonJS",
-    "moduleResolution": "NodeNext",
-  },
-  "include": ["./src/**/*", "./__test__/**/*"]
+    "strict": true
+  }
 }

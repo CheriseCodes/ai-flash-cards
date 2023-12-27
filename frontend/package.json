@@ -15,11 +15,12 @@
     "react-bootstrap": "^2.9.0",
     "react-dom": "^18.2.0",
     "react-redux": "^8.1.2",
-    "react-scripts": "^5.0.1",
+    "react-scripts": "5.0.1",
     "redux-persist": "^6.0.0",
-    "typescript": "^5.3.3",
+    "typescript": "^2.7.0",
     "uuid": "^9.0.1",
-    "web-vitals": "^2.1.4"
+    "web-vitals": "^2.1.4",
+    "@typescript-eslint/eslint-plugin": "6.16.0"
   },
   "scripts": {
     "start": "react-scripts start",
@@ -48,6 +49,7 @@
     "@babel/preset-env": "^7.23.5",
     "@babel/preset-react": "^7.23.3",
     "@testing-library/react": "^14.1.2",
+    "@typescript-eslint/parser": "6.16.0",
     "babel-jest": "^29.7.0",
     "eslint": "^8.53.0",
     "eslint-plugin-prettier": "^5.0.1",
@@ -55,7 +57,9 @@
     "jest": "^27.5.1",
     "msw": "^2.0.10",
     "prettier": "^3.0.3",
-    "react-test-renderer": "^18.2.0"
+    "react-test-renderer": "^18.2.0",
+    "@typescript-eslint/eslint-plugin-v5": "5.30.7",
+    "eslint-config-react-app": "7.0.1"
   },
   "msw": {
     "workerDirectory": "public"

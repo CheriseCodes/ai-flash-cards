@@ -4,12 +4,12 @@ import appConfig from "../config";
 
 import { useSelector, useDispatch } from "react-redux";
 
-const LanguageLevelFormInput = ({ languageLevelID }) => {
-  const languageLevel = useSelector((state) => state.languageLevel);
-  const languageMode = useSelector((state) => state.languageMode);
+const LanguageLevelFormInput = ({ languageLevelID } : { languageLevelID: string }) => {
+  const languageLevel = useSelector((state: LanguageState) => state.languageLevel);
+  const languageMode = useSelector((state: LanguageState) => state.languageMode);
   const dispatch = useDispatch();
 
-  const handleChange = (e) => {
+  const handleChange = (e: any) => {
     console.log(e);
     if (languageLevel !== e.target.value) {
       dispatch({ type: "update-language-level", langLevel: e.target.value });

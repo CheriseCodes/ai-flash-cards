@@ -1,9 +1,11 @@
+import { AnyAction } from "@reduxjs/toolkit";
+import { Dispatch, SetStateAction } from "react";
 import { v4 as uuidv4 } from "uuid";
 
 // TODO: Stop updating card data object directly... only update with update-card reducer
 const PORT = (process.env.NODE_ENV == "development") ? 3000 : 8000
 
-const getNewCardText = async (word, languageMode, languageLevel, userId, cardId, timeStamp) => {
+const getNewCardText = async (word: string, languageMode: string, languageLevel: string, userId: string, cardId: string, timeStamp: number) => {
   console.log("start getNewCardText");
   const response = await fetch(
     `http://localhost:${PORT}/openai/test/text?word=${word}&lang_mode=${languageMode}&lang_level=${languageLevel}`,
@@ -30,7 +32,7 @@ const getNewCardText = async (word, languageMode, languageLevel, userId, cardId,
   return cardData;
 }
 
-const getNewCardImage = async (dispatch, cardData, languageMode, languageLevel, userId, cardId) => {
+const getNewCardImage = async (dispatch: Dispatch<AnyAction>, cardData: FlashCard, languageMode: string, languageLevel: string, userId: string, cardId: string) => {
     console.log("start getNewCardImage...")
     cardData.generatingImage = true;
     dispatch({ type: "update-card", cardData: cardData, cardId: cardId });
@@ -70,7 +72,7 @@ const getNewCardImage = async (dispatch, cardData, languageMode, languageLevel, 
     return cardData;
 }
 
-const getNewCardData = async (dispatch, word, languageMode, languageLevel, userId, cardId, timeStamp) => {
+const getNewCardData = async (dispatch: Dispatch<AnyAction>, word: string, languageMode: string, languageLevel: string, userId: string, cardId: string, timeStamp: number) => {
   console.log("start getNewCardData")
   let cardData = await getNewCardText(word, languageMode, languageLevel, userId, cardId, timeStamp);
   let promise1 = Promise.resolve(cardData);
@@ -98,12 +100,12 @@ const getNewCardData = async (dispatch, word, languageMode, languageLevel, userI
 }
 
 export const generateNewCard = async (
-  dispatch,
-  word,
-  languageMode,
-  languageLevel,
-  setErrors,
-  userId,
+  dispatch: Dispatch<AnyAction>,
+  word: string,
+  languageMode: string,
+  languageLevel: string,
+  setErrors: Dispatch<SetStateAction<Array<ErrorMessage>>>,
+  userId: string,
 ) => {
     try {
       if (word) {
@@ -120,7 +122,7 @@ export const generateNewCard = async (
         });
         getNewCardData(dispatch, word, languageMode, languageLevel, userId,cardId, timeStamp);
       }
-    } catch (e) {
+    } catch (e: any) {
       // Delete newly created card if there is an error
       const errItem = { id: uuidv4(), message: e.message };
       setErrors((errs) => [...errs, errItem]);
@@ -130,13 +132,13 @@ export const generateNewCard = async (
 
 
 export const generateNextCard = async (
-  dispatch,
-  word,
-  languageMode,
-  languageLevel,
-  cardData, // TODO: swap to cardId cause that's all that's used
-  setErrors,
-  userId,
+  dispatch: Dispatch<AnyAction>,
+  word: string,
+  languageMode: string,
+  languageLevel: string,
+  cardData: FlashCard, // TODO: swap to cardId cause that's all that's used
+  setErrors: Dispatch<SetStateAction<Array<ErrorMessage>>>,
+  userId: string,
 ) => {
     const cardId = cardData.id;
     const timeStamp = Date.now();
@@ -144,7 +146,7 @@ export const generateNextCard = async (
       dispatch({ type: "set-generating-text", cardId: cardId, isGenerating: true });
       await getNewCardData(dispatch, word, languageMode, languageLevel, userId, cardId, timeStamp)
       dispatch({ type: "set-generating-text", cardId: cardId, isGenerating: false });
-    } catch (e) {
+    } catch (e: any) {
       // Signal that no longer generating text on error
       dispatch({ type: "set-generating-text", cardId: cardId, isGenerating: false  });
       const errItem = { id: uuidv4(), message: e.message };

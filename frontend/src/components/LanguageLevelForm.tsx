@@ -4,7 +4,7 @@ import appConfig from "../config";
 import LanguageLevelFormInput from "./LanguageLevelFormInput";
 
 const LanguageLevelForm = () => {
-  const languageMode = useSelector((state) => state.languageMode);
+  const languageMode = useSelector((state: LanguageState) => state.languageMode);
   return (
     <div className="language-form">
       <h2>Target Level</h2>

@@ -11,11 +11,11 @@ import { v4 as uuidv4 } from "uuid";
 const PORT = (process.env.NODE_ENV == "development") ? 3000 : 8000;
 
 const App = () => {
-  const cards = useSelector((state) => state.cards);
-  const [errors, setErrors] = useState([]);
+  const cards = useSelector((state: CardState) => state.cards);
+  const [errors, setErrors] = useState<ErrorMessage[]>([]);
   const userId = "default";
 
-  const handleSubmit = (e) => {
+  const handleSubmit = (e: any) => {
     e.preventDefault();
     console.log();
   };
@@ -41,7 +41,7 @@ const App = () => {
       // TODO: If there isn't a with ID, add the data to card data list
 
       // TODO: If the ID mathes cut the data doesn't overwrite backend data with frontend data
-    } catch (e) {
+    } catch (e: any) {
       const errItem = { id: uuidv4(), message: e.message };
       setErrors((errs) => [...errs, errItem]);
     }

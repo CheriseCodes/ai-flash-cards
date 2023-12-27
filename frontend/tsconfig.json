@@ -5,7 +5,7 @@
   "include": ["src/**/*", "types/**/*.d.ts"],
   "compilerOptions": {
     "lib": ["dom", "dom.iterable", "esnext", "WebWorker"],
-    "types": ["vite/client","node"],
+    "types": ["vite/client","node", "jest"],
     "target": "ESNext",
     "module": "NodeNext",
     "moduleResolution": "Node16",

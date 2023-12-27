@@ -2,19 +2,17 @@
  * @jest-environment jsdom
  */
 import React from 'react';
-import { renderWithProviders } from './test-utils.js';
-import App from '../src/App.js';
-import appConfig from '../src/config.js';
-import WordInput from '../src/components/WordInput.js';
-
+import { renderWithProviders } from './test-utils';
+import appConfig from '../src/config';
+import WordInput from '../src/components/WordInput';
+import { it, expect } from '@jest/globals';
 
 it("should have language modes in the correct order", () => {
-    const setErrors = App.setErrors;
     const userId = "default";
-    const { container } = renderWithProviders(<WordInput setErrors={setErrors} userId={userId}></WordInput>, {preloadedState : {
+    const { container } = renderWithProviders(<WordInput setErrors={() => {}} userId={userId}></WordInput>, {preloadedState : {
         cards: [],
         languageMode: appConfig.languageModes.KOREAN,
-        languageLevel: appConfig.cferLanguageLevels.TOPIK1,
+        languageLevel: appConfig.koreanLanguageLevels.TOPIK1,
         selectedCards: [],
     }});
     const buttons = container.querySelectorAll("button");

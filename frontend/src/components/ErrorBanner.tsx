@@ -1,6 +1,6 @@
 import React, { Dispatch, SetStateAction } from "react";
 import PropTypes from "prop-types";
-import Alert from "react-bootstrap/Alert";
+import { Alert } from "react-bootstrap";
 
 const ErrorBanner = ({ e, setErrors } : {e: ErrorMessage, setErrors: Dispatch<SetStateAction<Array<ErrorMessage>>>}) => {
   return (

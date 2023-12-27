@@ -2,7 +2,7 @@ import React, { useRef, useState, Dispatch, SetStateAction } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import PropTypes from "prop-types";
 import { generateNewCard } from "../utils";
-import Button from "react-bootstrap/Button";
+import { Button } from "react-bootstrap";
 
 const WordInput = ({ setErrors, userId }: { setErrors: Dispatch<SetStateAction<Array<ErrorMessage>>>, userId: string }) => {
   const languageLevel = useSelector((state: LanguageState) => state.languageLevel);

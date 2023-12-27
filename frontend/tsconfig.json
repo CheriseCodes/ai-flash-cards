@@ -4,10 +4,11 @@
   "_version": "2.0.0",
   "include": ["src/**/*", "types/**/*.d.ts"],
   "compilerOptions": {
-    "lib": ["dom", "dom.iterable", "esnext"],
-    "module": "esnext",
-    "moduleResolution": "bundler",
-    "target": "es2015",
+    "lib": ["dom", "dom.iterable", "esnext", "WebWorker"],
+    "types": ["vite/client","node"],
+    "target": "ESNext",
+    "module": "NodeNext",
+    "moduleResolution": "Node16",
     "allowJs": true,
     "allowSyntheticDefaultImports": true,
     "esModuleInterop": true,
@@ -16,7 +17,6 @@
     "jsx": "react-jsx",
     "noEmit": true,
     "noFallthroughCasesInSwitch": true,
-    "resolveJsonModule": true,
     "skipLibCheck": true,
     "strict": true
   }

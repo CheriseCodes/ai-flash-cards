@@ -3,7 +3,7 @@ import { useDispatch, useSelector } from "react-redux";
 import PropTypes from "prop-types";
 import { generateNextCard  } from "../utils";
 import LoadingSpinner from "./LoadingSpinner";
-import CloseButton from "react-bootstrap/CloseButton";
+import { CloseButton } from "react-bootstrap";
 
 const FlashCard = ({ cardData, setErrors, userId }: { cardData: FlashCard, setErrors: Dispatch<SetStateAction<Array<ErrorMessage>>>, userId: string}) => {
   const [enableEdit, setEnableEdit] = useState(false);

@@ -5,9 +5,9 @@
   "dependencies": {
     "@reduxjs/toolkit": "^1.9.7",
     "@types/jest": "^29.5.11",
-    "@types/node": "^20.10.5",
     "@types/react": "^18.2.45",
     "@types/react-dom": "^18.2.18",
+    "@vitejs/plugin-react": "^4.2.1",
     "bootstrap": "^5.3.2",
     "lodash": "^4.17.21",
     "openai": "^4.6.0",
@@ -15,20 +15,20 @@
     "react-bootstrap": "^2.9.0",
     "react-dom": "^18.2.0",
     "react-redux": "^8.1.2",
-    "react-scripts": "5.0.1",
     "redux-persist": "^6.0.0",
-    "typescript": "^2.7.0",
+    "typescript": "^4.7.0",
     "uuid": "^9.0.1",
-    "web-vitals": "^2.1.4",
-    "@typescript-eslint/eslint-plugin": "6.16.0"
+    "vite": "^5.0.10",
+    "vite-tsconfig-paths": "^4.2.2",
+    "web-vitals": "^2.1.4"
   },
   "scripts": {
-    "start": "react-scripts start",
+    "start": "vite",
+    "preview": "vite preview",
     "lint:fix": "npx eslint --fix --ext .js,.jsx,.ts .",
     "lint": "npx eslint --ext .js,.jsx,.ts .",
-    "build": "react-scripts build",
-    "test": "react-scripts test --passWithNoTests",
-    "jest": "jest",
+    "build": "tsc && vite build",
+    "test": "jest",
     "eject": "react-scripts eject"
   },
   "browserslist": {
@@ -49,7 +49,7 @@
     "@babel/preset-env": "^7.23.5",
     "@babel/preset-react": "^7.23.3",
     "@testing-library/react": "^14.1.2",
-    "@typescript-eslint/parser": "6.16.0",
+    "@types/node": "^20.10.5",
     "babel-jest": "^29.7.0",
     "eslint": "^8.53.0",
     "eslint-plugin-prettier": "^5.0.1",
@@ -57,9 +57,7 @@
     "jest": "^27.5.1",
     "msw": "^2.0.10",
     "prettier": "^3.0.3",
-    "react-test-renderer": "^18.2.0",
-    "@typescript-eslint/eslint-plugin-v5": "5.30.7",
-    "eslint-config-react-app": "7.0.1"
+    "react-test-renderer": "^18.2.0"
   },
   "msw": {
     "workerDirectory": "public"

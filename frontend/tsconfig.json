@@ -1,0 +1,11 @@
+{
+  "compilerOptions": {
+    "outDir": "./built",
+    "allowJs": true,
+    "target": "es6",
+    "skipLibCheck": true,
+    "module": "CommonJS",
+    "moduleResolution": "NodeNext",
+  },
+  "include": ["./src/**/*", "./__test__/**/*"]
+}

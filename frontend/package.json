@@ -4,6 +4,10 @@
   "private": true,
   "dependencies": {
     "@reduxjs/toolkit": "^1.9.7",
+    "@types/jest": "^29.5.11",
+    "@types/node": "^20.10.5",
+    "@types/react": "^18.2.45",
+    "@types/react-dom": "^18.2.18",
     "bootstrap": "^5.3.2",
     "lodash": "^4.17.21",
     "openai": "^4.6.0",
@@ -13,6 +17,7 @@
     "react-redux": "^8.1.2",
     "react-scripts": "^5.0.1",
     "redux-persist": "^6.0.0",
+    "typescript": "^5.3.3",
     "uuid": "^9.0.1",
     "web-vitals": "^2.1.4"
   },

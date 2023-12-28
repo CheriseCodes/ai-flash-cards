@@ -1,4 +1,4 @@
-import express from "express";
+import express, { Application } from "express";
 import bodyParser from "body-parser";
 import OpenAI from "openai";
 import cors from "cors";
@@ -32,7 +32,7 @@ export const dynamoDbClient: DynamoDBClient = new DynamoDBClient({
   region: "ca-central-1",
 });
 
-export const app = express();
+export const app: Application = express();
 app.use(cors());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
@@ -115,19 +115,23 @@ app.post("/openai/test/text", async (req, res) => {
     if (targetLanguage === appConfig.languageModes.SPANISH) {
       cert = cert.concat("DELE");
     } else if (targetLanguage === appConfig.languageModes.FRENCH) {
-      if (["C1", "C2"].includes(targetLevel)) {
-        cert = cert.concat("DALF");
-      } else {
-        cert = cert.concat("DELF");
+      if (targetLevel !== undefined) {
+        if (["C1", "C2"].includes(targetLevel.toString())) {
+          cert = cert.concat("DALF");
+        } else {
+          cert = cert.concat("DELF");
+        }
       }
     } else if (targetLanguage == appConfig.languageModes.KOREAN) {
-      targetLevel = `${targetLevel.slice(0, -1)} ${targetLevel.slice(-1)}`;
-      if (["1", "2"].includes(targetLevel.slice(-1))) {
-        cert = cert.concat("TOPIK I");
-      } else {
-        cert = cert.concat("TOPIK II");
+      if (targetLevel !== undefined) {
+        targetLevel = `${targetLevel.toString().slice(0, -1)} ${targetLevel.toString().slice(-1)}`;
+        if (["1", "2"].includes(targetLevel.slice(-1))) {
+          cert = cert.concat("TOPIK I");
+        } else {
+          cert = cert.concat("TOPIK II");
+        }
+        targetLevel = `(${targetLevel})`;
       }
-      targetLevel = `(${targetLevel})`;
     }
     for (let wordToSearch of wordsToSearch) {
       messages.push({
@@ -157,17 +161,17 @@ app.post("/openai/test/imagine", async (req, res) => {
     const langMode = req.query.lang_mode;
     // not a fool-proof check but good for learning purposes
     if (langMode == "Korean") {
-      if (!(appConfig.allowedKoreanWords.includes(word))) {
+      if (!(appConfig.allowedKoreanWords.includes(word.toString()))) {
         res.status(400).send({status: 400, message: `Unsupported word: ${word}`})
         return
       }
     } else if (langMode == "French") {
-      if (!(appConfig.allowedFrenchWords.includes(word))) {
+      if (!(appConfig.allowedFrenchWords.includes(word.toString()))) {
         res.status(400).send({status: 400, message: `Unsupported word: ${word}`})
         return
       }
     } else if (langMode == "Spanish") {
-      if (!(appConfig.allowedSpanishWords.includes(word))) {
+      if (!(appConfig.allowedSpanishWords.includes(word.toString()))) {
         res.status(400).send({status: 400, message: `Unsupported word: ${word}`})
         return
       }

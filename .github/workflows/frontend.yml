@@ -5,9 +5,9 @@ name: Frontend React CI
 
 on:
   push:
-    branches: [ "main", "frontend" ]
+    branches: [ "main", "pre-release" ]
   pull_request:
-    branches: [ "main" ]
+    branches: [ "main", "pre-release" ]
 
 defaults:
  run:

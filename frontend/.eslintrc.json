@@ -3,9 +3,12 @@
         "browser": true,
         "es2021": true
     },
+    "parser": "@typescript-eslint/parser",
     "extends": [
         "eslint:recommended",
-        "plugin:react/recommended"
+        "plugin:react/recommended",
+        "plugin:@typescript-eslint/eslint-recommended",
+        "plugin:@typescript-eslint/recommended"
     ],
     "parserOptions": {
         "ecmaVersion": "latest",
@@ -16,6 +19,7 @@
     },
     "plugins": [
         "react",
+        "@typescript-eslint",
         "prettier"
     ],
     "ignorePatterns": ["**/node_modules/**"],

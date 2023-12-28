@@ -17,6 +17,7 @@ helm
 
 # production
 build
+dist
 
 # typescript
 built

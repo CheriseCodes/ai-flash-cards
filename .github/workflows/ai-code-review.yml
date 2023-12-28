@@ -1,6 +1,8 @@
 name: GitHub Actions Demo # TODO: Create ai code review action using: https://github.com/marketplace/actions/ai-code-review-action
 run-name: ${{ github.actor }} is testing out GitHub Actions 🚀
-on: [push]
+on:
+  push:
+    branches: [ "main" ]
 jobs:
   Explore-GitHub-Actions:
     runs-on: ubuntu-latest

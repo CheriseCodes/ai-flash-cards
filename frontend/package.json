@@ -24,8 +24,8 @@
   "scripts": {
     "start": "vite",
     "preview": "vite preview",
-    "lint:fix": "npx eslint --fix --ext .js,.jsx,.ts .",
-    "lint": "npx eslint --ext .js,.jsx,.ts .",
+    "lint:fix": "eslint . --fix --ext .js,.jsx,.ts,.tsx",
+    "lint": "eslint . --ext .js,.jsx,.ts,.tsx",
     "build": "tsc && vite build",
     "test": "jest",
     "eject": "react-scripts eject"
@@ -52,6 +52,7 @@
     "@testing-library/react": "^14.1.2",
     "@types/jest": "^29.5.11",
     "@types/node": "^20.10.5",
+    "@typescript-eslint/eslint-plugin": "^6.16.0",
     "babel-jest": "^29.7.0",
     "eslint": "^8.53.0",
     "eslint-plugin-prettier": "^5.0.1",

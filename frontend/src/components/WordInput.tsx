@@ -46,7 +46,7 @@ const WordInput = ({ setErrors, userId }: { setErrors: Dispatch<SetStateAction<A
     const cardsToDownload = parsedCards.filter((card) => {
       return selectedCards.includes(card.id);
     });
-    for (let card of cardsToDownload) {
+    for (const card of cardsToDownload) {
       fileContents = fileContents.concat(
         `${card.word}<br>${card.sampleSentence}    <img src="${card.img}"><br>${card.translatedSampleSentence}`,
       );

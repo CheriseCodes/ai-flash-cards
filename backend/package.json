@@ -21,6 +21,7 @@
   "scripts": {
     "tsc": "tsc",
     "start": "node ./built/src/main.js",
+    "build": "tsc",
     "start:dev": "nodemon ./built/src/main.js",
     "lint:fix": "npx eslint --fix --ext .js,.jsx,.ts .",
     "lint": "npx eslint --ext .js,.jsx,.ts .",

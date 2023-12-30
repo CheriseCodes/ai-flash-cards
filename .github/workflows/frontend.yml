@@ -22,7 +22,6 @@ jobs:
       matrix:
         node-version: [20.x]
         # See supported Node.js release schedule at https://nodejs.org/en/about/previous-releases/
-
     steps:
     - uses: actions/checkout@v3
     - uses: oven-sh/setup-bun@v1

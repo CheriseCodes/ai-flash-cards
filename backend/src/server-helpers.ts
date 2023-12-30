@@ -12,7 +12,7 @@ const validateWord = (word, langMode) => {
   }
 };
 
-const validateLang = (langMode: string) => {
+const validateLang = (langMode) => {
   return ["French", "Spanish", "Korean"].includes(langMode);
 };
 

@@ -12,10 +12,12 @@ import {
   DynamoDBClient,
   QueryCommand,
   PutItemCommand,
+  DeleteItemCommand,
   UpdateItemCommand,
   PutItemCommandInput,
   UpdateItemCommandInput,
   QueryCommandInput,
+  DeleteItemCommandInput,
 } from "@aws-sdk/client-dynamodb";
 import { fromSSO } from "@aws-sdk/credential-providers";
 
@@ -285,8 +287,31 @@ app.post("/flashcards", async (req, res) => {
 
 // TODO: Make deletion and update endpoints
 app.post("/delete/flashcard", async (req, res) => {
-  // delete dynamodb item with text
-  // delete image
+  try {
+    const cardId = req.body.userId;
+    // TODO: get image id
+
+    // delete dynamodb item with text
+    let input: DeleteItemCommandInput = {
+      TableName: "FlashCardGenAITable",
+      Key: {
+        FlashCardId: cardId,
+      },
+    }
+    let command = new DeleteItemCommand(input);
+    let response = await dynamoDbClient.send(command);
+    console.log(response);
+    // delete image
+    
+    res.status(200).send({cardId: cardId});
+  } catch (error) {
+    
+  } {
+    
+  }
+  
+  
+  
 });
 
 app.post("/delete/image", async (req, res) => {

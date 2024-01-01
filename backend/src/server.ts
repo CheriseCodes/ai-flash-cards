@@ -6,10 +6,11 @@ import cors from "cors";
 import { open, rm } from "node:fs/promises";
 import https from "https";
 
-import { PutObjectCommand, S3Client } from "@aws-sdk/client-s3";
+import { PutObjectCommand, DeleteObjectCommand, S3Client, DeleteObjectCommandInput } from "@aws-sdk/client-s3";
 
 import {
   DynamoDBClient,
+  GetItemCommand,
   QueryCommand,
   PutItemCommand,
   DeleteItemCommand,
@@ -225,6 +226,7 @@ app.post("/upload/image", async (req, res) => {
     console.log("starting download..");
     const imgUrl = req.body.imgUrl;
     const imgName = req.body.imgName;
+    const cardId = req.body.cardId;
     const localFileName = `./private/images/${imgName}.png`;
     const remoteFileName = `users/default/images/${imgName}.png`;
 
@@ -252,6 +254,19 @@ app.post("/upload/image", async (req, res) => {
         const s3Response = await s3Client.send(command);
         console.log("s3 upload response", s3Response);
         stream.close();
+        // TODO: Update DynamoDB Table with correct image link
+        const ddbInput: UpdateItemCommandInput = {
+          Key: { FlashCardId: { S: cardId } },
+          TableName: "FlashCardGenAITable",
+          UpdateExpression:
+            "SET ImageLink = :imgl",
+          ExpressionAttributeValues: {
+            ":imgl": { S: remoteFileName },
+          },
+          ReturnValues: "ALL_NEW",
+        };
+        const ddbCommand = new UpdateItemCommand(ddbInput);
+        await dynamoDbClient.send(ddbCommand);
       });
     });
     const domainName = process.env.CLOUDFRONT_URL;
@@ -288,30 +303,48 @@ app.post("/flashcards", async (req, res) => {
 // TODO: Make deletion and update endpoints
 app.post("/delete/flashcard", async (req, res) => {
   try {
-    const cardId = req.body.userId;
+    const cardId = req.body.cardId;
     // TODO: get image id
-
-    // delete dynamodb item with text
-    let input: DeleteItemCommandInput = {
-      TableName: "FlashCardGenAITable",
-      Key: {
-        FlashCardId: cardId,
+    // TODO: get image id
+    const input = { // GetItemInput
+      TableName: "FlashCardGenAITable", // required
+      Key: { // Key // required
+        FlashCardId: { // AttributeValue Union: only one key present
+          S: cardId,
+        },
       },
-    }
-    let command = new DeleteItemCommand(input);
-    let response = await dynamoDbClient.send(command);
+      ConsistentRead: true,
+    };
+    const command = new GetItemCommand(input);
+    const response = await dynamoDbClient.send(command);
     console.log(response);
     // delete image
-    
+    const s3Input: DeleteObjectCommandInput = {
+      Bucket: process.env.BUCKET_NAME,
+      Key: response.Item.ImageLink.S,
+    }
+    const s3Command = new DeleteObjectCommand(s3Input);
+    try {
+      const s3Response = await s3Client.send(s3Command);
+      console.log(s3Response);
+    } catch (err) {
+      console.error(err);
+    }
+    // delete dynamodb item with text
+    let ddbInput: DeleteItemCommandInput = {
+      TableName: "FlashCardGenAITable",
+      Key: {
+        FlashCardId: {S : cardId},
+      },
+    }
+    let ddbCommand = new DeleteItemCommand(ddbInput);
+    let ddbResponse = await dynamoDbClient.send(ddbCommand);
+    console.log(ddbResponse);
     res.status(200).send({cardId: cardId});
-  } catch (error) {
-    
-  } {
-    
+  } catch (err) {
+    console.error(err);
+    res.status(500).send({error: err})
   }
-  
-  
-  
 });
 
 app.post("/delete/image", async (req, res) => {

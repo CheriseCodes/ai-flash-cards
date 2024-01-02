@@ -6,6 +6,9 @@ name: Backend Node.js CI
 on:
   push:
     branches: [ "backend" ]
+    paths:
+      - "src/**"
+      - "__test__/**"
   pull_request:
     branches: [ "main", "pre-release" ]
 env:

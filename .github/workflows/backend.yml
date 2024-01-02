@@ -7,13 +7,13 @@ on:
   push:
     branches: [ "backend" ]
     paths:
-      - "src/**"
-      - "__test__/**"
+      - "backend/src/**"
+      - "backend/__test__/**"
   pull_request:
     branches: [ "main", "pre-release" ]
     paths:
-      - "src/**"
-      - "__test__/**"
+      - "backend/src/**"
+      - "backend/__test__/**"
 env:
   OPENAI_API_KEY: "sk-123abc"
   BUCKET_NAME: "bucket-name"

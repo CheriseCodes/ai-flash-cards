@@ -358,3 +358,11 @@ app.post("/update/flashcard", async (req, res) => {
   // upload new image
   // update dynamodb item with new image
 });
+
+app.post("/login", async (req, res) => {
+  
+});
+
+app.post("/logout", async (req, res) => {
+  
+});

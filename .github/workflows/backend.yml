@@ -11,14 +11,17 @@ on:
       - "__test__/**"
   pull_request:
     branches: [ "main", "pre-release" ]
+    paths:
+      - "src/**"
+      - "__test__/**"
 env:
   OPENAI_API_KEY: "sk-123abc"
   BUCKET_NAME: "bucket-name"
   CLOUDFRONT_URL: "cloudfront-url"
   AWS_PROFILE: "aws-profile"
 defaults:
- run:
-  working-directory: ./backend
+  run:
+    working-directory: ./backend
 
 jobs:
   build:

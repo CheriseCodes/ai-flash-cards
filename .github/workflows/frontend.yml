@@ -6,8 +6,14 @@ name: Frontend React CI
 on:
   push:
     branches: [ "frontend" ]
+    paths:
+      - "frontend/src/**"
+      - "frontend/__test__/**"
   pull_request:
     branches: [ "main", "pre-release" ]
+    paths:
+      - "frontend/src/**"
+      - "frontend/__test__/**"
 
 defaults:
  run:

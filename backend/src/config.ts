@@ -102,7 +102,7 @@ const allowedFrenchWords: string[] = [
   "probablement",
 ];
 
-const allowedSpanishWords = [
+const allowedSpanishWords: string[] = [
   "ser",
   "estar",
   "tener",

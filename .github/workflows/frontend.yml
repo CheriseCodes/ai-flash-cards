@@ -10,7 +10,7 @@ on:
       - "frontend/src/**"
       - "frontend/__test__/**"
   pull_request:
-    branches: [ "main", "pre-release" ]
+    branches: [ "main" ]
     paths:
       - "frontend/src/**"
       - "frontend/__test__/**"

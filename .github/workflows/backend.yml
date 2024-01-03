@@ -10,7 +10,7 @@ on:
       - "backend/src/**"
       - "backend/__test__/**"
   pull_request:
-    branches: [ "main", "pre-release" ]
+    branches: [ "main" ]
     paths:
       - "backend/src/**"
       - "backend/__test__/**"

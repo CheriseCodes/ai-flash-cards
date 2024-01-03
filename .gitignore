@@ -30,6 +30,9 @@ built
 .env.test.local
 .env.production.local
 
+# security
+kubernetes/secrets
+
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*

@@ -74,10 +74,8 @@ const putItemFlashCardTable = async (userId, timeStamp, cardId, response, messag
   await dynamoDbClient.send(awsCommand);
 }
 
-// app.get("/", async (req, res) => {
-//   res.status(200).send({message: "app is alive"});
-// });
-
+app.get("/service/readyz", (req, res) => res.status(200).json({ readyz: {status: "ok" }}));
+app.get("/service/livez", (req, res) => res.status(200).json({ livez: {status: "ok" }}));
 app.post("/openai/test/text", async (req, res) => {
   try {
     const wordsToSearch = Array.isArray(req.query.word)

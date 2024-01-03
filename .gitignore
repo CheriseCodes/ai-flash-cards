@@ -13,7 +13,8 @@ notes.txt
 sample_sentences_data.json
 test_import.txt
 /aws/ignore/
-helm
+helm*/
+
 
 # production
 build
@@ -28,6 +29,9 @@ built
 .env.development.local
 .env.test.local
 .env.production.local
+
+# security
+kubernetes/secrets
 
 npm-debug.log*
 yarn-debug.log*

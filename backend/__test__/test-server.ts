@@ -10,6 +10,10 @@ import {
 import assert from "node:assert";
 import { mockClient } from "aws-sdk-client-mock";
 import { dynamoDbClient, s3Client, openai, app } from "../src/server";
+import {
+  GetItemCommand,
+  DeleteItemCommand,
+} from "@aws-sdk/client-dynamodb";
 
 const PORT = 8000;
 
@@ -76,6 +80,34 @@ describe("POST /flashcards", () => {
     });
     const json = await response.json();
     assert.deepStrictEqual(json, { cards: queryResult.Items });
+  });
+});
+
+describe("POST /delete/flashcard", () => {
+  beforeEach(() => {
+    ddbMock.reset();
+    s3Mock.reset();
+  });
+  afterEach(() => {
+    ddbMock.restore();
+    s3Mock.restore();
+  });
+  test("existing flashcard is deleted", async () => {
+    ddbMock.on(GetItemCommand).resolves({Item: {ImageLink: {S: "123abc"}}});
+    ddbMock.on(DeleteItemCommand).resolves({});
+    s3Mock.onAnyCommand().resolves({});
+    const cardId = "abc123";
+    const response = await fetch(`http://localhost:${PORT}/delete/flashcard`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        cardId: cardId,
+      }),
+    });
+    const json = await response.json();
+    assert.deepStrictEqual(json, { cardId: cardId });
   });
 });
 

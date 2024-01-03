@@ -1,5 +1,5 @@
 import { app } from "./server";
-const PORT = 8000;
+const PORT: number = 8000;
 const server = app.listen(PORT, () =>
   console.log("server is running on port " + PORT),
 );

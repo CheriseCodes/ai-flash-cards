@@ -6,16 +6,19 @@ import cors from "cors";
 import { open, rm } from "node:fs/promises";
 import https from "https";
 
-import { PutObjectCommand, S3Client } from "@aws-sdk/client-s3";
+import { PutObjectCommand, DeleteObjectCommand, S3Client, DeleteObjectCommandInput } from "@aws-sdk/client-s3";
 
 import {
   DynamoDBClient,
+  GetItemCommand,
   QueryCommand,
   PutItemCommand,
+  DeleteItemCommand,
   UpdateItemCommand,
   PutItemCommandInput,
   UpdateItemCommandInput,
   QueryCommandInput,
+  DeleteItemCommandInput,
 } from "@aws-sdk/client-dynamodb";
 import { fromSSO } from "@aws-sdk/credential-providers";
 
@@ -47,7 +50,6 @@ const openAIChatCompletion = async (model, temperature, messages) => {
     temperature: temperature,
     messages,
   });
-  console.log(response);
   return response
 }
 
@@ -68,17 +70,12 @@ const putItemFlashCardTable = async (userId, timeStamp, cardId, response, messag
     },
     TableName: "FlashCardGenAITable",
   };
-
-  // console.log(awsInput);
   const awsCommand = new PutItemCommand(awsInput);
-  const awsResponse = await dynamoDbClient.send(awsCommand);
-  console.log("putItemFlashCardTable", awsResponse);
+  await dynamoDbClient.send(awsCommand);
 }
 
-// app.get("/", async (req, res) => {
-//   res.send({message: "app is alive"});
-// });
-
+app.get("/service/readyz", (req, res) => res.status(200).json({ readyz: {status: "ok" }}));
+app.get("/service/livez", (req, res) => res.status(200).json({ livez: {status: "ok" }}));
 app.post("/openai/test/text", async (req, res) => {
   try {
     const wordsToSearch = Array.isArray(req.query.word)
@@ -91,12 +88,10 @@ app.post("/openai/test/text", async (req, res) => {
     }
     let invalidWords = "";
     for (let word of wordsToSearch) {
-      console.log(sh.validateWord(word, targetLanguage))
       if (!(sh.validateWord(word, targetLanguage))) {
         invalidWords = invalidWords + ` ${word}`;
       }
     }
-    console.log(invalidWords);
     if (invalidWords !== "") {
       res.status(400).send({status: 400, message: `Invalid words:${invalidWords}`})
       return
@@ -109,7 +104,6 @@ app.post("/openai/test/text", async (req, res) => {
     const userId = req.body.userId;
     const cardId = req.body.cardId;
     const timeStamp = req.body.timeStamp;
-    console.log("userid", userId, "cardid", cardId, "timeStamp", timeStamp);
     const messages = [];
     let cert = " ";
     if (targetLanguage === appConfig.languageModes.SPANISH) {
@@ -141,12 +135,9 @@ app.post("/openai/test/text", async (req, res) => {
         } ${targetLevel} vocabulary and grammar points. Return the sentence in the following JSON format {"word": "${wordToSearch}","sampleSentence": "Example sentence using ${wordToSearch}","translatedSampleSentence":"English translation of the example sentence","wordTranslated": "English translation of ${wordToSearch}"}.`,
       });
     }
-    console.log("promt for text:", messages[0].content);
     const response = await openAIChatCompletion("gpt-3.5-turbo", 1, messages);
-    // console.log(response.choices[0].message.content);
     if (response.id) {
-      // console.log(response.choices[0].message.content);
-      res.send({content: response.choices[0].message.content});
+      res.status(200).send({content: response.choices[0].message.content});
       await putItemFlashCardTable(userId, timeStamp, cardId, response, messages)
       return
     }
@@ -181,7 +172,6 @@ app.post("/openai/test/imagine", async (req, res) => {
     }
     const sentenceToVisualize = req.query.sentence;
     const cardId = req.body.cardId;
-    console.log("visualizing...", sentenceToVisualize);
     const prompt = `${sentenceToVisualize}, Georges Seurat, Bradshaw Crandell, vibrant colors, realistic`;
     const response = await openai.images.generate({
       prompt: prompt,
@@ -189,7 +179,7 @@ app.post("/openai/test/imagine", async (req, res) => {
       size: "256x256",
     });
     if (response?.created) {
-      res.send(response);
+      res.status(200).send(response);
       const input: UpdateItemCommandInput = {
         Key: { FlashCardId: { S: cardId } },
         TableName: "FlashCardGenAITable",
@@ -220,9 +210,9 @@ app.post("/openai/test/imagine", async (req, res) => {
 app.post("/upload/image", async (req, res) => {
   try {
     // Download image
-    console.log("starting download..");
     const imgUrl = req.body.imgUrl;
     const imgName = req.body.imgName;
+    const cardId = req.body.cardId;
     const localFileName = `./private/images/${imgName}.png`;
     const remoteFileName = `users/default/images/${imgName}.png`;
 
@@ -247,14 +237,26 @@ app.post("/upload/image", async (req, res) => {
           CacheControl: "public, max-age=31536000",
         };
         const command = new PutObjectCommand(input);
-        const s3Response = await s3Client.send(command);
-        console.log("s3 upload response", s3Response);
+        await s3Client.send(command);
         stream.close();
+        // TODO: Update DynamoDB Table with correct image link
+        const ddbInput: UpdateItemCommandInput = {
+          Key: { FlashCardId: { S: cardId } },
+          TableName: "FlashCardGenAITable",
+          UpdateExpression:
+            "SET ImageLink = :imgl",
+          ExpressionAttributeValues: {
+            ":imgl": { S: remoteFileName },
+          },
+          ReturnValues: "ALL_NEW",
+        };
+        const ddbCommand = new UpdateItemCommand(ddbInput);
+        await dynamoDbClient.send(ddbCommand);
       });
     });
     const domainName = process.env.CLOUDFRONT_URL;
     // const domainName = `https://${process.env.BUCKET_NAME}.s3.ca-central-1.amazonaws.com`
-    res.send({ url: `${domainName}/${remoteFileName}` });
+    res.status(200).send({ url: `${domainName}/${remoteFileName}` });
   } catch (err) {
     console.error(err);
     res.status(500).send({error: err})
@@ -275,8 +277,7 @@ app.post("/flashcards", async (req, res) => {
     };
     const command = new QueryCommand(input);
     const awsResponse = await dynamoDbClient.send(command);
-    console.log(awsResponse);
-    res.send({"cards": awsResponse.Items});
+    res.status(200).send({"cards": awsResponse.Items});
   } catch (err) {
     console.error(err);
     res.status(500).send({error: err})
@@ -285,8 +286,44 @@ app.post("/flashcards", async (req, res) => {
 
 // TODO: Make deletion and update endpoints
 app.post("/delete/flashcard", async (req, res) => {
-  // delete dynamodb item with text
-  // delete image
+  try {
+    const cardId = req.body.cardId;
+    const input = { // GetItemInput
+      TableName: "FlashCardGenAITable", // required
+      Key: { // Key // required
+        FlashCardId: { // AttributeValue Union: only one key present
+          S: cardId,
+        },
+      },
+      ConsistentRead: true,
+    };
+    const command = new GetItemCommand(input);
+    const response = await dynamoDbClient.send(command);
+    // delete image
+    const s3Input: DeleteObjectCommandInput = {
+      Bucket: process.env.BUCKET_NAME,
+      Key: response.Item.ImageLink.S,
+    }
+    const s3Command = new DeleteObjectCommand(s3Input);
+    try {
+      const s3Response = await s3Client.send(s3Command);
+    } catch (err) {
+      console.error(err);
+    }
+    // delete dynamodb item with text
+    let ddbInput: DeleteItemCommandInput = {
+      TableName: "FlashCardGenAITable",
+      Key: {
+        FlashCardId: {S : cardId},
+      },
+    }
+    let ddbCommand = new DeleteItemCommand(ddbInput);
+    await dynamoDbClient.send(ddbCommand);
+    res.status(200).send({cardId: cardId});
+  } catch (err) {
+    console.error(err);
+    res.status(500).send({error: err})
+  }
 });
 
 app.post("/delete/image", async (req, res) => {
@@ -299,4 +336,12 @@ app.post("/update/flashcard", async (req, res) => {
   // delete old image
   // upload new image
   // update dynamodb item with new image
+});
+
+app.post("/login", async (req, res) => {
+  
+});
+
+app.post("/logout", async (req, res) => {
+  
 });

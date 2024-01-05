@@ -77,7 +77,12 @@ const putItemFlashCardTable = async (userId, timeStamp, cardId, response, messag
 
 app.get("/service/readyz", (req, res) => res.status(200).json({ readyz: {status: "ok" }}));
 app.get("/service/livez", (req, res) => res.status(200).json({ livez: {status: "ok" }}));
-app.post("/openai/test/text", async (req, res) => {
+app.get("/openai/test/text", async (req, res) => {
+  const status = ah.authenticateToken(req)
+    if (status != 200) {
+      res.sendStatus(status);
+      return;
+  }
   try {
     const wordsToSearch = Array.isArray(req.query.word)
       ? req.query.word
@@ -147,8 +152,13 @@ app.post("/openai/test/text", async (req, res) => {
     res.status(500).send({error: err})
   }
 });
-app.post("/openai/test/imagine", async (req, res) => {
+app.get("/openai/test/imagine", async (req, res) => {
   try {
+    const status = ah.authenticateToken(req)
+    if (status != 200) {
+      res.sendStatus(status);
+      return;
+    }
     const word = req.query.word;
     const langMode = req.query.lang_mode;
     // not a fool-proof check but good for learning purposes
@@ -208,8 +218,13 @@ app.post("/openai/test/imagine", async (req, res) => {
   }
 });
 
-app.post("/upload/image", async (req, res) => {
+app.post("/image", async (req, res) => {
   try {
+    const status = ah.authenticateToken(req);
+    if (status != 200) {
+      res.sendStatus(status);
+      return;
+    }
     // Download image
     const imgUrl = req.body.imgUrl;
     const imgName = req.body.imgName;
@@ -269,6 +284,7 @@ app.get("/flashcards", async (req, res) => {
     const status = ah.authenticateToken(req)
     if (status != 200) {
       res.sendStatus(status);
+      return;
     }
     const userId: string = req.query.userId[0];
     const input: QueryCommandInput = {
@@ -289,9 +305,13 @@ app.get("/flashcards", async (req, res) => {
   }
 });
 
-// TODO: Make deletion and update endpoints
-app.post("/delete/flashcard", async (req, res) => {
+app.delete("/flashcard", async (req, res) => {
   try {
+    const status = ah.authenticateToken(req)
+    if (status != 200) {
+      res.sendStatus(status);
+      return;
+    }
     const cardId = req.body.cardId;
     const input = { // GetItemInput
       TableName: "FlashCardGenAITable", // required
@@ -331,12 +351,13 @@ app.post("/delete/flashcard", async (req, res) => {
   }
 });
 
-app.post("/delete/image", async (req, res) => {
+app.delete("/image", async (req, res) => {
   // delete dynamodb item with text
   // delete image
 });
 
-app.post("/update/flashcard", async (req, res) => {
+// update the flashcard
+app.put("/flashcard", async (req, res) => {
   // update dynamodb item with text
   // delete old image
   // upload new image

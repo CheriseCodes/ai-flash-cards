@@ -22,8 +22,9 @@ import {
 } from "@aws-sdk/client-dynamodb";
 import { fromSSO } from "@aws-sdk/credential-providers";
 
-import appConfig from "./config.js";
-import * as sh from "./server-helpers.js";
+import appConfig from "./config";
+import * as sh from "./server-helpers";
+import * as ah from "./auth-helpers";
 
 export const s3Client: S3Client = new S3Client({
   credentials: fromSSO({ profile: process.env.AWS_PROFILE }),
@@ -263,9 +264,13 @@ app.post("/upload/image", async (req, res) => {
   }
 });
 
-app.post("/flashcards", async (req, res) => {
+app.get("/flashcards", async (req, res) => {
   try {
-    const userId = req.body.userId;
+    const status = ah.authenticateToken(req)
+    if (status != 200) {
+      res.sendStatus(status);
+    }
+    const userId: string = req.query.userId[0];
     const input: QueryCommandInput = {
       TableName: "FlashCardGenAITable",
       IndexName: "UserId",
@@ -336,6 +341,15 @@ app.post("/update/flashcard", async (req, res) => {
   // delete old image
   // upload new image
   // update dynamodb item with new image
+});
+
+app.post("/signup", async (req, res) => {
+  const username: string = req.body.username;
+  const password: string = req.body.password
+  // TODO: Check if user exists in the DB first
+  const token = ah.generateAccessToken({ username: username });
+  // TODO: Store the user and credentials in the DB
+  res.json(token);
 });
 
 app.post("/login", async (req, res) => {

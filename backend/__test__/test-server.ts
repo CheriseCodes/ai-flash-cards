@@ -14,13 +14,14 @@ import {
   GetItemCommand,
   DeleteItemCommand,
 } from "@aws-sdk/client-dynamodb";
+import { authenticateToken } from "../src/auth-helpers";
 
 const PORT = 8000;
 
 const ddbMock = mockClient(dynamoDbClient);
 const s3Mock = mockClient(s3Client);
 let server;
-describe("POST /flashcards", () => {
+describe("GET /flashcards", () => {
   beforeEach(() => {
     ddbMock.reset();
     s3Mock.reset();
@@ -35,6 +36,7 @@ describe("POST /flashcards", () => {
     ); // IMPORTANT: First test should start the server
   });
   test("existent user should have non-empty cards response", async () => {
+    mock.fn(authenticateToken, () => {return 200})
     const queryResult = {
       Items: [
         {
@@ -50,33 +52,28 @@ describe("POST /flashcards", () => {
     ddbMock.onAnyCommand().resolves(queryResult);
     s3Mock.onAnyCommand().resolves({});
     const userId = "default";
-    const response = await fetch(`http://localhost:${PORT}/flashcards`, {
-      method: "POST",
+    const response = await fetch(`http://localhost:${PORT}/flashcards?userId=${userId}`, {
       headers: {
         "Content-Type": "application/json",
+        "Authorization": "Bearer abc123"
       },
-      body: JSON.stringify({
-        userId: userId,
-      }),
     });
     const json = await response.json();
     assert.deepStrictEqual(json, { cards: queryResult.Items });
   });
   test("non-existent user should have non-empty cards response", async () => {
+    mock.fn(authenticateToken, () => {return 200})
     const queryResult = {
       Items: [],
     };
     ddbMock.onAnyCommand().resolves(queryResult);
     s3Mock.onAnyCommand().resolves({});
     const userId = "default";
-    const response = await fetch(`http://localhost:${PORT}/flashcards`, {
-      method: "POST",
+    const response = await fetch(`http://localhost:${PORT}/flashcards?userId=${userId}`, {
       headers: {
         "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        userId: userId,
-      }),
+        "Authorization": "Bearer abc123"
+      }
     });
     const json = await response.json();
     assert.deepStrictEqual(json, { cards: queryResult.Items });

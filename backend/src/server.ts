@@ -77,7 +77,7 @@ const putItemFlashCardTable = async (userId, timeStamp, cardId, response, messag
 
 app.get("/service/readyz", (req, res) => res.status(200).json({ readyz: {status: "ok" }}));
 app.get("/service/livez", (req, res) => res.status(200).json({ livez: {status: "ok" }}));
-app.get("/openai/test/text", async (req, res) => {
+app.get("/generations/sentences", async (req, res) => {
   const status = ah.authenticateToken(req)
     if (status != 200) {
       res.sendStatus(status);
@@ -107,9 +107,9 @@ app.get("/openai/test/text", async (req, res) => {
       res.status(400).send({status: 400, message: `Invalid language level: ${targetLevel}`})
       return
     }
-    const userId = req.body.userId;
-    const cardId = req.body.cardId;
-    const timeStamp = req.body.timeStamp;
+    const userId = req.query.userId;
+    const cardId = req.query.cardId;
+    const timeStamp = req.query.timeStamp;
     const messages = [];
     let cert = " ";
     if (targetLanguage === appConfig.languageModes.SPANISH) {
@@ -152,7 +152,7 @@ app.get("/openai/test/text", async (req, res) => {
     res.status(500).send({error: err})
   }
 });
-app.get("/openai/test/imagine", async (req, res) => {
+app.get("/generations/images", async (req, res) => {
   try {
     const status = ah.authenticateToken(req)
     if (status != 200) {
@@ -182,7 +182,7 @@ app.get("/openai/test/imagine", async (req, res) => {
       return
     }
     const sentenceToVisualize = req.query.sentence;
-    const cardId = req.body.cardId;
+    const cardId = req.query.cardId[0];
     const prompt = `${sentenceToVisualize}, Georges Seurat, Bradshaw Crandell, vibrant colors, realistic`;
     const response = await openai.images.generate({
       prompt: prompt,

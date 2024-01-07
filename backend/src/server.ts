@@ -2,6 +2,7 @@ import express, { Application } from "express";
 import bodyParser from "body-parser";
 import OpenAI from "openai";
 import cors from "cors";
+import bcrypt from "bcrypt";
 
 import { open, rm } from "node:fs/promises";
 import https from "https";
@@ -20,19 +21,19 @@ import {
   QueryCommandInput,
   DeleteItemCommandInput,
 } from "@aws-sdk/client-dynamodb";
-import { fromSSO } from "@aws-sdk/credential-providers";
+import { fromEnv } from "@aws-sdk/credential-providers";
 
 import appConfig from "./config";
 import * as sh from "./server-helpers";
 import * as ah from "./auth-helpers";
 
 export const s3Client: S3Client = new S3Client({
-  credentials: fromSSO({ profile: process.env.AWS_PROFILE }),
+  credentials: fromEnv(),
   region: "ca-central-1",
 });
 
 export const dynamoDbClient: DynamoDBClient = new DynamoDBClient({
-  credentials: fromSSO({ profile: process.env.AWS_PROFILE }),
+  credentials: fromEnv(),
   region: "ca-central-1",
 });
 
@@ -40,6 +41,8 @@ export const app: Application = express();
 app.use(cors());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
+
+const maxAge = 3 * 24 * 60 * 60;
 
 export const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
@@ -331,7 +334,7 @@ app.delete("/flashcard", async (req, res) => {
     }
     const s3Command = new DeleteObjectCommand(s3Input);
     try {
-      const s3Response = await s3Client.send(s3Command);
+      await s3Client.send(s3Command);
     } catch (err) {
       console.error(err);
     }
@@ -366,15 +369,73 @@ app.put("/flashcard", async (req, res) => {
 
 app.post("/signup", async (req, res) => {
   const username: string = req.body.username;
-  const password: string = req.body.password
-  // TODO: Check if user exists in the DB first
+  const password: string = req.body.password;
+  // Check if user exists in the DB first
+  const input = { // GetItemInput
+    TableName: "UserTable", // required
+    Key: { // Key // required
+      UserId: { // AttributeValue Union: only one key present
+        S: username,
+      },
+    },
+    ConsistentRead: true,
+  };
+  const command = new GetItemCommand(input);
+  const response = await dynamoDbClient.send(command);
+  // user already exists, don't let them create a new user
+  if (response.Item) {
+    res.status(400).send(`User ${username} already exists`);
+    return;
+  }
   const token = ah.generateAccessToken({ username: username });
-  // TODO: Store the user and credentials in the DB
-  res.json(token);
+  // Store the user and credentials in the DB
+  const hashRes = await bcrypt.hash(password, 10)
+  const awsInput: PutItemCommandInput = {
+    Item: {
+      UserId: { S: username },
+      AccessToken: {S: token},
+      Password: {S: hashRes},
+      Role: {S: "learner"},
+    },
+    TableName: "UserTable",
+  };
+  const awsCommand = new PutItemCommand(awsInput);
+  await dynamoDbClient.send(awsCommand);
+  res.setHeader("Set-Cookie", `fc_jwt=${token}; Max-Age=${maxAge*1000}`);
+  res.status(201).json({Token: token});
 });
 
 app.post("/login", async (req, res) => {
-  
+  const username: string = req.body.username;
+  const password: string = req.body.password;
+  // Check if user exists in the DB first
+  const input = { // GetItemInput
+    TableName: "UserTable", // required
+    Key: { // Key // required
+      UserId: { // AttributeValue Union: only one key present
+        S: username,
+      },
+    },
+    ConsistentRead: true,
+  };
+  const command = new GetItemCommand(input);
+  const response = await dynamoDbClient.send(command);
+  // user already exists, don't let them create a new user
+  if (response.Item === undefined) {
+    res.status(400).send(`Incorect username or password`);
+    return;
+  }
+  // confirm the password
+  const compareRes = await bcrypt.compare(password, response.Item.Password.S);
+  if (compareRes) { // login succesful
+    const token = ah.generateAccessToken({ username: username });
+    res.setHeader("Set-Cookie", `fc_jwt=${token}; Max-Age=${maxAge*1000}`);
+    res.status(200).send(`${username} logged in successfully`);
+    return;
+  } else {
+    res.status(400).send(`Incorect username or password`);
+    return;
+  }
 });
 
 app.post("/logout", async (req, res) => {

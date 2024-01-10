@@ -310,9 +310,14 @@ app.get("/flashcards", async (req, res) => {
 
 app.delete("/flashcard", async (req, res) => {
   try {
-    const status = ah.authenticateToken(req)
+    const status = ah.authenticateToken(req);
     if (status != 200) {
       res.sendStatus(status);
+      return;
+    }
+    const userName = ah.authorizeToken(req);
+    if (userName == "Unauthorized") {
+      res.sendStatus(400);
       return;
     }
     const cardId = req.body.cardId;
@@ -327,6 +332,10 @@ app.delete("/flashcard", async (req, res) => {
     };
     const command = new GetItemCommand(input);
     const response = await dynamoDbClient.send(command);
+    if (userName != response.Item.UserId.S) {
+      res.status(400).json({message: `${userName} is unauthorzed to delete flashcard`});
+      return;
+    }
     // delete image
     const s3Input: DeleteObjectCommandInput = {
       Bucket: process.env.BUCKET_NAME,
@@ -439,5 +448,10 @@ app.post("/login", async (req, res) => {
 });
 
 app.post("/logout", async (req, res) => {
-  
+  try {
+    res.setHeader("Set-Cookie", `fc_jwt=""; Max-Age=${1}`);
+    res.sendStatus(200)
+  } catch (err) {
+    res.sendStatus(500)
+  }
 });

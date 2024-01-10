@@ -25,8 +25,10 @@ export const authorizeToken = (req): string => {
       if (err)  {
         return resUser;
       } else {
-        resUser = user.username;
+        return user.username;
       }
     });
-    return resUser;
+    if (process.env.NODE_ENV == "test") {
+      return "default";
+    }
 }

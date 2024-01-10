@@ -14,7 +14,7 @@ import {
   GetItemCommand,
   DeleteItemCommand,
 } from "@aws-sdk/client-dynamodb";
-import { authenticateToken } from "../src/auth-helpers";
+import { authenticateToken, authorizeToken } from "../src/auth-helpers";
 
 const PORT = 8000;
 
@@ -36,7 +36,8 @@ describe("GET /flashcards", () => {
     ); // IMPORTANT: First test should start the server
   });
   test("existent user should have non-empty cards response", async () => {
-    mock.fn(authenticateToken, () => {return 200});
+    mock.fn(authenticateToken, (req) => {return 200; });
+    mock.fn(authorizeToken, (req) => {return "default";});
     const queryResult = {
       Items: [
         {
@@ -63,6 +64,7 @@ describe("GET /flashcards", () => {
   });
   test("non-existent user should have non-empty cards response", async () => {
     mock.fn(authenticateToken, () => {return 200});
+    mock.fn(authorizeToken, () => {return "default"});
     const queryResult = {
       Items: [],
     };
@@ -91,7 +93,8 @@ describe("DELETE /flashcard", () => {
   });
   test("existing flashcard is deleted", async () => {
     mock.fn(authenticateToken, () => {return 200});
-    ddbMock.on(GetItemCommand).resolves({Item: {ImageLink: {S: "123abc"}}});
+    mock.fn(authorizeToken, (a,b,c) => {return "default"});
+    ddbMock.on(GetItemCommand).resolves({Item: {ImageLink: {S: "123abc"}, UserId: {S: "default"}}});
     ddbMock.on(DeleteItemCommand).resolves({});
     s3Mock.onAnyCommand().resolves({});
     const cardId = "abc123";
@@ -123,6 +126,7 @@ describe("GET /generations/images", () => {
   });
   test("Allowed word should return a valid image", async () => {
     mock.fn(authenticateToken, () => {return 200})
+    mock.fn(authorizeToken, () => {return "default"});
     const word = "trouver";
     const langMode = "French";
     const sentence = "Je ne trouve pas mes lunettes.";
@@ -154,6 +158,7 @@ describe("GET /generations/images", () => {
   });
   test("Unallowed word should return a error image", async () => {
     mock.fn(authenticateToken, () => {return 200})
+    mock.fn(authorizeToken, () => {return "default"});
     const word = "rentrée";
     const langMode = "French";
     const sentence = "Courage, c'est la rentrée!";
@@ -190,7 +195,8 @@ describe("POST /upload/image", () => {
     s3Mock.restore();
   });
   test("image should be uploaded successfully", async () => {
-    mock.fn(authenticateToken, () => {return 200})
+    mock.fn(authenticateToken, () => {return 200});
+    mock.fn(authorizeToken, () => {return "default"; });
     const cardId = "93960a65-ce5e-4d4d-ba2a-8d9e8eeb57d9";
     const languageMode = "French";
     const languageLevel = "C2";
@@ -232,6 +238,7 @@ describe("POST /generations/sentences", () => {
   });
   test("invalid word should return an empty response", async () => {
     mock.fn(authenticateToken, () => {return 200})
+    mock.fn(authorizeToken, () => {return "default"});
     const word = "hello"; // invalid word
     const userId = "default";
     const cardId = "93960a65-ce5e-4d4d-ba2a-8d9e8eeb57d9";
@@ -280,6 +287,7 @@ describe("POST /generations/sentences", () => {
   });
   test("unsupported language should return an empty response", async () => {
     mock.fn(authenticateToken, () => {return 200});
+    mock.fn(authorizeToken, () => {return "default"});
     const word = "viikko"; // invalid word
     const userId = "default";
     const cardId = "93960a65-ce5e-4d4d-ba2a-8d9e8eeb57d9";
@@ -303,6 +311,7 @@ describe("POST /generations/sentences", () => {
   });
   test("invalid language level should return an empty response", async () => {
     mock.fn(authenticateToken, () => {return 200});
+    mock.fn(authorizeToken, () => {return "default"});
     const word = "être";
     const userId = "default";
     const cardId = "93960a65-ce5e-4d4d-ba2a-8d9e8eeb57d9";
@@ -326,6 +335,7 @@ describe("POST /generations/sentences", () => {
   });
   test("valid input should return JSON stringified response with correct key values", async () => {
     mock.fn(authenticateToken, () => {return 200});
+    mock.fn(authorizeToken, () => {return "default"});
     const word = "être";
     const userId = "default";
     const cardId = "93960a65-ce5e-4d4d-ba2a-8d9e8eeb57d9";

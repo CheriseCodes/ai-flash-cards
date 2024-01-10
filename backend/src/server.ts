@@ -295,7 +295,7 @@ app.post("/image", async (req, res) => {
 
 app.get("/flashcards", async (req, res) => {
   try {
-    const status = ah.authenticateToken(req)
+    const status = ah.authenticateToken(req);
     if (status != 200) {
       res.sendStatus(status);
       return;

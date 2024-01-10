@@ -93,7 +93,7 @@ describe("DELETE /flashcard", () => {
   });
   test("existing flashcard is deleted", async () => {
     mock.fn(authenticateToken, () => {return 200});
-    mock.fn(authorizeToken, (a,b,c) => {return "default"});
+    mock.fn(authorizeToken, () => {return "default"});
     ddbMock.on(GetItemCommand).resolves({Item: {ImageLink: {S: "123abc"}, UserId: {S: "default"}}});
     ddbMock.on(DeleteItemCommand).resolves({});
     s3Mock.onAnyCommand().resolves({});

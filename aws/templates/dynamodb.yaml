@@ -31,4 +31,17 @@ Resources:
           ProvisionedThroughput: 
             ReadCapacityUnits: 1
             WriteCapacityUnits: 1
-
+  UserTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: UserTable
+      TableClass: STANDARD
+      ProvisionedThroughput:
+        ReadCapacityUnits: 1
+        WriteCapacityUnits: 1
+      KeySchema:
+        - AttributeName: UserId
+          KeyType: HASH
+      AttributeDefinitions:
+        - AttributeName: UserId
+          AttributeType: S

@@ -86,6 +86,11 @@ app.get("/generations/sentences", async (req, res) => {
       res.sendStatus(status);
       return;
   }
+  const userName = ah.authorizeToken(req);
+    if (userName == "Unauthorized") {
+      res.sendStatus(400);
+      return;
+  }
   try {
     const wordsToSearch = Array.isArray(req.query.word)
       ? req.query.word
@@ -110,7 +115,7 @@ app.get("/generations/sentences", async (req, res) => {
       res.status(400).send({status: 400, message: `Invalid language level: ${targetLevel}`})
       return
     }
-    const userId = req.query.userId;
+    const userId = userName;
     const cardId = req.query.cardId;
     const timeStamp = req.query.timeStamp;
     const messages = [];
@@ -228,12 +233,18 @@ app.post("/image", async (req, res) => {
       res.sendStatus(status);
       return;
     }
+    const userName = ah.authorizeToken(req);
+    if (userName == "Unauthorized") {
+      res.sendStatus(400);
+      return;
+    }
     // Download image
+    const userId = userName;
     const imgUrl = req.body.imgUrl;
     const imgName = req.body.imgName;
     const cardId = req.body.cardId;
     const localFileName = `./private/images/${imgName}.png`;
-    const remoteFileName = `users/default/images/${imgName}.png`;
+    const remoteFileName = `users/${userName}/images/${imgName}.png`;
 
     https.get(imgUrl, async (res) => {
       const fdWrite = await open(localFileName, "w");
@@ -289,7 +300,12 @@ app.get("/flashcards", async (req, res) => {
       res.sendStatus(status);
       return;
     }
-    const userId: string = req.query.userId[0];
+    const userName = ah.authorizeToken(req);
+    if (userName == "Unauthorized") {
+      res.sendStatus(400);
+      return;
+    }
+    const userId: string = userName;
     const input: QueryCommandInput = {
       TableName: "FlashCardGenAITable",
       IndexName: "UserId",

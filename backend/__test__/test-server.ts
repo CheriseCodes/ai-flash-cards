@@ -9,7 +9,8 @@ import {
 } from "node:test";
 import assert from "node:assert";
 import { mockClient } from "aws-sdk-client-mock";
-import { dynamoDbClient, s3Client, openai, app } from "../src/server";
+import { openai, app } from "../src/server";
+import { dynamoDbClient, s3Client } from "../src/aws-clients";
 import {
   GetItemCommand,
   DeleteItemCommand,

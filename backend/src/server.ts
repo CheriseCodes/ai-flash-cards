@@ -3,14 +3,14 @@ import bodyParser from "body-parser";
 import OpenAI from "openai";
 import cors from "cors";
 import bcrypt from "bcrypt";
+// import { csrf } from 'csurf';
 
 import { open, rm } from "node:fs/promises";
 import https from "https";
 
-import { PutObjectCommand, DeleteObjectCommand, S3Client, DeleteObjectCommandInput } from "@aws-sdk/client-s3";
+import { PutObjectCommand, DeleteObjectCommand, DeleteObjectCommandInput } from "@aws-sdk/client-s3";
 
 import {
-  DynamoDBClient,
   GetItemCommand,
   QueryCommand,
   PutItemCommand,
@@ -21,26 +21,30 @@ import {
   QueryCommandInput,
   DeleteItemCommandInput,
 } from "@aws-sdk/client-dynamodb";
-import { fromEnv } from "@aws-sdk/credential-providers";
+
+import { dynamoDbClient, s3Client } from "../src/aws-clients";
 
 import appConfig from "./config";
 import * as sh from "./server-helpers";
 import * as ah from "./auth-helpers";
 
-export const s3Client: S3Client = new S3Client({
-  credentials: fromEnv(),
-  region: "ca-central-1",
-});
-
-export const dynamoDbClient: DynamoDBClient = new DynamoDBClient({
-  credentials: fromEnv(),
-  region: "ca-central-1",
-});
-
 export const app: Application = express();
 app.use(cors());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
+
+// const sessionConfig = {
+//   secret: 'your-secret-key',
+//   resave: false,
+//   saveUninitialized: true,
+//   cookie: {
+//     httpOnly: true,
+//     secure: process.env.NODE_ENV === 'production',
+//   }
+// };
+// app.use(cookieParser());
+// app.use(session(sessionConfig));
+// app.use(csrf());
 
 const maxAge = 3 * 24 * 60 * 60;
 
@@ -414,11 +418,14 @@ app.post("/signup", async (req, res) => {
   }
   const token = ah.generateAccessToken({ username: username });
   // Store the user and credentials in the DB
+  // Maybe: salt = crypto.randomBytes(16);
+  // Maybe: crypto.pbkdf2(req.body.password, salt, 310000, 32, 'sha256')
   const hashRes = await bcrypt.hash(password, 10)
   const awsInput: PutItemCommandInput = {
     Item: {
       UserId: { S: username },
       AccessToken: {S: token},
+      // Salt: {S: salt},
       Password: {S: hashRes},
       Role: {S: "learner"},
     },
@@ -430,6 +437,9 @@ app.post("/signup", async (req, res) => {
   res.status(201).json({Token: token});
 });
 
+// TODO: return csrf token
+// TODO: return session token
+// TODO: Add security headers HttpOnly, SameSite (optional), Secure (for HTTPS)
 app.post("/login", async (req, res) => {
   const username: string = req.body.username;
   const password: string = req.body.password;
@@ -451,6 +461,12 @@ app.post("/login", async (req, res) => {
     return;
   }
   // confirm the password
+  // Maybe:
+  // crypto.pbkdf2(password, response.Item.Salt.S, 310000, 32, 'sha256', function(err, hashedPassword) {
+  //   if (err) { return cb(err); }
+  //   if (!crypto.timingSafeEqual(response.Item.HashedPassword, hashedPassword)) {
+  //       return cb(null, false, { message: 'Incorrect username or password.' });
+  //   }
   const compareRes = await bcrypt.compare(password, response.Item.Password.S);
   if (compareRes) { // login succesful
     const token = ah.generateAccessToken({ username: username });
@@ -471,3 +487,7 @@ app.post("/logout", async (req, res) => {
     res.sendStatus(500)
   }
 });
+
+// app.get('/csrf-token', (req, res) => {
+//   res.json({ csrfToken: req.csrfToken() });
+// });

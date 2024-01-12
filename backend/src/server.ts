@@ -2,14 +2,15 @@ import express, { Application } from "express";
 import bodyParser from "body-parser";
 import OpenAI from "openai";
 import cors from "cors";
+import bcrypt from "bcrypt";
+// import { csrf } from 'csurf';
 
 import { open, rm } from "node:fs/promises";
 import https from "https";
 
-import { PutObjectCommand, DeleteObjectCommand, S3Client, DeleteObjectCommandInput } from "@aws-sdk/client-s3";
+import { PutObjectCommand, DeleteObjectCommand, DeleteObjectCommandInput } from "@aws-sdk/client-s3";
 
 import {
-  DynamoDBClient,
   GetItemCommand,
   QueryCommand,
   PutItemCommand,
@@ -20,26 +21,32 @@ import {
   QueryCommandInput,
   DeleteItemCommandInput,
 } from "@aws-sdk/client-dynamodb";
-import { fromSSO } from "@aws-sdk/credential-providers";
+
+import { dynamoDbClient, s3Client } from "../src/aws-clients";
 
 import appConfig from "./config";
 import * as sh from "./server-helpers";
 import * as ah from "./auth-helpers";
 
-export const s3Client: S3Client = new S3Client({
-  credentials: fromSSO({ profile: process.env.AWS_PROFILE }),
-  region: "ca-central-1",
-});
-
-export const dynamoDbClient: DynamoDBClient = new DynamoDBClient({
-  credentials: fromSSO({ profile: process.env.AWS_PROFILE }),
-  region: "ca-central-1",
-});
-
 export const app: Application = express();
 app.use(cors());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
+
+// const sessionConfig = {
+//   secret: 'your-secret-key',
+//   resave: false,
+//   saveUninitialized: true,
+//   cookie: {
+//     httpOnly: true,
+//     secure: process.env.NODE_ENV === 'production',
+//   }
+// };
+// app.use(cookieParser());
+// app.use(session(sessionConfig));
+// app.use(csrf());
+
+const maxAge = 3 * 24 * 60 * 60;
 
 export const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
@@ -77,7 +84,17 @@ const putItemFlashCardTable = async (userId, timeStamp, cardId, response, messag
 
 app.get("/service/readyz", (req, res) => res.status(200).json({ readyz: {status: "ok" }}));
 app.get("/service/livez", (req, res) => res.status(200).json({ livez: {status: "ok" }}));
-app.post("/openai/test/text", async (req, res) => {
+app.get("/generations/sentences", async (req, res) => {
+  const status = ah.authenticateToken(req)
+    if (status != 200) {
+      res.sendStatus(status);
+      return;
+  }
+  const userName = ah.authorizeToken(req);
+    if (userName == "Unauthorized") {
+      res.sendStatus(400);
+      return;
+  }
   try {
     const wordsToSearch = Array.isArray(req.query.word)
       ? req.query.word
@@ -102,9 +119,9 @@ app.post("/openai/test/text", async (req, res) => {
       res.status(400).send({status: 400, message: `Invalid language level: ${targetLevel}`})
       return
     }
-    const userId = req.body.userId;
-    const cardId = req.body.cardId;
-    const timeStamp = req.body.timeStamp;
+    const userId = userName;
+    const cardId = req.query.cardId;
+    const timeStamp = req.query.timeStamp;
     const messages = [];
     let cert = " ";
     if (targetLanguage === appConfig.languageModes.SPANISH) {
@@ -147,8 +164,13 @@ app.post("/openai/test/text", async (req, res) => {
     res.status(500).send({error: err})
   }
 });
-app.post("/openai/test/imagine", async (req, res) => {
+app.get("/generations/images", async (req, res) => {
   try {
+    const status = ah.authenticateToken(req)
+    if (status != 200) {
+      res.sendStatus(status);
+      return;
+    }
     const word = req.query.word;
     const langMode = req.query.lang_mode;
     // not a fool-proof check but good for learning purposes
@@ -172,7 +194,7 @@ app.post("/openai/test/imagine", async (req, res) => {
       return
     }
     const sentenceToVisualize = req.query.sentence;
-    const cardId = req.body.cardId;
+    const cardId = req.query.cardId[0];
     const prompt = `${sentenceToVisualize}, Georges Seurat, Bradshaw Crandell, vibrant colors, realistic`;
     const response = await openai.images.generate({
       prompt: prompt,
@@ -208,14 +230,25 @@ app.post("/openai/test/imagine", async (req, res) => {
   }
 });
 
-app.post("/upload/image", async (req, res) => {
+app.post("/image", async (req, res) => {
   try {
+    const status = ah.authenticateToken(req);
+    if (status != 200) {
+      res.sendStatus(status);
+      return;
+    }
+    const userName = ah.authorizeToken(req);
+    if (userName == "Unauthorized") {
+      res.sendStatus(400);
+      return;
+    }
     // Download image
+    const userId = userName;
     const imgUrl = req.body.imgUrl;
     const imgName = req.body.imgName;
     const cardId = req.body.cardId;
     const localFileName = `./private/images/${imgName}.png`;
-    const remoteFileName = `users/default/images/${imgName}.png`;
+    const remoteFileName = `users/${userName}/images/${imgName}.png`;
 
     https.get(imgUrl, async (res) => {
       const fdWrite = await open(localFileName, "w");
@@ -266,11 +299,17 @@ app.post("/upload/image", async (req, res) => {
 
 app.get("/flashcards", async (req, res) => {
   try {
-    const status = ah.authenticateToken(req)
+    const status = ah.authenticateToken(req);
     if (status != 200) {
       res.sendStatus(status);
+      return;
     }
-    const userId: string = req.query.userId[0];
+    const userName = ah.authorizeToken(req);
+    if (userName == "Unauthorized") {
+      res.sendStatus(400);
+      return;
+    }
+    const userId: string = userName;
     const input: QueryCommandInput = {
       TableName: "FlashCardGenAITable",
       IndexName: "UserId",
@@ -289,9 +328,18 @@ app.get("/flashcards", async (req, res) => {
   }
 });
 
-// TODO: Make deletion and update endpoints
-app.post("/delete/flashcard", async (req, res) => {
+app.delete("/flashcard", async (req, res) => {
   try {
+    const status = ah.authenticateToken(req);
+    if (status != 200) {
+      res.sendStatus(status);
+      return;
+    }
+    const userName = ah.authorizeToken(req);
+    if (userName == "Unauthorized") {
+      res.sendStatus(400);
+      return;
+    }
     const cardId = req.body.cardId;
     const input = { // GetItemInput
       TableName: "FlashCardGenAITable", // required
@@ -304,6 +352,10 @@ app.post("/delete/flashcard", async (req, res) => {
     };
     const command = new GetItemCommand(input);
     const response = await dynamoDbClient.send(command);
+    if (userName != response.Item.UserId.S) {
+      res.status(400).json({message: `${userName} is unauthorzed to delete flashcard`});
+      return;
+    }
     // delete image
     const s3Input: DeleteObjectCommandInput = {
       Bucket: process.env.BUCKET_NAME,
@@ -311,7 +363,7 @@ app.post("/delete/flashcard", async (req, res) => {
     }
     const s3Command = new DeleteObjectCommand(s3Input);
     try {
-      const s3Response = await s3Client.send(s3Command);
+      await s3Client.send(s3Command);
     } catch (err) {
       console.error(err);
     }
@@ -331,12 +383,13 @@ app.post("/delete/flashcard", async (req, res) => {
   }
 });
 
-app.post("/delete/image", async (req, res) => {
+app.delete("/image", async (req, res) => {
   // delete dynamodb item with text
   // delete image
 });
 
-app.post("/update/flashcard", async (req, res) => {
+// update the flashcard
+app.put("/flashcard", async (req, res) => {
   // update dynamodb item with text
   // delete old image
   // upload new image
@@ -345,17 +398,96 @@ app.post("/update/flashcard", async (req, res) => {
 
 app.post("/signup", async (req, res) => {
   const username: string = req.body.username;
-  const password: string = req.body.password
-  // TODO: Check if user exists in the DB first
+  const password: string = req.body.password;
+  // Check if user exists in the DB first
+  const input = { // GetItemInput
+    TableName: "UserTable", // required
+    Key: { // Key // required
+      UserId: { // AttributeValue Union: only one key present
+        S: username,
+      },
+    },
+    ConsistentRead: true,
+  };
+  const command = new GetItemCommand(input);
+  const response = await dynamoDbClient.send(command);
+  // user already exists, don't let them create a new user
+  if (response.Item) {
+    res.status(400).send(`User ${username} already exists`);
+    return;
+  }
   const token = ah.generateAccessToken({ username: username });
-  // TODO: Store the user and credentials in the DB
-  res.json(token);
+  // Store the user and credentials in the DB
+  // Maybe: salt = crypto.randomBytes(16);
+  // Maybe: crypto.pbkdf2(req.body.password, salt, 310000, 32, 'sha256')
+  const hashRes = await bcrypt.hash(password, 10)
+  const awsInput: PutItemCommandInput = {
+    Item: {
+      UserId: { S: username },
+      AccessToken: {S: token},
+      // Salt: {S: salt},
+      Password: {S: hashRes},
+      Role: {S: "learner"},
+    },
+    TableName: "UserTable",
+  };
+  const awsCommand = new PutItemCommand(awsInput);
+  await dynamoDbClient.send(awsCommand);
+  res.setHeader("Set-Cookie", `fc_jwt=${token}; Max-Age=${maxAge*1000}`);
+  res.status(201).json({Token: token});
 });
 
+// TODO: return csrf token
+// TODO: return session token
+// TODO: Add security headers HttpOnly, SameSite (optional), Secure (for HTTPS)
 app.post("/login", async (req, res) => {
-  
+  const username: string = req.body.username;
+  const password: string = req.body.password;
+  // Check if user exists in the DB first
+  const input = { // GetItemInput
+    TableName: "UserTable", // required
+    Key: { // Key // required
+      UserId: { // AttributeValue Union: only one key present
+        S: username,
+      },
+    },
+    ConsistentRead: true,
+  };
+  const command = new GetItemCommand(input);
+  const response = await dynamoDbClient.send(command);
+  // user already exists, don't let them create a new user
+  if (response.Item === undefined) {
+    res.status(400).send(`Incorect username or password`);
+    return;
+  }
+  // confirm the password
+  // Maybe:
+  // crypto.pbkdf2(password, response.Item.Salt.S, 310000, 32, 'sha256', function(err, hashedPassword) {
+  //   if (err) { return cb(err); }
+  //   if (!crypto.timingSafeEqual(response.Item.HashedPassword, hashedPassword)) {
+  //       return cb(null, false, { message: 'Incorrect username or password.' });
+  //   }
+  const compareRes = await bcrypt.compare(password, response.Item.Password.S);
+  if (compareRes) { // login succesful
+    const token = ah.generateAccessToken({ username: username });
+    res.setHeader("Set-Cookie", `fc_jwt=${token}; Max-Age=${maxAge*1000}`);
+    res.status(200).send(`${username} logged in successfully`);
+    return;
+  } else {
+    res.status(400).send(`Incorect username or password`);
+    return;
+  }
 });
 
 app.post("/logout", async (req, res) => {
-  
+  try {
+    res.setHeader("Set-Cookie", `fc_jwt=""; Max-Age=${1}`);
+    res.sendStatus(200)
+  } catch (err) {
+    res.sendStatus(500)
+  }
 });
+
+// app.get('/csrf-token', (req, res) => {
+//   res.json({ csrfToken: req.csrfToken() });
+// });

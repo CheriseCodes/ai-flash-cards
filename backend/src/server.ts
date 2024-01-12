@@ -3,7 +3,7 @@ import bodyParser from "body-parser";
 import OpenAI from "openai";
 import cors from "cors";
 import bcrypt from "bcrypt";
-import { csrf } from 'csurf';
+// import { csrf } from 'csurf';
 
 import { open, rm } from "node:fs/promises";
 import https from "https";
@@ -44,7 +44,7 @@ app.use(bodyParser.json());
 // };
 // app.use(cookieParser());
 // app.use(session(sessionConfig));
-app.use(csrf());
+// app.use(csrf());
 
 const maxAge = 3 * 24 * 60 * 60;
 
@@ -488,6 +488,6 @@ app.post("/logout", async (req, res) => {
   }
 });
 
-app.get('/csrf-token', (req, res) => {
-  res.json({ csrfToken: req.csrfToken() });
-});
+// app.get('/csrf-token', (req, res) => {
+//   res.json({ csrfToken: req.csrfToken() });
+// });

@@ -7,8 +7,10 @@ import LanguageLevelForm from "./components/LanguageLevelForm";
 import ErrorBanner from "./components/ErrorBanner";
 
 import { v4 as uuidv4 } from "uuid";
+import LoginButton from "./components/LoginButton";
+import Profile from "./components/Profile";
 
-const PORT = (process.env.NODE_ENV == "development") ? 3000 : 8000;
+const PORT = (process.env.NODE_ENV == "dev") ? 3000 : 8000;
 
 const App = () => {
   const cards = useSelector((state: CardState) => state.cards);
@@ -58,6 +60,8 @@ const App = () => {
         <h1 className="title">AI Generated Flashcards</h1>
       </div>
       <WordInput setErrors={setErrors} userId={userId} />
+      <LoginButton />
+      <Profile />
       <LanguageModeForm />
       <LanguageLevelForm />
       {errors.map((e) => (

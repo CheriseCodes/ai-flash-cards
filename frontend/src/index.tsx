@@ -3,6 +3,7 @@ import ReactDOM from "react-dom/client";
 import { Provider } from "react-redux";
 import { PersistGate } from "redux-persist/lib/integration/react";
 import { persistStore } from "redux-persist";
+import { Auth0Provider } from '@auth0/auth0-react';
 
 import store from "./store";
 import "./index.css";
@@ -11,7 +12,7 @@ import App from "./App";
 
 async function enableMocking() {
   console.log(`NODE_ENV is ${process.env.NODE_ENV}`)
-  if (process.env.NODE_ENV !== 'development') {
+  if (process.env.NODE_ENV !== 'dev') {
     return
   }
  
@@ -28,11 +29,19 @@ const renderApp = () => {
   if (rootEl != null) {
     const root = ReactDOM.createRoot(rootEl);
     root.render(
+      <Auth0Provider
+      domain="dev-akcpb5t2powmgxer.us.auth0.com"
+      clientId="ePyflRQeGysD5yi5tgrCY5UtDM6nZa5T"
+      authorizationParams={{
+        redirect_uri: window.location.origin
+      }}
+      >
       <Provider store={store}>
         <PersistGate loading={<div>Loading...</div>} persistor={persistor}>
           <App />
         </PersistGate>
-      </Provider>,
+      </Provider>
+      </Auth0Provider>,
     );
   }
 }

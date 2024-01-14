@@ -3,6 +3,8 @@ import bodyParser from "body-parser";
 import OpenAI from "openai";
 import cors from "cors";
 import bcrypt from "bcrypt";
+import { auth } from 'express-oauth2-jwt-bearer';
+
 // import { csrf } from 'csurf';
 
 import { open, rm } from "node:fs/promises";
@@ -46,6 +48,12 @@ app.use(bodyParser.json());
 // app.use(session(sessionConfig));
 // app.use(csrf());
 
+export const jwtCheck = auth({
+  audience: 'http://localhost:8000',
+  issuerBaseURL: 'https://dev-akcpb5t2powmgxer.us.auth0.com/',
+  tokenSigningAlg: 'RS256',
+});
+
 const maxAge = 3 * 24 * 60 * 60;
 
 export const openai = new OpenAI({
@@ -60,6 +68,8 @@ const openAIChatCompletion = async (model, temperature, messages) => {
   });
   return response
 }
+
+const authMiddleware = process.env.NODE_ENV == "test" ? (req, res, next) => next() : jwtCheck;
 
 const putItemFlashCardTable = async (userId, timeStamp, cardId, response, messages) => {
   const awsInput: PutItemCommandInput = {
@@ -84,17 +94,7 @@ const putItemFlashCardTable = async (userId, timeStamp, cardId, response, messag
 
 app.get("/service/readyz", (req, res) => res.status(200).json({ readyz: {status: "ok" }}));
 app.get("/service/livez", (req, res) => res.status(200).json({ livez: {status: "ok" }}));
-app.get("/generations/sentences", async (req, res) => {
-  const status = ah.authenticateToken(req)
-    if (status != 200) {
-      res.sendStatus(status);
-      return;
-  }
-  const userName = ah.authorizeToken(req);
-    if (userName == "Unauthorized") {
-      res.sendStatus(400);
-      return;
-  }
+app.get("/generations/sentences", authMiddleware, async (req, res) => {
   try {
     const wordsToSearch = Array.isArray(req.query.word)
       ? req.query.word
@@ -119,7 +119,7 @@ app.get("/generations/sentences", async (req, res) => {
       res.status(400).send({status: 400, message: `Invalid language level: ${targetLevel}`})
       return
     }
-    const userId = userName;
+    const userId = req.body.userId;
     const cardId = req.query.cardId;
     const timeStamp = req.query.timeStamp;
     const messages = [];
@@ -164,13 +164,8 @@ app.get("/generations/sentences", async (req, res) => {
     res.status(500).send({error: err})
   }
 });
-app.get("/generations/images", async (req, res) => {
+app.get("/generations/images", authMiddleware, async (req, res) => {
   try {
-    const status = ah.authenticateToken(req)
-    if (status != 200) {
-      res.sendStatus(status);
-      return;
-    }
     const word = req.query.word;
     const langMode = req.query.lang_mode;
     // not a fool-proof check but good for learning purposes
@@ -230,25 +225,15 @@ app.get("/generations/images", async (req, res) => {
   }
 });
 
-app.post("/image", async (req, res) => {
+app.post("/image", authMiddleware, async (req, res) => {
   try {
-    const status = ah.authenticateToken(req);
-    if (status != 200) {
-      res.sendStatus(status);
-      return;
-    }
-    const userName = ah.authorizeToken(req);
-    if (userName == "Unauthorized") {
-      res.sendStatus(400);
-      return;
-    }
     // Download image
-    const userId = userName;
+    const userId = req.body.userId;
     const imgUrl = req.body.imgUrl;
     const imgName = req.body.imgName;
     const cardId = req.body.cardId;
     const localFileName = `./private/images/${imgName}.png`;
-    const remoteFileName = `users/${userName}/images/${imgName}.png`;
+    const remoteFileName = `users/${userId}/images/${imgName}.png`;
 
     https.get(imgUrl, async (res) => {
       const fdWrite = await open(localFileName, "w");
@@ -297,19 +282,13 @@ app.post("/image", async (req, res) => {
   }
 });
 
-app.get("/flashcards", async (req, res) => {
+app.get("/callback", async (req, res) => {
+  res.send({"data": "callback"});
+});
+
+app.get("/flashcards", authMiddleware, async (req, res) => {
   try {
-    const status = ah.authenticateToken(req);
-    if (status != 200) {
-      res.sendStatus(status);
-      return;
-    }
-    const userName = ah.authorizeToken(req);
-    if (userName == "Unauthorized") {
-      res.sendStatus(400);
-      return;
-    }
-    const userId: string = userName;
+    const userId: string = req.query.userId[0];
     const input: QueryCommandInput = {
       TableName: "FlashCardGenAITable",
       IndexName: "UserId",
@@ -324,22 +303,13 @@ app.get("/flashcards", async (req, res) => {
     res.status(200).send({"cards": awsResponse.Items});
   } catch (err) {
     console.error(err);
-    res.status(500).send({error: err})
+    res.status(500).send({error: err});
   }
 });
 
-app.delete("/flashcard", async (req, res) => {
+app.delete("/flashcard", authMiddleware, async (req, res) => {
   try {
-    const status = ah.authenticateToken(req);
-    if (status != 200) {
-      res.sendStatus(status);
-      return;
-    }
-    const userName = ah.authorizeToken(req);
-    if (userName == "Unauthorized") {
-      res.sendStatus(400);
-      return;
-    }
+    const userId = req.body.userId;
     const cardId = req.body.cardId;
     const input = { // GetItemInput
       TableName: "FlashCardGenAITable", // required
@@ -352,8 +322,8 @@ app.delete("/flashcard", async (req, res) => {
     };
     const command = new GetItemCommand(input);
     const response = await dynamoDbClient.send(command);
-    if (userName != response.Item.UserId.S) {
-      res.status(400).json({message: `${userName} is unauthorzed to delete flashcard`});
+    if (userId != response.Item.UserId.S) {
+      res.status(400).json({message: `${userId} is unauthorzed to delete flashcard`});
       return;
     }
     // delete image

@@ -48,6 +48,12 @@ app.use(bodyParser.json());
 // app.use(session(sessionConfig));
 // app.use(csrf());
 
+// TODO: Add checkScopes middleware for each protected endpoint
+// REF: https://auth0.com/docs/quickstart/backend/nodejs/01-authorization#protect-api-endpoints
+// const { requiredScopes } = require('express-oauth2-jwt-bearer');
+
+// const checkScopes = requiredScopes('read:messages');
+
 export const jwtCheck = auth({
   audience: 'http://localhost:8000',
   issuerBaseURL: 'https://dev-akcpb5t2powmgxer.us.auth0.com/',

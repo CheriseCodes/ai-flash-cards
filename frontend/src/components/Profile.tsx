@@ -15,6 +15,7 @@ const Profile = () => {
         const accessToken = await getAccessTokenSilently();
         if (accessToken) {
           console.log("got access token");
+          // TODO: Store cookie securely with HttpOnly and/or Secure settings
           document.cookie = `afc_app=${accessToken}; SameSite=Lax`;
         } else {
           console.error("didn't get access token")

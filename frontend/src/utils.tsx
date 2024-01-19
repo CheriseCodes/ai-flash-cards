@@ -31,7 +31,7 @@ const getNewCardText = async (word: string, languageMode: string, languageLevel:
   return cardData;
 }
 
-const getNewCardImage = async (dispatch: Dispatch<AnyAction>, cardData: FlashCard, languageMode: string, languageLevel: string, userId: string, cardId: string) => {
+const getNewCardImage = async (dispatch: Dispatch<AnyAction>, cardData: FlashCard, languageMode: string, languageLevel: string, userId: string, cardId: string, word: string) => {
     console.log("start getNewCardImage...");
     const authToken = document.cookie
       .split("; ")
@@ -86,7 +86,7 @@ const getNewCardData = async (dispatch: Dispatch<AnyAction>, word: string, langu
   });
 })
   
-  cardData = await getNewCardImage(dispatch, cardData, languageMode, languageLevel, userId, cardId);
+  cardData = await getNewCardImage(dispatch, cardData, languageMode, languageLevel, userId, cardId, word);
   promise1 = Promise.resolve(cardData);
   
   promise1.then((values) => {

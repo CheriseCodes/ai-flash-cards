@@ -7,8 +7,10 @@ import LanguageLevelForm from "./components/LanguageLevelForm";
 import ErrorBanner from "./components/ErrorBanner";
 
 import { v4 as uuidv4 } from "uuid";
+import LoginButton from "./components/LoginButton";
+import Profile from "./components/Profile";
 
-const PORT = (process.env.NODE_ENV == "development") ? 3000 : 8000;
+const PORT = (process.env.NODE_ENV == "dev") ? 3000 : 8000;
 
 const App = () => {
   const cards = useSelector((state: CardState) => state.cards);
@@ -22,25 +24,29 @@ const App = () => {
 
   const fetchAllFlashcards = async () => {
     try {
-      const response = await fetch(
-        `http://localhost:${PORT}/flashcards`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
+      const authToken = document.cookie
+      .split("; ")
+      .find((row) => row.startsWith("afc_app="))
+      ?.split("=")[1];
+      if (authToken) {
+        console.log("token:", authToken)
+        const response = await fetch(
+          `http://localhost:${PORT}/flashcards?userId=${userId}`,
+          {
+            headers: {
+              "Content-Type": "application/json",
+              "Authorization": `Bearer ${authToken}`
+            },
           },
-          body: JSON.stringify({
-            userId: userId,
-          }),
-        },
-      );
-      const json = await response.json()
-      console.log("/flashcards", JSON.stringify(json))
-      // TODO: check if the ids of the returned results don't match what is currently shown
-
-      // TODO: If there isn't a with ID, add the data to card data list
-
-      // TODO: If the ID mathes cut the data doesn't overwrite backend data with frontend data
+        );
+        const json = await response.json()
+        console.log("/flashcards", JSON.stringify(json))
+        // TODO: check if the ids of the returned results don't match what is currently shown
+  
+        // TODO: If there isn't a with ID, add the data to card data list
+  
+        // TODO: If the ID mathes cut the data doesn't overwrite backend data with frontend data
+      }
     } catch (e: any) {
       const errItem = { id: uuidv4(), message: e.message };
       setErrors((errs) => [...errs, errItem]);
@@ -50,7 +56,10 @@ const App = () => {
   // TODO: fetch flashcards for current user on first load
   useEffect(() => {
     fetchAllFlashcards()
-  },[])
+  },[document.cookie
+    .split("; ")
+    .find((row) => row.startsWith("afc_app="))
+    ?.split("=")[1]])
 
   return (
     <div className="App">
@@ -58,6 +67,8 @@ const App = () => {
         <h1 className="title">AI Generated Flashcards</h1>
       </div>
       <WordInput setErrors={setErrors} userId={userId} />
+      <LoginButton />
+      <Profile />
       <LanguageModeForm />
       <LanguageLevelForm />
       {errors.map((e) => (

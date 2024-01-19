@@ -9,12 +9,12 @@ import {
 } from "node:test";
 import assert from "node:assert";
 import { mockClient } from "aws-sdk-client-mock";
-import { dynamoDbClient, s3Client, openai, app } from "../src/server";
+import { openai, app } from "../src/server";
+import { dynamoDbClient, s3Client } from "../src/aws-clients";
 import {
   GetItemCommand,
   DeleteItemCommand,
 } from "@aws-sdk/client-dynamodb";
-import { authenticateToken } from "../src/auth-helpers";
 
 const PORT = 8000;
 
@@ -25,10 +25,12 @@ describe("GET /flashcards", () => {
   beforeEach(() => {
     ddbMock.reset();
     s3Mock.reset();
+    mock.reset()
   });
   afterEach(() => {
     ddbMock.restore();
     s3Mock.restore();
+    mock.restoreAll()
   });
   before(() => {
     server = app.listen(PORT, () =>
@@ -36,7 +38,7 @@ describe("GET /flashcards", () => {
     ); // IMPORTANT: First test should start the server
   });
   test("existent user should have non-empty cards response", async () => {
-    mock.fn(authenticateToken, () => {return 200})
+    
     const queryResult = {
       Items: [
         {
@@ -58,11 +60,11 @@ describe("GET /flashcards", () => {
         "Authorization": "Bearer abc123"
       },
     });
+    console.log(response);
     const json = await response.json();
     assert.deepStrictEqual(json, { cards: queryResult.Items });
   });
   test("non-existent user should have non-empty cards response", async () => {
-    mock.fn(authenticateToken, () => {return 200})
     const queryResult = {
       Items: [],
     };
@@ -73,34 +75,38 @@ describe("GET /flashcards", () => {
       headers: {
         "Content-Type": "application/json",
         "Authorization": "Bearer abc123"
-      }
+      },
     });
     const json = await response.json();
     assert.deepStrictEqual(json, { cards: queryResult.Items });
   });
 });
 
-describe("POST /delete/flashcard", () => {
+describe("DELETE /flashcard", () => {
   beforeEach(() => {
     ddbMock.reset();
     s3Mock.reset();
+    mock.reset();
   });
   afterEach(() => {
     ddbMock.restore();
     s3Mock.restore();
+    mock.restoreAll();
   });
   test("existing flashcard is deleted", async () => {
-    ddbMock.on(GetItemCommand).resolves({Item: {ImageLink: {S: "123abc"}}});
+    ddbMock.on(GetItemCommand).resolves({Item: {ImageLink: {S: "123abc"}, UserId: {S: "default"}}});
     ddbMock.on(DeleteItemCommand).resolves({});
     s3Mock.onAnyCommand().resolves({});
     const cardId = "abc123";
-    const response = await fetch(`http://localhost:${PORT}/delete/flashcard`, {
-      method: "POST",
+    const response = await fetch(`http://localhost:${PORT}/flashcard`, {
+      method: "DELETE",
       headers: {
         "Content-Type": "application/json",
+        "Authorization": "Bearer abc123",
       },
       body: JSON.stringify({
         cardId: cardId,
+        userId: "default",
       }),
     });
     const json = await response.json();
@@ -108,7 +114,7 @@ describe("POST /delete/flashcard", () => {
   });
 });
 
-describe("POST /openai/test/imagine", () => {
+describe("GET /generations/images", () => {
   beforeEach(() => {
     ddbMock.reset();
     s3Mock.reset();
@@ -138,16 +144,12 @@ describe("POST /openai/test/imagine", () => {
     });
     ddbMock.onAnyCommand().resolves({});
     const response = await fetch(
-      `http://localhost:${PORT}/openai/test/imagine?sentence=${sentence}&lang_mode=${langMode}&word=${word}`,
+      `http://localhost:${PORT}/generations/images?sentence=${sentence}&lang_mode=${langMode}&word=${word}&cardId=${cardId}&userId=${userId}`,
       {
-        method: "POST",
         headers: {
           "Content-Type": "application/json",
+          "Authorization": "Bearer abc123",
         },
-        body: JSON.stringify({
-          userId: userId,
-          cardId: cardId,
-        }),
       },
     );
     const json = await response.json();
@@ -157,23 +159,19 @@ describe("POST /openai/test/imagine", () => {
     const word = "rentrée";
     const langMode = "French";
     const sentence = "Courage, c'est la rentrée!";
-    const userId = "default";
+    // const userId = "default";
     const cardId = "93960a65-ce5e-4d4d-ba2a-8d9e8eeb57d9";
     ddbMock.onAnyCommand().resolves({});
     mock.method(openai.images, "generate", () => {
       return {};
     });
     const response = await fetch(
-      `http://localhost:${PORT}/openai/test/imagine?sentence=${sentence}&lang_mode=${langMode}&word=${word}`,
+      `http://localhost:${PORT}/generations/images?sentence=${sentence}&lang_mode=${langMode}&word=${word}&cardId=${cardId}`,
       {
-        method: "POST",
         headers: {
           "Content-Type": "application/json",
+          "Authorization": "Bearer abc123",
         },
-        body: JSON.stringify({
-          userId: userId,
-          cardId: cardId,
-        }),
       },
     );
     const json = await response.json();
@@ -188,10 +186,12 @@ describe("POST /upload/image", () => {
   beforeEach(() => {
     ddbMock.reset();
     s3Mock.reset();
+    mock.reset();
   });
   afterEach(() => {
     ddbMock.restore();
     s3Mock.restore();
+    mock.restoreAll();
   });
   test("image should be uploaded successfully", async () => {
     const cardId = "93960a65-ce5e-4d4d-ba2a-8d9e8eeb57d9";
@@ -201,14 +201,16 @@ describe("POST /upload/image", () => {
       "https://www.usatoday.com/gcdn/presto/2022/05/25/USAT/719946ca-660e-4ebf-805a-2c3b7d221a85-Hero-3.jpg";
     const imgName = `${cardId}-${languageMode}-${languageLevel}-123`;
     s3Mock.onAnyCommand().resolves({});
-    const response = await fetch(`http://localhost:${PORT}/upload/image`, {
+    const response = await fetch(`http://localhost:${PORT}/image`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
+        "Authorization": "Bearer abc123",
       },
       body: JSON.stringify({
         imgUrl: imgUrl,
         imgName: imgName,
+        userId: "default"
       }),
     });
     const json = await response.json();
@@ -218,7 +220,7 @@ describe("POST /upload/image", () => {
   });
 });
 
-describe("POST /openai/test/text", () => {
+describe("POST /generations/sentences", () => {
   after(() => {
     server.close(); // IMPORTANT: Last test should close the server
   });
@@ -265,17 +267,12 @@ describe("POST /openai/test/text", () => {
       };
     });
     const response = await fetch(
-      `http://localhost:${PORT}/openai/test/text?word=${word}&lang_mode=${languageMode}&lang_level=${languageLevel}`,
+      `http://localhost:${PORT}/generations/sentences?word=${word}&lang_mode=${languageMode}&lang_level=${languageLevel}&userId=${userId}&cardId=${cardId}&timestamp=${timeStamp}`,
       {
-        method: "POST",
         headers: {
           "Content-Type": "application/json",
+          "Authorization": "Bearer abc123",
         },
-        body: JSON.stringify({
-          userId: userId,
-          cardId: cardId,
-          timeStamp: timeStamp,
-        }),
       },
     );
     const json = await response.json();
@@ -292,17 +289,12 @@ describe("POST /openai/test/text", () => {
     const languageLevel = "YKI1";
     const timeStamp = Date.now();
     const response = await fetch(
-      `http://localhost:${PORT}/openai/test/text?word=${word}&lang_mode=${languageMode}&lang_level=${languageLevel}`,
+      `http://localhost:${PORT}/generations/sentences?word=${word}&lang_mode=${languageMode}&lang_level=${languageLevel}&userId=${userId}&cardId=${cardId}&timestamp=${timeStamp}`,
       {
-        method: "POST",
         headers: {
           "Content-Type": "application/json",
+          "Authorization": "Bearer abc123",
         },
-        body: JSON.stringify({
-          userId: userId,
-          cardId: cardId,
-          timeStamp: timeStamp,
-        }),
       },
     );
     const json = await response.json();
@@ -319,17 +311,12 @@ describe("POST /openai/test/text", () => {
     const languageLevel = "G2";
     const timeStamp = Date.now();
     const response = await fetch(
-      `http://localhost:${PORT}/openai/test/text?word=${word}&lang_mode=${languageMode}&lang_level=${languageLevel}`,
+      `http://localhost:${PORT}/generations/sentences?word=${word}&lang_mode=${languageMode}&lang_level=${languageLevel}&userId=${userId}&cardId=${cardId}&timestamp=${timeStamp}`,
       {
-        method: "POST",
         headers: {
           "Content-Type": "application/json",
+          "Authorization": "Bearer abc123",
         },
-        body: JSON.stringify({
-          userId: userId,
-          cardId: cardId,
-          timeStamp: timeStamp,
-        }),
       },
     );
     const json = await response.json();
@@ -371,17 +358,12 @@ describe("POST /openai/test/text", () => {
       };
     });
     const response = await fetch(
-      `http://localhost:${PORT}/openai/test/text?word=${word}&lang_mode=${languageMode}&lang_level=${languageLevel}`,
+      `http://localhost:${PORT}/generations/sentences?word=${word}&lang_mode=${languageMode}&lang_level=${languageLevel}&userId=${userId}&cardId=${cardId}&timestamp=${timeStamp}`,
       {
-        method: "POST",
         headers: {
           "Content-Type": "application/json",
+          "Authorization": "Bearer abc123",
         },
-        body: JSON.stringify({
-          userId: userId,
-          cardId: cardId,
-          timeStamp: timeStamp,
-        }),
       },
     ).catch((err) => {
       return new Response(new Blob(), {

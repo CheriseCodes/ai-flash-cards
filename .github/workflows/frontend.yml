@@ -5,7 +5,7 @@ name: Frontend React CI
 
 on:
   push:
-    branches: [ "frontend" ]
+    branches: [ "frontend", "fullstack-release", "frontend-release" ]
     paths:
       - "frontend/src/**"
       - "frontend/__test__/**"

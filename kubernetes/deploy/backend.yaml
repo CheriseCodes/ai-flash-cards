@@ -15,22 +15,21 @@ spec:
         app: backend
     spec:
       containers:
-      - name: backend
-        image: cherisecodes/ai-flash-cards-backend:latest
-        ports:
-        - name: http
-          containerPort: 8000
-        readinessProbe:
-          httpGet:
-            path: /service/readyz
-            port: 8000
-          periodSeconds: 5
-          failureThreshold: 2
-        livenessProbe:
-          httpGet:
-            path: /service/livez
-            port: 8000
-          initialDelaySeconds: 10
-          periodSeconds: 30
-          failureThreshold: 2
-
+        - name: backend
+          image: cherisecodes/ai-flash-cards-backend:latest
+          ports:
+            - name: http
+              containerPort: 8000
+          readinessProbe:
+            httpGet:
+              path: /service/readyz
+              port: 8000
+            periodSeconds: 5
+            failureThreshold: 2
+          livenessProbe:
+            httpGet:
+              path: /service/livez
+              port: 8000
+            initialDelaySeconds: 10
+            periodSeconds: 30
+            failureThreshold: 2

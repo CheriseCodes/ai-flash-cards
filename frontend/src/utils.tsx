@@ -7,18 +7,17 @@ const PORT = (process.env.NODE_ENV == "development") ? 3000 : 8000
 
 const getNewCardText = async (word: string, languageMode: string, languageLevel: string, userId: string, cardId: string, timeStamp: number) => {
   console.log("start getNewCardText");
+  const authToken = document.cookie
+      .split("; ")
+      .find((row) => row.startsWith("afc_app="))
+      ?.split("=")[1];
   const response = await fetch(
-    `http://localhost:${PORT}/openai/test/text?word=${word}&lang_mode=${languageMode}&lang_level=${languageLevel}`,
+    `http://localhost:${PORT}/generations/sentences?word=${word}&lang_mode=${languageMode}&lang_level=${languageLevel}&userId=${userId}&cardId=${cardId}&timestamp${timeStamp}`,
     {
-      method: "POST",
       headers: {
         "Content-Type": "application/json",
+        "Authorization": `Bearer ${authToken}`,
       },
-      body: JSON.stringify({
-        userId: userId,
-        cardId: cardId,
-        timeStamp: timeStamp,
-      }),
     },
   );
   const json = await response.json();
@@ -32,21 +31,21 @@ const getNewCardText = async (word: string, languageMode: string, languageLevel:
   return cardData;
 }
 
-const getNewCardImage = async (dispatch: Dispatch<AnyAction>, cardData: FlashCard, languageMode: string, languageLevel: string, userId: string, cardId: string) => {
-    console.log("start getNewCardImage...")
+const getNewCardImage = async (dispatch: Dispatch<AnyAction>, cardData: FlashCard, languageMode: string, languageLevel: string, userId: string, cardId: string, word: string) => {
+    console.log("start getNewCardImage...");
+    const authToken = document.cookie
+      .split("; ")
+      .find((row) => row.startsWith("afc_app="))
+      ?.split("=")[1];
     cardData.generatingImage = true;
     dispatch({ type: "update-card", cardData: cardData, cardId: cardId });
     const imageResponse = await fetch(
-      `http://localhost:${PORT}/openai/test/imagine?sentence=${cardData.translatedSampleSentence}`,
+      `http://localhost:${PORT}/generations/images?sentence=${cardData.translatedSampleSentence}&lang_mode=${languageMode}&word=${word}&cardId=${cardData.id}&userId=${userId}`,
       {
-        method: "POST",
         headers: {
           "Content-Type": "application/json",
+          "Authorization": `Bearer ${authToken}`
         },
-        body: JSON.stringify({
-          userId: userId,
-          cardId: cardId,
-        }),
       },
     );
     const imageJson = await imageResponse.json();
@@ -57,10 +56,12 @@ const getNewCardImage = async (dispatch: Dispatch<AnyAction>, cardData: FlashCar
         method: "POST",
         headers: {
           "Content-Type": "application/json",
+          "Authorization": `Bearer ${authToken}`
         },
         body: JSON.stringify({
           imgUrl: imageJson.data[0].url,
           imgName: `${cardId}-${languageMode}-${languageLevel}-${Date.now()}`,
+          userId: userId
         }),
       },
     );
@@ -85,7 +86,7 @@ const getNewCardData = async (dispatch: Dispatch<AnyAction>, word: string, langu
   });
 })
   
-  cardData = await getNewCardImage(dispatch, cardData, languageMode, languageLevel, userId, cardId);
+  cardData = await getNewCardImage(dispatch, cardData, languageMode, languageLevel, userId, cardId, word);
   promise1 = Promise.resolve(cardData);
   
   promise1.then((values) => {

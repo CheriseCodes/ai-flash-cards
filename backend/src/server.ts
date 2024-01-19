@@ -10,7 +10,7 @@ import { auth } from 'express-oauth2-jwt-bearer';
 import { open, rm } from "node:fs/promises";
 import https from "https";
 
-import { PutObjectCommand, DeleteObjectCommand, DeleteObjectCommandInput } from "@aws-sdk/client-s3";
+import { PutObjectCommand, DeleteObjectCommand, DeleteObjectCommandInput, ObjectCannedACL } from "@aws-sdk/client-s3";
 
 import {
   GetItemCommand,
@@ -47,6 +47,12 @@ app.use(bodyParser.json());
 // app.use(cookieParser());
 // app.use(session(sessionConfig));
 // app.use(csrf());
+
+// TODO: Add checkScopes middleware for each protected endpoint
+// REF: https://auth0.com/docs/quickstart/backend/nodejs/01-authorization#protect-api-endpoints
+// const { requiredScopes } = require('express-oauth2-jwt-bearer');
+
+// const checkScopes = requiredScopes('read:messages');
 
 export const jwtCheck = auth({
   audience: 'http://localhost:8000',
@@ -251,7 +257,7 @@ app.post("/image", authMiddleware, async (req, res) => {
           Body: stream,
           Bucket: process.env.BUCKET_NAME, // required
           Key: remoteFileName, // required
-          // ACL: "public-read", // w/o OAC
+          ACL: ObjectCannedACL.public_read,
           ContentType: "image/png",
           CacheControl: "public, max-age=31536000",
         };

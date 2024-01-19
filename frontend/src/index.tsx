@@ -33,7 +33,9 @@ const renderApp = () => {
       domain="dev-akcpb5t2powmgxer.us.auth0.com"
       clientId="ePyflRQeGysD5yi5tgrCY5UtDM6nZa5T"
       authorizationParams={{
-        redirect_uri: window.location.origin
+        redirect_uri: window.location.origin,
+        audience: "http://localhost:8000",
+        scope: "openid profile email",
       }}
       >
       <Provider store={store}>

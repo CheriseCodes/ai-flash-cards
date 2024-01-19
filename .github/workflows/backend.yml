@@ -5,7 +5,7 @@ name: Backend Node.js CI
 
 on:
   push:
-    branches: [ "backend" ]
+    branches: [ "backend", "fullstack-release", "backend-release" ]
     paths:
       - "backend/src/**"
       - "backend/__test__/**"

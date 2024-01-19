@@ -15,6 +15,9 @@ on:
       - "frontend/src/**"
       - "frontend/__test__/**"
 
+env:
+  NODE_ENV: "dev"
+
 defaults:
  run:
   working-directory: ./frontend

@@ -11,10 +11,7 @@ import assert from "node:assert";
 import { mockClient } from "aws-sdk-client-mock";
 import { openai, app } from "../src/server";
 import { dynamoDbClient, s3Client } from "../src/aws-clients";
-import {
-  GetItemCommand,
-  DeleteItemCommand,
-} from "@aws-sdk/client-dynamodb";
+import { GetItemCommand, DeleteItemCommand } from "@aws-sdk/client-dynamodb";
 
 const PORT = 8000;
 
@@ -25,12 +22,12 @@ describe("GET /flashcards", () => {
   beforeEach(() => {
     ddbMock.reset();
     s3Mock.reset();
-    mock.reset()
+    mock.reset();
   });
   afterEach(() => {
     ddbMock.restore();
     s3Mock.restore();
-    mock.restoreAll()
+    mock.restoreAll();
   });
   before(() => {
     server = app.listen(PORT, () =>
@@ -38,7 +35,6 @@ describe("GET /flashcards", () => {
     ); // IMPORTANT: First test should start the server
   });
   test("existent user should have non-empty cards response", async () => {
-    
     const queryResult = {
       Items: [
         {
@@ -54,12 +50,15 @@ describe("GET /flashcards", () => {
     ddbMock.onAnyCommand().resolves(queryResult);
     s3Mock.onAnyCommand().resolves({});
     const userId = "default";
-    const response = await fetch(`http://localhost:${PORT}/flashcards?userId=${userId}`, {
-      headers: {
-        "Content-Type": "application/json",
-        "Authorization": "Bearer abc123"
+    const response = await fetch(
+      `http://localhost:${PORT}/flashcards?userId=${userId}`,
+      {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: "Bearer abc123",
+        },
       },
-    });
+    );
     console.log(response);
     const json = await response.json();
     assert.deepStrictEqual(json, { cards: queryResult.Items });
@@ -71,12 +70,15 @@ describe("GET /flashcards", () => {
     ddbMock.onAnyCommand().resolves(queryResult);
     s3Mock.onAnyCommand().resolves({});
     const userId = "default";
-    const response = await fetch(`http://localhost:${PORT}/flashcards?userId=${userId}`, {
-      headers: {
-        "Content-Type": "application/json",
-        "Authorization": "Bearer abc123"
+    const response = await fetch(
+      `http://localhost:${PORT}/flashcards?userId=${userId}`,
+      {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: "Bearer abc123",
+        },
       },
-    });
+    );
     const json = await response.json();
     assert.deepStrictEqual(json, { cards: queryResult.Items });
   });
@@ -94,7 +96,9 @@ describe("DELETE /flashcard", () => {
     mock.restoreAll();
   });
   test("existing flashcard is deleted", async () => {
-    ddbMock.on(GetItemCommand).resolves({Item: {ImageLink: {S: "123abc"}, UserId: {S: "default"}}});
+    ddbMock.on(GetItemCommand).resolves({
+      Item: { ImageLink: { S: "123abc" }, UserId: { S: "default" } },
+    });
     ddbMock.on(DeleteItemCommand).resolves({});
     s3Mock.onAnyCommand().resolves({});
     const cardId = "abc123";
@@ -102,7 +106,7 @@ describe("DELETE /flashcard", () => {
       method: "DELETE",
       headers: {
         "Content-Type": "application/json",
-        "Authorization": "Bearer abc123",
+        Authorization: "Bearer abc123",
       },
       body: JSON.stringify({
         cardId: cardId,
@@ -148,7 +152,7 @@ describe("GET /generations/images", () => {
       {
         headers: {
           "Content-Type": "application/json",
-          "Authorization": "Bearer abc123",
+          Authorization: "Bearer abc123",
         },
       },
     );
@@ -170,7 +174,7 @@ describe("GET /generations/images", () => {
       {
         headers: {
           "Content-Type": "application/json",
-          "Authorization": "Bearer abc123",
+          Authorization: "Bearer abc123",
         },
       },
     );
@@ -205,12 +209,12 @@ describe("POST /upload/image", () => {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        "Authorization": "Bearer abc123",
+        Authorization: "Bearer abc123",
       },
       body: JSON.stringify({
         imgUrl: imgUrl,
         imgName: imgName,
-        userId: "default"
+        userId: "default",
       }),
     });
     const json = await response.json();
@@ -271,7 +275,7 @@ describe("POST /generations/sentences", () => {
       {
         headers: {
           "Content-Type": "application/json",
-          "Authorization": "Bearer abc123",
+          Authorization: "Bearer abc123",
         },
       },
     );
@@ -293,7 +297,7 @@ describe("POST /generations/sentences", () => {
       {
         headers: {
           "Content-Type": "application/json",
-          "Authorization": "Bearer abc123",
+          Authorization: "Bearer abc123",
         },
       },
     );
@@ -315,7 +319,7 @@ describe("POST /generations/sentences", () => {
       {
         headers: {
           "Content-Type": "application/json",
-          "Authorization": "Bearer abc123",
+          Authorization: "Bearer abc123",
         },
       },
     );
@@ -362,7 +366,7 @@ describe("POST /generations/sentences", () => {
       {
         headers: {
           "Content-Type": "application/json",
-          "Authorization": "Bearer abc123",
+          Authorization: "Bearer abc123",
         },
       },
     ).catch((err) => {

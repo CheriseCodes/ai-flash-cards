@@ -3,7 +3,7 @@ import { Dispatch, SetStateAction } from "react";
 import { v4 as uuidv4 } from "uuid";
 
 // TODO: Stop updating card data object directly... only update with update-card reducer
-const PORT = (process.env.NODE_ENV == "development") ? 3000 : 8000
+const PORT = (process.env.NODE_ENV == "dev") ? 3000 : 8000
 
 const getNewCardText = async (word: string, languageMode: string, languageLevel: string, userId: string, cardId: string, timeStamp: number) => {
   console.log("start getNewCardText");

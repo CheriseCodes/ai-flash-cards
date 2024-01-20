@@ -11,6 +11,7 @@ import LoginButton from "./components/LoginButton";
 import Profile from "./components/Profile";
 
 const PORT = (process.env.NODE_ENV == "dev") ? 3000 : 8000;
+const BACKEND_DOMAIN = (process.env.NODE_ENV == "staging") ? "backend-service" : "localhost";
 
 const App = () => {
   const cards = useSelector((state: CardState) => state.cards);
@@ -31,7 +32,7 @@ const App = () => {
       if (authToken) {
         console.log("token:", authToken)
         const response = await fetch(
-          `http://localhost:${PORT}/flashcards?userId=${userId}`,
+          `http://${BACKEND_DOMAIN}:${PORT}/flashcards?userId=${userId}`,
           {
             headers: {
               "Content-Type": "application/json",

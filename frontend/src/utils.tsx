@@ -4,6 +4,7 @@ import { v4 as uuidv4 } from "uuid";
 
 // TODO: Stop updating card data object directly... only update with update-card reducer
 const PORT = (process.env.NODE_ENV == "dev") ? 3000 : 8000
+const BACKEND_DOMAIN = (process.env.NODE_ENV == "staging") ? "backend-service" : "localhost";
 
 const getNewCardText = async (word: string, languageMode: string, languageLevel: string, userId: string, cardId: string, timeStamp: number) => {
   console.log("start getNewCardText");
@@ -12,7 +13,7 @@ const getNewCardText = async (word: string, languageMode: string, languageLevel:
       .find((row) => row.startsWith("afc_app="))
       ?.split("=")[1];
   const response = await fetch(
-    `http://localhost:${PORT}/generations/sentences?word=${word}&lang_mode=${languageMode}&lang_level=${languageLevel}&userId=${userId}&cardId=${cardId}&timestamp${timeStamp}`,
+    `http://${BACKEND_DOMAIN}:${PORT}/generations/sentences?word=${word}&lang_mode=${languageMode}&lang_level=${languageLevel}&userId=${userId}&cardId=${cardId}&timestamp${timeStamp}`,
     {
       headers: {
         "Content-Type": "application/json",
@@ -40,7 +41,7 @@ const getNewCardImage = async (dispatch: Dispatch<AnyAction>, cardData: FlashCar
     cardData.generatingImage = true;
     dispatch({ type: "update-card", cardData: cardData, cardId: cardId });
     const imageResponse = await fetch(
-      `http://localhost:${PORT}/generations/images?sentence=${cardData.translatedSampleSentence}&lang_mode=${languageMode}&word=${word}&cardId=${cardData.id}&userId=${userId}`,
+      `http://${BACKEND_DOMAIN}:${PORT}/generations/images?sentence=${cardData.translatedSampleSentence}&lang_mode=${languageMode}&word=${word}&cardId=${cardData.id}&userId=${userId}`,
       {
         headers: {
           "Content-Type": "application/json",
@@ -51,7 +52,7 @@ const getNewCardImage = async (dispatch: Dispatch<AnyAction>, cardData: FlashCar
     const imageJson = await imageResponse.json();
     // 3rd fetch to persist the image in s3 then update references with persisted url
     const uploadResponse = await fetch(
-      `http://localhost:${PORT}/upload/image`,
+      `http://${BACKEND_DOMAIN}:${PORT}/upload/image`,
       {
         method: "POST",
         headers: {

@@ -1,0 +1,8 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: backend-config
+data:
+  AWS_DEFAULT_REGION: <the region your aws resources exist in>
+  BUCKET_NAME: <your s3 bucket name>
+  CLOUDFRONT_URL: <your cloudfront url>

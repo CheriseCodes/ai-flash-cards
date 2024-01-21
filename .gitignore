@@ -15,7 +15,8 @@ test_import.txt
 /aws/ignore/
 helm*/
 ai-code-review.yml
-
+.nginx/
+reverse_proxy/
 # production
 build
 dist

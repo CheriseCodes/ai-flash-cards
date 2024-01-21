@@ -20,22 +20,9 @@ spec:
           ports:
             - name: http
               containerPort: 8000
-          env:
-          - name: AWS_DEFAULT_REGION
-            valueFrom:
-              configMapKeyRef:
-                name: backend-config
-                key: aws-default-region
-          - name: BUCKET_NAME
-            valueFrom:
-              configMapKeyRef:
-                name: backend-config
-                key: bucket-name
-          - name: CLOUDFRONT_URL
-            valueFrom:
-              configMapKeyRef:
-                name: backend-config
-                key: cloudfront-url
+          envFrom:
+          - configMapRef:
+              name: backend-config
           readinessProbe:
             httpGet:
               path: /service/readyz

@@ -209,14 +209,14 @@ app.get("/generations/images", authMiddleware, async (req, res) => {
       res.status(400).send({error: `Sentence to visualize is undefined`})
       return
     }
-    if (typeof(req.query.cardId) == 'undefined') {
+    if ((typeof(req.query.cardId) == 'undefined') || (typeof(req.query.cardId[0]) == 'undefined')) {
       res.status(400).send({error: `Flash card ID is undefined`})
       return
     }
     const word = req.query.word;
     const langMode = req.query.lang_mode;
     const sentenceToVisualize = req.query.sentence;
-    const cardId = req.query.cardId;
+    const cardId: string = req.query.cardId[0];
     if (langMode == "Korean") {
       if (!(appConfig.allowedKoreanWords.includes(word.toString()))) {
         res.status(400).send({status: 400, message: `Unsupported word: ${word}`})

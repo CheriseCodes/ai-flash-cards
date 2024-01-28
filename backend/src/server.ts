@@ -106,6 +106,32 @@ app.get("/generations/sentences", authMiddleware, async (req, res) => {
       ? req.query.word
       : [req.query.word];
     const targetLanguage = req.query.lang_mode;
+    let targetLevel = req.query.lang_level;
+    const userId = req.query.userId;
+    const cardId = req.query.cardId;
+    const timeStamp = req.query.timeStamp;
+
+    // check for undefined values
+    if (typeof(wordsToSearch) == 'undefined') {
+      res.status(400).send({error: `Word to generate is undefined`})
+      return
+    }
+    if (typeof(targetLanguage) == 'undefined') {
+      res.status(400).send({error: `Target language is undefined`})
+      return
+    }
+    if (typeof(userId) == 'undefined') {
+      res.status(400).send({error: `User ID is undefined`})
+      return
+    }
+    if (typeof(cardId) == 'undefined') {
+      res.status(400).send({error: `Flash card ID is undefined`})
+      return
+    }
+    if (typeof(timeStamp) == 'undefined') {
+      res.status(400).send({error: `Flash card timestamp is undefined`})
+      return
+    }
     if (!sh.validateLang(targetLanguage)) {
       res.status(400).send({status: 400, message: `Unsupported language: ${targetLanguage}`})
       return
@@ -120,14 +146,12 @@ app.get("/generations/sentences", authMiddleware, async (req, res) => {
       res.status(400).send({status: 400, message: `Invalid words:${invalidWords}`})
       return
     }
-    let targetLevel = req.query.lang_level;
+    
     if (!(sh.validateLangLevel(targetLanguage, targetLevel))) {
       res.status(400).send({status: 400, message: `Invalid language level: ${targetLevel}`})
       return
     }
-    const userId = req.body.userId;
-    const cardId = req.query.cardId;
-    const timeStamp = req.query.timeStamp;
+
     const messages = [];
     let cert = " ";
     if (targetLanguage === appConfig.languageModes.SPANISH) {
@@ -174,7 +198,26 @@ app.get("/generations/images", authMiddleware, async (req, res) => {
   try {
     const word = req.query.word;
     const langMode = req.query.lang_mode;
-    // not a fool-proof check but good for learning purposes
+    const sentenceToVisualize = req.query.sentence;
+    const cardId = req.query.cardId[0];
+
+    // check for undefined values
+    if (typeof(word) == 'undefined') {
+      res.status(400).send({error: `Word to generate is undefined`})
+      return
+    }
+    if (typeof(langMode) == 'undefined') {
+      res.status(400).send({error: `Language mode is undefined`})
+      return
+    }
+    if (typeof(sentenceToVisualize) == 'undefined') {
+      res.status(400).send({error: `Sentence to visualize is undefined`})
+      return
+    }
+    if (typeof(cardId) == 'undefined') {
+      res.status(400).send({error: `Flash card ID is undefined`})
+      return
+    }
     if (langMode == "Korean") {
       if (!(appConfig.allowedKoreanWords.includes(word.toString()))) {
         res.status(400).send({status: 400, message: `Unsupported word: ${word}`})
@@ -194,8 +237,7 @@ app.get("/generations/images", authMiddleware, async (req, res) => {
       res.status(400).send({status: 400, message: `Unsupported language: ${langMode}`})
       return
     }
-    const sentenceToVisualize = req.query.sentence;
-    const cardId = req.query.cardId[0];
+    
     const prompt = `${sentenceToVisualize}, Georges Seurat, Bradshaw Crandell, vibrant colors, realistic`;
     const response = await openai.images.generate({
       prompt: prompt,
@@ -238,6 +280,23 @@ app.post("/image", authMiddleware, async (req, res) => {
     const imgUrl = req.body.imgUrl;
     const imgName = req.body.imgName;
     const cardId = req.body.cardId;
+    // check for undefined values
+    if (typeof(userId) == 'undefined') {
+      res.status(400).send({error: `User ID is undefined`})
+      return
+    }
+    if (typeof(imgUrl) == 'undefined') {
+      res.status(400).send({error: `URL of image to upload is undefined`})
+      return
+    }
+    if (typeof(imgName) == 'undefined') {
+      res.status(400).send({error: `Name of image to upload is undefined`})
+      return
+    }
+    if (typeof(cardId) == 'undefined') {
+      res.status(400).send({error: `Flash card ID is undefined`})
+      return
+    }
     const localFileName = `./private/images/${imgName}.png`;
     const remoteFileName = `users/${userId}/images/${imgName}.png`;
 
@@ -295,6 +354,11 @@ app.get("/callback", async (req, res) => {
 app.get("/flashcards", authMiddleware, async (req, res) => {
   try {
     const userId: string = req.query.userId[0];
+    // check for undefined values
+    if (typeof(userId) == 'undefined') {
+      res.status(400).send({error: `User ID is undefined`})
+      return
+    }
     const input: QueryCommandInput = {
       TableName: "FlashCardGenAITable",
       IndexName: "UserId",
@@ -317,6 +381,15 @@ app.delete("/flashcard", authMiddleware, async (req, res) => {
   try {
     const userId = req.body.userId;
     const cardId = req.body.cardId;
+    // check for undefined values
+    if (typeof(userId) == 'undefined') {
+      res.status(400).send({error: `User ID is undefined`})
+      return
+    }
+    if (typeof(cardId) == 'undefined') {
+      res.status(400).send({error: `Flash card ID is undefined`})
+      return
+    }
     const input = { // GetItemInput
       TableName: "FlashCardGenAITable", // required
       Key: { // Key // required

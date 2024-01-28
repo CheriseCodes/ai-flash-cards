@@ -148,7 +148,7 @@ describe("GET /generations/images", () => {
     });
     ddbMock.onAnyCommand().resolves({});
     const response = await fetch(
-      `http://localhost:${PORT}/generations/images?sentence=${sentence}&lang_mode=${langMode}&word=${word}&cardId=${cardId}&userId=${userId}`,
+      `http://localhost:${PORT}/generations/images?sentence=${sentence}&lang_mode=${langMode}&word=${word}&cardId=${cardId}&userId=${userId}&timeStamp=123`,
       {
         headers: {
           "Content-Type": "application/json",
@@ -215,6 +215,7 @@ describe("POST /upload/image", () => {
         imgUrl: imgUrl,
         imgName: imgName,
         userId: "default",
+        cardId: cardId,
       }),
     });
     const json = await response.json();
@@ -244,7 +245,6 @@ describe("POST /generations/sentences", () => {
     const cardId = "93960a65-ce5e-4d4d-ba2a-8d9e8eeb57d9";
     const languageMode = "French";
     const languageLevel = "A1";
-    const timeStamp = Date.now();
     mock.method(openai.chat.completions, "create", () => {
       return {
         id: 123,
@@ -271,7 +271,7 @@ describe("POST /generations/sentences", () => {
       };
     });
     const response = await fetch(
-      `http://localhost:${PORT}/generations/sentences?word=${word}&lang_mode=${languageMode}&lang_level=${languageLevel}&userId=${userId}&cardId=${cardId}&timestamp=${timeStamp}`,
+      `http://localhost:${PORT}/generations/sentences?word=${word}&lang_mode=${languageMode}&lang_level=${languageLevel}&userId=${userId}&cardId=${cardId}&timeStamp=123`,
       {
         headers: {
           "Content-Type": "application/json",
@@ -291,9 +291,8 @@ describe("POST /generations/sentences", () => {
     const cardId = "93960a65-ce5e-4d4d-ba2a-8d9e8eeb57d9";
     const languageMode = "Finnish";
     const languageLevel = "YKI1";
-    const timeStamp = Date.now();
     const response = await fetch(
-      `http://localhost:${PORT}/generations/sentences?word=${word}&lang_mode=${languageMode}&lang_level=${languageLevel}&userId=${userId}&cardId=${cardId}&timestamp=${timeStamp}`,
+      `http://localhost:${PORT}/generations/sentences?word=${word}&lang_mode=${languageMode}&lang_level=${languageLevel}&userId=${userId}&cardId=${cardId}&timeStamp=123`,
       {
         headers: {
           "Content-Type": "application/json",
@@ -313,9 +312,8 @@ describe("POST /generations/sentences", () => {
     const cardId = "93960a65-ce5e-4d4d-ba2a-8d9e8eeb57d9";
     const languageMode = "French";
     const languageLevel = "G2";
-    const timeStamp = Date.now();
     const response = await fetch(
-      `http://localhost:${PORT}/generations/sentences?word=${word}&lang_mode=${languageMode}&lang_level=${languageLevel}&userId=${userId}&cardId=${cardId}&timestamp=${timeStamp}`,
+      `http://localhost:${PORT}/generations/sentences?word=${word}&lang_mode=${languageMode}&lang_level=${languageLevel}&userId=${userId}&cardId=${cardId}&timeStamp=123`,
       {
         headers: {
           "Content-Type": "application/json",
@@ -335,7 +333,6 @@ describe("POST /generations/sentences", () => {
     const cardId = "93960a65-ce5e-4d4d-ba2a-8d9e8eeb57d9";
     const languageMode = "French";
     const languageLevel = "C2";
-    const timeStamp = Date.now();
     const expectedResult = {
       word: `${word}`,
       sampleSentence: `Example sentence using ${word} in ${languageMode}} at level ${languageLevel}`,
@@ -362,7 +359,7 @@ describe("POST /generations/sentences", () => {
       };
     });
     const response = await fetch(
-      `http://localhost:${PORT}/generations/sentences?word=${word}&lang_mode=${languageMode}&lang_level=${languageLevel}&userId=${userId}&cardId=${cardId}&timestamp=${timeStamp}`,
+      `http://localhost:${PORT}/generations/sentences?word=${word}&lang_mode=${languageMode}&lang_level=${languageLevel}&userId=${userId}&cardId=${cardId}&timeStamp=123`,
       {
         headers: {
           "Content-Type": "application/json",

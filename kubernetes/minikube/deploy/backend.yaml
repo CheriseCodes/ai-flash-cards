@@ -17,18 +17,22 @@ spec:
       containers:
         - name: backend
           image: cherisecodes/ai-flash-cards-backend:latest
+          imagePullPolicy: Always 
           ports:
             - name: http
               containerPort: 8000
           envFrom:
           - configMapRef:
               name: backend-config
+          - secretRef:
+              name: api-secret
           readinessProbe:
             httpGet:
               path: /service/readyz
               port: 8000
             periodSeconds: 5
             failureThreshold: 2
+            initialDelaySeconds: 10
           livenessProbe:
             httpGet:
               path: /service/livez
@@ -36,11 +40,3 @@ spec:
             initialDelaySeconds: 10
             periodSeconds: 30
             failureThreshold: 2
-          volumeMounts:
-          - name: secret-volume
-            mountPath: /etc/secret-volume
-            readOnly: true
-      volumes:
-      - name: secret-volume
-        secret:
-          secretName: api-secret

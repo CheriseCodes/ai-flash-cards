@@ -102,6 +102,28 @@ app.get("/service/readyz", (req, res) => res.status(200).json({ readyz: {status:
 app.get("/service/livez", (req, res) => res.status(200).json({ livez: {status: "ok" }}));
 app.get("/generations/sentences", authMiddleware, async (req, res) => {
   try {
+
+    // check for undefined values
+    if ((typeof(req.query.word) == 'undefined') || (typeof(req.query.word[0]) == 'undefined')) {
+      res.status(400).send({error: `Word to generate is undefined`})
+      return
+    }
+    if (typeof(req.query.lang_mode) == 'undefined') {
+      res.status(400).send({error: `Target language is undefined`})
+      return
+    }
+    if (typeof(req.query.userId) == 'undefined') {
+      res.status(400).send({error: `User ID is undefined`})
+      return
+    }
+    if (typeof(req.query.cardId) == 'undefined') {
+      res.status(400).send({error: `Flash card ID is undefined`})
+      return
+    }
+    if (typeof(req.query.timeStamp) == 'undefined') {
+      res.status(400).send({error: `Flash card timestamp is undefined`})
+      return
+    }
     const wordsToSearch = Array.isArray(req.query.word)
       ? req.query.word
       : [req.query.word];
@@ -110,28 +132,6 @@ app.get("/generations/sentences", authMiddleware, async (req, res) => {
     const userId = req.query.userId;
     const cardId = req.query.cardId;
     const timeStamp = req.query.timeStamp;
-
-    // check for undefined values
-    if (typeof(wordsToSearch) == 'undefined') {
-      res.status(400).send({error: `Word to generate is undefined`})
-      return
-    }
-    if (typeof(targetLanguage) == 'undefined') {
-      res.status(400).send({error: `Target language is undefined`})
-      return
-    }
-    if (typeof(userId) == 'undefined') {
-      res.status(400).send({error: `User ID is undefined`})
-      return
-    }
-    if (typeof(cardId) == 'undefined') {
-      res.status(400).send({error: `Flash card ID is undefined`})
-      return
-    }
-    if (typeof(timeStamp) == 'undefined') {
-      res.status(400).send({error: `Flash card timestamp is undefined`})
-      return
-    }
     if (!sh.validateLang(targetLanguage)) {
       res.status(400).send({status: 400, message: `Unsupported language: ${targetLanguage}`})
       return
@@ -196,28 +196,27 @@ app.get("/generations/sentences", authMiddleware, async (req, res) => {
 });
 app.get("/generations/images", authMiddleware, async (req, res) => {
   try {
-    const word = req.query.word;
-    const langMode = req.query.lang_mode;
-    const sentenceToVisualize = req.query.sentence;
-    const cardId = req.query.cardId[0];
-
     // check for undefined values
-    if (typeof(word) == 'undefined') {
+    if (typeof(req.query.word) == 'undefined') {
       res.status(400).send({error: `Word to generate is undefined`})
       return
     }
-    if (typeof(langMode) == 'undefined') {
+    if (typeof(req.query.lang_mode) == 'undefined') {
       res.status(400).send({error: `Language mode is undefined`})
       return
     }
-    if (typeof(sentenceToVisualize) == 'undefined') {
+    if (typeof(req.query.sentence) == 'undefined') {
       res.status(400).send({error: `Sentence to visualize is undefined`})
       return
     }
-    if (typeof(cardId) == 'undefined') {
+    if (typeof(req.query.cardId) == 'undefined') {
       res.status(400).send({error: `Flash card ID is undefined`})
       return
     }
+    const word = req.query.word;
+    const langMode = req.query.lang_mode;
+    const sentenceToVisualize = req.query.sentence;
+    const cardId = req.query.cardId;
     if (langMode == "Korean") {
       if (!(appConfig.allowedKoreanWords.includes(word.toString()))) {
         res.status(400).send({status: 400, message: `Unsupported word: ${word}`})
@@ -275,28 +274,29 @@ app.get("/generations/images", authMiddleware, async (req, res) => {
 
 app.post("/image", authMiddleware, async (req, res) => {
   try {
+    
+    // check for undefined values
+    if (typeof(req.body.userId) == 'undefined') {
+      res.status(400).send({error: `User ID is undefined`})
+      return
+    }
+    if (typeof(req.body.imgUrl) == 'undefined') {
+      res.status(400).send({error: `URL of image to upload is undefined`})
+      return
+    }
+    if (typeof(req.body.imgName) == 'undefined') {
+      res.status(400).send({error: `Name of image to upload is undefined`})
+      return
+    }
+    if (typeof(req.body.cardId) == 'undefined') {
+      res.status(400).send({error: `Flash card ID is undefined`})
+      return
+    }
     // Download image
     const userId = req.body.userId;
     const imgUrl = req.body.imgUrl;
     const imgName = req.body.imgName;
     const cardId = req.body.cardId;
-    // check for undefined values
-    if (typeof(userId) == 'undefined') {
-      res.status(400).send({error: `User ID is undefined`})
-      return
-    }
-    if (typeof(imgUrl) == 'undefined') {
-      res.status(400).send({error: `URL of image to upload is undefined`})
-      return
-    }
-    if (typeof(imgName) == 'undefined') {
-      res.status(400).send({error: `Name of image to upload is undefined`})
-      return
-    }
-    if (typeof(cardId) == 'undefined') {
-      res.status(400).send({error: `Flash card ID is undefined`})
-      return
-    }
     const localFileName = `./private/images/${imgName}.png`;
     const remoteFileName = `users/${userId}/images/${imgName}.png`;
 
@@ -353,12 +353,12 @@ app.get("/callback", async (req, res) => {
 
 app.get("/flashcards", authMiddleware, async (req, res) => {
   try {
-    const userId: string = req.query.userId[0];
     // check for undefined values
-    if (typeof(userId) == 'undefined') {
+    if ((typeof(req.query.userId) == 'undefined') || (typeof(req.query.userId[0]) == 'undefined')) {
       res.status(400).send({error: `User ID is undefined`})
       return
     }
+    const userId: string = req.query.userId[0];
     const input: QueryCommandInput = {
       TableName: "FlashCardGenAITable",
       IndexName: "UserId",
@@ -379,17 +379,18 @@ app.get("/flashcards", authMiddleware, async (req, res) => {
 
 app.delete("/flashcard", authMiddleware, async (req, res) => {
   try {
-    const userId = req.body.userId;
-    const cardId = req.body.cardId;
+    
     // check for undefined values
-    if (typeof(userId) == 'undefined') {
+    if (typeof(req.body.userId) == 'undefined') {
       res.status(400).send({error: `User ID is undefined`})
       return
     }
-    if (typeof(cardId) == 'undefined') {
+    if (typeof(req.body.cardId) == 'undefined') {
       res.status(400).send({error: `Flash card ID is undefined`})
       return
     }
+    const userId = req.body.userId;
+    const cardId = req.body.cardId;
     const input = { // GetItemInput
       TableName: "FlashCardGenAITable", // required
       Key: { // Key // required

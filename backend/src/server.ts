@@ -75,7 +75,7 @@ const openAIChatCompletion = async (model, temperature, messages) => {
   return response
 }
 
-const authMiddleware = process.env.NODE_ENV == "test" ? (req, res, next) => next() : jwtCheck;
+const authMiddleware = process.env.NODE_ENV == "test" ? (req, res, next) => { console.log('Auth middleware executed'); next();} : jwtCheck;
 
 const putItemFlashCardTable = async (userId, timeStamp, cardId, response, messages) => {
   const awsInput: PutItemCommandInput = {

@@ -12,4 +12,9 @@ export default defineConfig({
         // this sets a default port to 3000  
         port: 3000, 
     },
+    // define: {
+    //     "process.env": process.env,
+    //     BACKEND_HOST: process.env.BACKEND_HOST,
+    //     BACKEND_PORT: process.env.BACKEND_PORT,
+    // },
 })

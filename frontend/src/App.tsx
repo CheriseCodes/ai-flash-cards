@@ -10,8 +10,8 @@ import { v4 as uuidv4 } from "uuid";
 import LoginButton from "./components/LoginButton";
 import Profile from "./components/Profile";
 
-const PORT = (process.env.NODE_ENV == "dev") ? 3000 : 8000;
-const BACKEND_DOMAIN = (process.env.NODE_ENV == "staging") ? "backend-service" : "localhost";
+const PORT = import.meta.env.VITE_BACKEND_PORT;
+const BACKEND_DOMAIN = import.meta.env.VITE_BACKEND_HOST;
 
 const App = () => {
   const cards = useSelector((state: CardState) => state.cards);

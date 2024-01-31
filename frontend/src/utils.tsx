@@ -3,8 +3,8 @@ import { Dispatch, SetStateAction } from "react";
 import { v4 as uuidv4 } from "uuid";
 
 // TODO: Stop updating card data object directly... only update with update-card reducer
-const PORT = (process.env.NODE_ENV == "dev") ? 3000 : 8000
-const BACKEND_DOMAIN = (process.env.NODE_ENV == "staging") ? "backend-service" : "localhost";
+const PORT = import.meta.env.VITE_BACKEND_PORT;
+const BACKEND_DOMAIN = import.meta.env.VITE_BACKEND_HOST;
 
 const getNewCardText = async (word: string, languageMode: string, languageLevel: string, userId: string, cardId: string, timeStamp: number) => {
   console.log("start getNewCardText");
@@ -13,7 +13,7 @@ const getNewCardText = async (word: string, languageMode: string, languageLevel:
       .find((row) => row.startsWith("afc_app="))
       ?.split("=")[1];
   const response = await fetch(
-    `http://${BACKEND_DOMAIN}:${PORT}/generations/sentences?word=${word}&lang_mode=${languageMode}&lang_level=${languageLevel}&userId=${userId}&cardId=${cardId}&timestamp${timeStamp}`,
+    `http://${BACKEND_DOMAIN}:${PORT}/generations/sentences?word=${word}&lang_mode=${languageMode}&lang_level=${languageLevel}&userId=${userId}&cardId=${cardId}&timeStamp=${timeStamp}`,
     {
       headers: {
         "Content-Type": "application/json",

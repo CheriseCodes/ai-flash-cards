@@ -23,6 +23,7 @@
     "web-vitals": "^2.1.4"
   },
   "scripts": {
+    "start": "vite",
     "dev": "vite",
     "preview": "vite preview",
     "lint:fix": "eslint . --fix --ext .js,.jsx,.ts,.tsx",

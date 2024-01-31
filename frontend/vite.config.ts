@@ -1,10 +1,11 @@
-import { defineConfig } from 'vite'
+import { defineConfig, loadEnv } from 'vite'
 import react from '@vitejs/plugin-react'
 import viteTsconfigPaths from 'vite-tsconfig-paths'
 
-export default defineConfig({
+export default defineConfig(({command, mode}) => {
+    const env = loadEnv(mode, process.cwd());
     // depending on your application, base can also be "/"
-    base: '',
+    return {base: '',
     plugins: [react(), viteTsconfigPaths()],
     server: {    
         // this ensures that the browser opens upon server start
@@ -12,9 +13,9 @@ export default defineConfig({
         // this sets a default port to 3000  
         port: 3000, 
     },
-    // define: {
-    //     "process.env": process.env,
-    //     BACKEND_HOST: process.env.BACKEND_HOST,
-    //     BACKEND_PORT: process.env.BACKEND_PORT,
-    // },
+    define: {
+        'process.env.VITE_BACKEND_HOST': JSON.stringify(env.VITE_BACKEND_HOST),
+        'process.env.VITE_BACKEND_PORT': env.VITE_BACKEND_PORT,
+    },
+}
 })

@@ -3,8 +3,8 @@ import { Dispatch, SetStateAction } from "react";
 import { v4 as uuidv4 } from "uuid";
 
 // TODO: Stop updating card data object directly... only update with update-card reducer
-const PORT = import.meta.env.VITE_BACKEND_PORT;
-const BACKEND_DOMAIN = import.meta.env.VITE_BACKEND_HOST;
+const PORT = process.env.VITE_BACKEND_PORT;
+const BACKEND_DOMAIN = process.env.VITE_BACKEND_HOST;
 
 const getNewCardText = async (word: string, languageMode: string, languageLevel: string, userId: string, cardId: string, timeStamp: number) => {
   console.log("start getNewCardText");
@@ -21,6 +21,9 @@ const getNewCardText = async (word: string, languageMode: string, languageLevel:
       },
     },
   );
+  if (!(response.ok)) {
+    return {}
+  }
   const json = await response.json();
   let cardData;
   cardData = json.choices[0].message.content; // stringified JSON
@@ -78,15 +81,14 @@ const getNewCardData = async (dispatch: Dispatch<AnyAction>, word: string, langu
   console.log("start getNewCardData")
   let cardData = await getNewCardText(word, languageMode, languageLevel, userId, cardId, timeStamp);
   let promise1 = Promise.resolve(cardData);
-  
+  // TODO: handle failure to generate text properly
   promise1.then((values) => {
     dispatch({
     type: "update-card",
     cardId: cardId,
     cardData: values,
+    });
   });
-})
-  
   cardData = await getNewCardImage(dispatch, cardData, languageMode, languageLevel, userId, cardId, word);
   promise1 = Promise.resolve(cardData);
   

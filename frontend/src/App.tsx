@@ -10,8 +10,10 @@ import { v4 as uuidv4 } from "uuid";
 import LoginButton from "./components/LoginButton";
 import Profile from "./components/Profile";
 
-const PORT = import.meta.env.VITE_BACKEND_PORT;
-const BACKEND_DOMAIN = import.meta.env.VITE_BACKEND_HOST;
+const PORT = process.env.VITE_BACKEND_PORT;
+const BACKEND_DOMAIN = process.env.VITE_BACKEND_HOST;
+
+console.log(`Backend set to http://${BACKEND_DOMAIN}:${PORT}`)
 
 const App = () => {
   const cards = useSelector((state: CardState) => state.cards);
@@ -54,7 +56,7 @@ const App = () => {
     }
   }
 
-  // TODO: fetch flashcards for current user on first load
+  // fetch flashcards for current user on first load
   useEffect(() => {
     fetchAllFlashcards()
   },[document.cookie

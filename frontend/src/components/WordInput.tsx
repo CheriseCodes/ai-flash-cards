@@ -39,7 +39,8 @@ const WordInput = ({ setErrors, userId }: { setErrors: Dispatch<SetStateAction<A
     }
   };
 
-  const handleDownload = () => {
+  const handleDownload = (e: any) => {
+    e.preventDefault()
     // TODO: upgrade download file
     let fileContents = "#separator:tab\n#html:true\n";
     const parsedCards = cards.map((card) => JSON.parse(card));

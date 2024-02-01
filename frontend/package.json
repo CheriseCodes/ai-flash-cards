@@ -29,6 +29,7 @@
     "lint:fix": "eslint . --fix --ext .js,.jsx,.ts,.tsx",
     "lint": "eslint . --ext .js,.jsx,.ts,.tsx",
     "build": "tsc && vite build",
+    "build:dev": "tsc -w",
     "test": "jest"
   },
   "browserslist": {

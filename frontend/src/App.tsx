@@ -42,6 +42,9 @@ const App = () => {
             },
           },
         );
+        if (!(response.ok)) {
+          return
+        }
         const json = await response.json()
         console.log("/flashcards", JSON.stringify(json))
         // TODO: check if the ids of the returned results don't match what is currently shown
@@ -75,7 +78,7 @@ const App = () => {
       <LanguageModeForm />
       <LanguageLevelForm />
       {errors.map((e) => (
-        <ErrorBanner key={e.id} e={e} setErrors={setErrors} />
+        <ErrorBanner key={uuidv4()} e={e} setErrors={setErrors} />
       ))}
       <form className="flash-card-form" onSubmit={handleSubmit}>
         {cards.length == 0 && (
@@ -103,7 +106,7 @@ const App = () => {
         <div className="flash-card-container">
           {cards.map((cardData) => (
             <FlashCard
-              key={JSON.parse(cardData).id}
+              key={uuidv4()}
               cardData={JSON.parse(cardData)}
               setErrors={setErrors}
               userId={userId}

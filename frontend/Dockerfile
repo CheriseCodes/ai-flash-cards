@@ -8,6 +8,9 @@ FROM node:${NODE_VERSION}-alpine as build
 # Set the working directory in the container
 WORKDIR /app
 
+ARG BACKEND_HOST=backend-service
+ARG BACKEND_PORT=8000
+
 # Copy package.json and package-lock.json to the working directory
 COPY package*.json ./
 
@@ -16,6 +19,9 @@ RUN npm install
 
 # Copy the entire application code to the container
 COPY . .
+
+# Set backend url
+RUN printf "VITE_BACKEND_HOST=${BACKEND_HOST}\nVITE_BACKEND_PORT=${BACKEND_PORT}" > .env
 
 # Build the React app for production
 RUN npm run build
@@ -33,6 +39,5 @@ COPY --from=build /app/nginx/nginx.conf /etc/nginx/conf.d/default.conf
 # Expose port 80 for the Nginx server
 EXPOSE 80
 
-# # Start Nginx when the container runs
+# Start Nginx when the container runs
 CMD ["nginx", "-g", "daemon off;"]
-# CMD ["npm", "run", "start", "--host"]

@@ -2,6 +2,7 @@
   "name": "ai-flash-cards",
   "version": "0.1.0",
   "private": true,
+  "homepage": ".",
   "dependencies": {
     "@auth0/auth0-react": "^2.2.4",
     "@reduxjs/toolkit": "^1.9.7",

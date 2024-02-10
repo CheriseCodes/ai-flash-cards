@@ -41,19 +41,12 @@ RUN --mount=type=bind,source=package.json,target=package.json \
 # Copy the rest of the source files into the image.
 COPY . .
 # Run the build script.
-# RUN npm run build
+RUN npm run build
 
 ################################################################################
 # Create a new stage to run the application with minimal runtime dependencies
 # where the necessary files are copied from the build stage.
 FROM base as final
-
-# Use production node environment by default.
-ENV NODE_ENV production
-ENV OPENAI_API_KEY=$OPENAI_API_KEY
-ENV AWS_PROFILE=$AWS_PROFILE
-ENV BUCKET_NAME=$BUCKET_NAME
-ENV CLOUDFRONT_URL=$CLOUDFRONT_URL
 
 # Run the application as a non-root user.
 USER node
@@ -67,6 +60,9 @@ COPY . .
 COPY --from=deps /usr/src/app/node_modules ./node_modules
 # COPY --from=build /usr/src/app/build ./build
 
+# Set environmet variables
+ENV OPENAI_API_KEY='sk-default'
+ENV NODE_ENV='test'
 
 # Expose the port that the application listens on.
 EXPOSE 8000

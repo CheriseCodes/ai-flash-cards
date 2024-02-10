@@ -15,7 +15,8 @@ test_import.txt
 /aws/ignore/
 helm*/
 ai-code-review.yml
-
+.nginx/
+reverse_proxy/
 # production
 build
 dist
@@ -31,8 +32,9 @@ built
 .env.production.local
 
 # security
-kubernetes/secrets
-
+kubernetes/**/secrets/
+backend-config.yaml
+frontend-config.yaml
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*

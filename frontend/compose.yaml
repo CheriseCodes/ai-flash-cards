@@ -1,3 +1,4 @@
+# TODO: For single EC2 deployment
 services:
   frontend:
     build:

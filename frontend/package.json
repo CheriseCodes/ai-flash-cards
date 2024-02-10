@@ -2,6 +2,7 @@
   "name": "ai-flash-cards",
   "version": "0.1.0",
   "private": true,
+  "homepage": ".",
   "dependencies": {
     "@auth0/auth0-react": "^2.2.4",
     "@reduxjs/toolkit": "^1.9.7",
@@ -24,12 +25,13 @@
   },
   "scripts": {
     "start": "vite",
+    "dev": "vite",
     "preview": "vite preview",
     "lint:fix": "eslint . --fix --ext .js,.jsx,.ts,.tsx",
     "lint": "eslint . --ext .js,.jsx,.ts,.tsx",
     "build": "tsc && vite build",
-    "test": "jest",
-    "eject": "react-scripts eject"
+    "build:dev": "tsc -w",
+    "test": "jest"
   },
   "browserslist": {
     "production": [

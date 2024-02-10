@@ -28,7 +28,7 @@ export const authorizeToken = (req): string => {
         return user.username;
       }
     });
-    if (process.env.NODE_ENV == "test") {
+    if (process.env.NODE_ENV == "dev") {
       return "default";
     }
 }

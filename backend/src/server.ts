@@ -41,7 +41,7 @@ app.use(bodyParser.json());
 //   saveUninitialized: true,
 //   cookie: {
 //     httpOnly: true,
-//     secure: process.env.NODE_ENV === 'production',
+//     secure: process.env.NODE_ENV === 'prod',
 //   }
 // };
 // app.use(cookieParser());
@@ -75,7 +75,7 @@ const openAIChatCompletion = async (model, temperature, messages) => {
   return response
 }
 
-const authMiddleware = process.env.NODE_ENV == "test" ? (req, res, next) => { console.log('Auth middleware executed'); next();} : jwtCheck;
+const authMiddleware = process.env.NODE_ENV == "dev" ? (req, res, next) => { console.log('Auth middleware executed'); next();} : jwtCheck;
 
 const putItemFlashCardTable = async (userId, timeStamp, cardId, response, messages) => {
   const awsInput: PutItemCommandInput = {

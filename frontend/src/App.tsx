@@ -10,10 +10,7 @@ import { v4 as uuidv4 } from "uuid";
 import LoginButton from "./components/LoginButton";
 import Profile from "./components/Profile";
 
-const PORT = process.env.VITE_BACKEND_PORT;
-const BACKEND_DOMAIN = process.env.VITE_BACKEND_HOST;
-
-console.log(`Backend set to http://${BACKEND_DOMAIN}:${PORT}`)
+console.log(`Backend set to ${process.env.VITE_BACKEND_DOMAIN}`)
 
 const App = () => {
   const cards = useSelector((state: CardState) => state.cards);
@@ -34,7 +31,7 @@ const App = () => {
       if (authToken) {
         console.log("token:", authToken)
         const response = await fetch(
-          `http://${BACKEND_DOMAIN}:${PORT}/flashcards?userId=${userId}`,
+          `${process.env.VITE_BACKEND_DOMAIN}/flashcards?userId=${userId}`,
           {
             headers: {
               "Content-Type": "application/json",

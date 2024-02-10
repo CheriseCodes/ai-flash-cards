@@ -8,8 +8,7 @@ FROM node:${NODE_VERSION}-alpine as build
 # Set the working directory in the container
 WORKDIR /app
 
-ARG BACKEND_HOST=backend-service
-ARG BACKEND_PORT=8000
+ARG BACKEND_DOMAIN=http://localhost:8000
 
 # Copy package.json and package-lock.json to the working directory
 COPY package*.json ./
@@ -21,7 +20,7 @@ RUN npm install
 COPY . .
 
 # Set backend url
-RUN printf "VITE_BACKEND_HOST=${BACKEND_HOST}\nVITE_BACKEND_PORT=${BACKEND_PORT}" > .env
+RUN printf "VITE_BACKEND_DOMAIN=${BACKEND_DOMAIN}" > .env
 
 # Build the React app for production
 RUN npm run build

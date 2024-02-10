@@ -17,6 +17,12 @@ spec:
       containers:
         - name: frontend
           image: cherisecodes/ai-flash-cards-frontend:latest
+          env:
+          - name: NODE_ENV
+            valueFrom:
+              configMapKeyRef:
+                name: frontend-config
+                key: NODE_ENV
           imagePullPolicy: Always 
           ports:
             - name: http

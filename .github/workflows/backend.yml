@@ -5,7 +5,7 @@ name: Backend Node.js CI
 
 on:
   push:
-    branches: [ "backend" ]
+    branches: [ "backend", "fullstack-release", "backend-release" ]
     paths:
       - "backend/src/**"
       - "backend/__test__/**"
@@ -19,7 +19,7 @@ env:
   BUCKET_NAME: "bucket-name"
   CLOUDFRONT_URL: "cloudfront-url"
   AWS_PROFILE: "aws-profile"
-  NODE_ENV: "test"
+  NODE_ENV: "dev"
 defaults:
   run:
     working-directory: ./backend

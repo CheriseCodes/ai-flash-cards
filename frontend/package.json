@@ -2,7 +2,9 @@
   "name": "ai-flash-cards",
   "version": "0.1.0",
   "private": true,
+  "homepage": ".",
   "dependencies": {
+    "@auth0/auth0-react": "^2.2.4",
     "@reduxjs/toolkit": "^1.9.7",
     "@types/react": "^18.2.45",
     "@types/react-dom": "^18.2.18",
@@ -17,18 +19,19 @@
     "redux-persist": "^6.0.0",
     "typescript": "^4.7.0",
     "uuid": "^9.0.1",
-    "vite": "^5.0.10",
+    "vite": "^5.0.12",
     "vite-tsconfig-paths": "^4.2.2",
     "web-vitals": "^2.1.4"
   },
   "scripts": {
     "start": "vite",
+    "dev": "vite",
     "preview": "vite preview",
     "lint:fix": "eslint . --fix --ext .js,.jsx,.ts,.tsx",
     "lint": "eslint . --ext .js,.jsx,.ts,.tsx",
     "build": "tsc && vite build",
-    "test": "jest",
-    "eject": "react-scripts eject"
+    "build:dev": "tsc -w",
+    "test": "jest"
   },
   "browserslist": {
     "production": [

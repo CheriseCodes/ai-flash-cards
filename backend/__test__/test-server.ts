@@ -11,11 +11,7 @@ import assert from "node:assert";
 import { mockClient } from "aws-sdk-client-mock";
 import { openai, app } from "../src/server";
 import { dynamoDbClient, s3Client } from "../src/aws-clients";
-import {
-  GetItemCommand,
-  DeleteItemCommand,
-} from "@aws-sdk/client-dynamodb";
-import { authenticateToken, authorizeToken } from "../src/auth-helpers";
+import { GetItemCommand, DeleteItemCommand } from "@aws-sdk/client-dynamodb";
 
 const PORT = 8000;
 
@@ -26,10 +22,12 @@ describe("GET /flashcards", () => {
   beforeEach(() => {
     ddbMock.reset();
     s3Mock.reset();
+    mock.reset();
   });
   afterEach(() => {
     ddbMock.restore();
     s3Mock.restore();
+    mock.restoreAll();
   });
   before(() => {
     server = app.listen(PORT, () =>
@@ -37,8 +35,6 @@ describe("GET /flashcards", () => {
     ); // IMPORTANT: First test should start the server
   });
   test("existent user should have non-empty cards response", async () => {
-    mock.fn(authenticateToken, (req) => {return 200; });
-    mock.fn(authorizeToken, (req) => {return "default";});
     const queryResult = {
       Items: [
         {
@@ -54,30 +50,35 @@ describe("GET /flashcards", () => {
     ddbMock.onAnyCommand().resolves(queryResult);
     s3Mock.onAnyCommand().resolves({});
     const userId = "default";
-    const response = await fetch(`http://localhost:${PORT}/flashcards?userId=${userId}`, {
-      headers: {
-        "Content-Type": "application/json",
-        "Authorization": "Bearer abc123"
+    const response = await fetch(
+      `http://localhost:${PORT}/flashcards?userId=${userId}`,
+      {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: "Bearer abc123",
+        },
       },
-    });
+    );
+    console.log(response);
     const json = await response.json();
     assert.deepStrictEqual(json, { cards: queryResult.Items });
   });
   test("non-existent user should have non-empty cards response", async () => {
-    mock.fn(authenticateToken, () => {return 200});
-    mock.fn(authorizeToken, () => {return "default"});
     const queryResult = {
       Items: [],
     };
     ddbMock.onAnyCommand().resolves(queryResult);
     s3Mock.onAnyCommand().resolves({});
     const userId = "default";
-    const response = await fetch(`http://localhost:${PORT}/flashcards?userId=${userId}`, {
-      headers: {
-        "Content-Type": "application/json",
-        "Authorization": "Bearer abc123"
-      }
-    });
+    const response = await fetch(
+      `http://localhost:${PORT}/flashcards?userId=${userId}`,
+      {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: "Bearer abc123",
+        },
+      },
+    );
     const json = await response.json();
     assert.deepStrictEqual(json, { cards: queryResult.Items });
   });
@@ -87,15 +88,17 @@ describe("DELETE /flashcard", () => {
   beforeEach(() => {
     ddbMock.reset();
     s3Mock.reset();
+    mock.reset();
   });
   afterEach(() => {
     ddbMock.restore();
     s3Mock.restore();
+    mock.restoreAll();
   });
   test("existing flashcard is deleted", async () => {
-    mock.fn(authenticateToken, () => {return 200});
-    mock.fn(authorizeToken, () => {return "default"});
-    ddbMock.on(GetItemCommand).resolves({Item: {ImageLink: {S: "123abc"}, UserId: {S: "default"}}});
+    ddbMock.on(GetItemCommand).resolves({
+      Item: { ImageLink: { S: "123abc" }, UserId: { S: "default" } },
+    });
     ddbMock.on(DeleteItemCommand).resolves({});
     s3Mock.onAnyCommand().resolves({});
     const cardId = "abc123";
@@ -103,10 +106,11 @@ describe("DELETE /flashcard", () => {
       method: "DELETE",
       headers: {
         "Content-Type": "application/json",
-        "Authorization": "Bearer abc123",
+        Authorization: "Bearer abc123",
       },
       body: JSON.stringify({
         cardId: cardId,
+        userId: "default",
       }),
     });
     const json = await response.json();
@@ -126,8 +130,6 @@ describe("GET /generations/images", () => {
     mock.restoreAll();
   });
   test("Allowed word should return a valid image", async () => {
-    mock.fn(authenticateToken, () => {return 200})
-    mock.fn(authorizeToken, () => {return "default"});
     const word = "trouver";
     const langMode = "French";
     const sentence = "Je ne trouve pas mes lunettes.";
@@ -146,11 +148,11 @@ describe("GET /generations/images", () => {
     });
     ddbMock.onAnyCommand().resolves({});
     const response = await fetch(
-      `http://localhost:${PORT}/generations/images?sentence=${sentence}&lang_mode=${langMode}&word=${word}&cardId=${cardId}&userId=${userId}`,
+      `http://localhost:${PORT}/generations/images?sentence=${sentence}&lang_mode=${langMode}&word=${word}&cardId=${cardId}&userId=${userId}&timeStamp=123`,
       {
         headers: {
           "Content-Type": "application/json",
-          "Authorization": "Bearer abc123",
+          Authorization: "Bearer abc123",
         },
       },
     );
@@ -158,8 +160,6 @@ describe("GET /generations/images", () => {
     assert.deepStrictEqual(json, expectedResult);
   });
   test("Unallowed word should return a error image", async () => {
-    mock.fn(authenticateToken, () => {return 200})
-    mock.fn(authorizeToken, () => {return "default"});
     const word = "rentrée";
     const langMode = "French";
     const sentence = "Courage, c'est la rentrée!";
@@ -174,7 +174,7 @@ describe("GET /generations/images", () => {
       {
         headers: {
           "Content-Type": "application/json",
-          "Authorization": "Bearer abc123",
+          Authorization: "Bearer abc123",
         },
       },
     );
@@ -190,14 +190,14 @@ describe("POST /upload/image", () => {
   beforeEach(() => {
     ddbMock.reset();
     s3Mock.reset();
+    mock.reset();
   });
   afterEach(() => {
     ddbMock.restore();
     s3Mock.restore();
+    mock.restoreAll();
   });
   test("image should be uploaded successfully", async () => {
-    mock.fn(authenticateToken, () => {return 200});
-    mock.fn(authorizeToken, () => {return "default"; });
     const cardId = "93960a65-ce5e-4d4d-ba2a-8d9e8eeb57d9";
     const languageMode = "French";
     const languageLevel = "C2";
@@ -209,11 +209,13 @@ describe("POST /upload/image", () => {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        "Authorization": "Bearer abc123",
+        Authorization: "Bearer abc123",
       },
       body: JSON.stringify({
         imgUrl: imgUrl,
         imgName: imgName,
+        userId: "default",
+        cardId: cardId,
       }),
     });
     const json = await response.json();
@@ -238,14 +240,11 @@ describe("POST /generations/sentences", () => {
     mock.restoreAll();
   });
   test("invalid word should return an empty response", async () => {
-    mock.fn(authenticateToken, () => {return 200})
-    mock.fn(authorizeToken, () => {return "default"});
     const word = "hello"; // invalid word
     const userId = "default";
     const cardId = "93960a65-ce5e-4d4d-ba2a-8d9e8eeb57d9";
     const languageMode = "French";
     const languageLevel = "A1";
-    const timeStamp = Date.now();
     mock.method(openai.chat.completions, "create", () => {
       return {
         id: 123,
@@ -272,11 +271,11 @@ describe("POST /generations/sentences", () => {
       };
     });
     const response = await fetch(
-      `http://localhost:${PORT}/generations/sentences?word=${word}&lang_mode=${languageMode}&lang_level=${languageLevel}&userId=${userId}&cardId=${cardId}&timestamp=${timeStamp}`,
+      `http://localhost:${PORT}/generations/sentences?word=${word}&lang_mode=${languageMode}&lang_level=${languageLevel}&userId=${userId}&cardId=${cardId}&timeStamp=123`,
       {
         headers: {
           "Content-Type": "application/json",
-          "Authorization": "Bearer abc123",
+          Authorization: "Bearer abc123",
         },
       },
     );
@@ -287,20 +286,17 @@ describe("POST /generations/sentences", () => {
     });
   });
   test("unsupported language should return an empty response", async () => {
-    mock.fn(authenticateToken, () => {return 200});
-    mock.fn(authorizeToken, () => {return "default"});
     const word = "viikko"; // invalid word
     const userId = "default";
     const cardId = "93960a65-ce5e-4d4d-ba2a-8d9e8eeb57d9";
     const languageMode = "Finnish";
     const languageLevel = "YKI1";
-    const timeStamp = Date.now();
     const response = await fetch(
-      `http://localhost:${PORT}/generations/sentences?word=${word}&lang_mode=${languageMode}&lang_level=${languageLevel}&userId=${userId}&cardId=${cardId}&timestamp=${timeStamp}`,
+      `http://localhost:${PORT}/generations/sentences?word=${word}&lang_mode=${languageMode}&lang_level=${languageLevel}&userId=${userId}&cardId=${cardId}&timeStamp=123`,
       {
         headers: {
           "Content-Type": "application/json",
-          "Authorization": "Bearer abc123",
+          Authorization: "Bearer abc123",
         },
       },
     );
@@ -311,20 +307,17 @@ describe("POST /generations/sentences", () => {
     });
   });
   test("invalid language level should return an empty response", async () => {
-    mock.fn(authenticateToken, () => {return 200});
-    mock.fn(authorizeToken, () => {return "default"});
     const word = "être";
     const userId = "default";
     const cardId = "93960a65-ce5e-4d4d-ba2a-8d9e8eeb57d9";
     const languageMode = "French";
     const languageLevel = "G2";
-    const timeStamp = Date.now();
     const response = await fetch(
-      `http://localhost:${PORT}/generations/sentences?word=${word}&lang_mode=${languageMode}&lang_level=${languageLevel}&userId=${userId}&cardId=${cardId}&timestamp=${timeStamp}`,
+      `http://localhost:${PORT}/generations/sentences?word=${word}&lang_mode=${languageMode}&lang_level=${languageLevel}&userId=${userId}&cardId=${cardId}&timeStamp=123`,
       {
         headers: {
           "Content-Type": "application/json",
-          "Authorization": "Bearer abc123",
+          Authorization: "Bearer abc123",
         },
       },
     );
@@ -335,14 +328,11 @@ describe("POST /generations/sentences", () => {
     });
   });
   test("valid input should return JSON stringified response with correct key values", async () => {
-    mock.fn(authenticateToken, () => {return 200});
-    mock.fn(authorizeToken, () => {return "default"});
     const word = "être";
     const userId = "default";
     const cardId = "93960a65-ce5e-4d4d-ba2a-8d9e8eeb57d9";
     const languageMode = "French";
     const languageLevel = "C2";
-    const timeStamp = Date.now();
     const expectedResult = {
       word: `${word}`,
       sampleSentence: `Example sentence using ${word} in ${languageMode}} at level ${languageLevel}`,
@@ -369,11 +359,11 @@ describe("POST /generations/sentences", () => {
       };
     });
     const response = await fetch(
-      `http://localhost:${PORT}/generations/sentences?word=${word}&lang_mode=${languageMode}&lang_level=${languageLevel}&userId=${userId}&cardId=${cardId}&timestamp=${timeStamp}`,
+      `http://localhost:${PORT}/generations/sentences?word=${word}&lang_mode=${languageMode}&lang_level=${languageLevel}&userId=${userId}&cardId=${cardId}&timeStamp=123`,
       {
         headers: {
           "Content-Type": "application/json",
-          "Authorization": "Bearer abc123",
+          Authorization: "Bearer abc123",
         },
       },
     ).catch((err) => {

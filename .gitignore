@@ -35,6 +35,8 @@ built
 kubernetes/**/secrets/
 backend-config.yaml
 frontend-config.yaml
+kubernetes/eks/deploy/backend.yaml 
+kubernetes/eks/deploy/frontend.yaml 
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*

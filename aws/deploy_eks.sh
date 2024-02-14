@@ -16,5 +16,6 @@ kubectl apply -f ../kubernetes/eks/svc/backend.yaml
 kubectl apply -f ../kubernetes/eks/svc/frontend.yaml  
 
 # Create nginx ingress
+# TODO: Try AWS native load balancer https://kubernetes-sigs.github.io/aws-load-balancer-controller/v2.4/examples/echo_server/
 kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/controller-v1.8.2/deploy/static/provider/aws/deploy.yaml
 kubectl apply -f ../kubernetes/eks/ing/main-ingress.yaml   

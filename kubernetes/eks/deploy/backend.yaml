@@ -1,0 +1,42 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: backend-deployment
+  labels:
+    app: backend
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: backend
+  template:
+    metadata:
+      labels:
+        app: backend
+    spec:
+      containers:
+        - name: backend
+          image: 659948824573.dkr.ecr.ca-central-1.amazonaws.com/ai-flash-cards/backend:latest # cherisecodes/ai-flash-cards-backend:latest
+          imagePullPolicy: Always 
+          ports:
+            - name: http
+              containerPort: 8000
+          envFrom:
+          - configMapRef:
+              name: backend-config
+          - secretRef:
+              name: api-secret
+          readinessProbe:
+            httpGet:
+              path: /service/readyz
+              port: 8000
+            periodSeconds: 5
+            failureThreshold: 2
+            initialDelaySeconds: 10
+          livenessProbe:
+            httpGet:
+              path: /service/livez
+              port: 8000
+            initialDelaySeconds: 10
+            periodSeconds: 30
+            failureThreshold: 2

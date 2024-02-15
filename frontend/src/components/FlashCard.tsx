@@ -74,6 +74,7 @@ const FlashCard = ({ cardData, setErrors, userId }: { cardData: FlashCard, setEr
     setSelected((curr) => !curr);
   };
 
+  // TODO: remove reload
   const reloadImage = (e: any) => {
     // TODO: if error indicates that the image was deleted (404), change the image to OOPS image
     if (reloadCount > 3) {

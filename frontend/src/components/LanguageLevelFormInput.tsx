@@ -11,6 +11,7 @@ const LanguageLevelFormInput = ({ languageLevelID } : { languageLevelID: string 
 
   const handleChange = (e: any) => {
     console.log(e);
+    // if language level has changed, update redux setting
     if (languageLevel !== e.target.value) {
       dispatch({ type: "update-language-level", langLevel: e.target.value });
     }

@@ -175,6 +175,7 @@ export const generateNextCard = async (
     try {
       dispatch({ type: "set-generating-text", cardId: cardId, isGenerating: true });
       const cardData = await getNewCardData(dispatch, word, languageMode, languageLevel, userId, cardId, timeStamp)
+      // delete card if sample sentence was not successfully generated
       if (typeof(cardData.sampleSentence) == 'undefined') {
         dispatch({
           type: "delete-card",

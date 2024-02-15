@@ -6,7 +6,6 @@ import { v4 as uuidv4 } from "uuid";
 const PORT = process.env.VITE_BACKEND_PORT;
 const BACKEND_DOMAIN = process.env.VITE_BACKEND_HOST;
 const SECURE_TRANSPORT = (PORT == "443") ? "s" : ""; 
-const DOMAIN_PREFIX = (PORT == "443") ? "/backend" : ""; 
 
 const getNewCardText = async (word: string, languageMode: string, languageLevel: string, userId: string, cardId: string, timeStamp: number) => {
 

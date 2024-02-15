@@ -60,11 +60,8 @@ jobs:
           password: ${{ secrets.DOCKERHUB_TOKEN }}
       - name: CompareAndPush
         run: |
-          local_image_hash=$(docker inspect --type=image cherisecodes/ai-flash-cards-frontend -f '{{index .RepoDigests 0}}' | awk '{split($0,a,"@"); print a[1]}')
-          remote_image_hash=$(docker inspect --type=image docker.io/cherisecodes/ai-flash-cards-frontend -f '{{index .RepoDigests 0}}' | awk '{split($0,a,"@"); print a[1]}')
-          echo $(docker inspect --type=image cherisecodes/ai-flash-cards-frontend)
-          echo $local_image_hash
-          echo $remote_image_hash
+          local_image_hash=$(docker inspect --type=image cherisecodes/ai-flash-cards-frontend -f '{{ .Id }}')
+          remote_image_hash=$(docker inspect --type=image docker.io/cherisecodes/ai-flash-cards-frontend -f '{{ .Id }}')
           if [[ "$local_image_hash" != "$remote_image_hash" ]];
           then
             docker push cherisecodes/ai-flash-cards-frontend:latest

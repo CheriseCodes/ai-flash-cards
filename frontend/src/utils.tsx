@@ -1,13 +1,8 @@
 import { AnyAction } from "@reduxjs/toolkit";
-import { deepStrictEqual } from "assert";
 import { Dispatch, SetStateAction } from "react";
 import { v4 as uuidv4 } from "uuid";
 
 // TODO: Stop updating card data object directly... only update with update-card reducer
-const PORT = process.env.VITE_BACKEND_PORT;
-const BACKEND_DOMAIN = process.env.VITE_BACKEND_HOST;
-const SECURE_TRANSPORT = (PORT == "443") ? "s" : ""; 
-const DOMAIN_PREFIX = (PORT == "443") ? "/backend" : ""; 
 
 const getNewCardText = async (word: string, languageMode: string, languageLevel: string, userId: string, cardId: string, timeStamp: number) => {
 
@@ -165,7 +160,7 @@ export const generateNewCard = async (
     }
 };
 
-
+// Update an existing card with a new generation
 export const generateNextCard = async (
   dispatch: Dispatch<AnyAction>,
   word: string,
@@ -180,6 +175,7 @@ export const generateNextCard = async (
     try {
       dispatch({ type: "set-generating-text", cardId: cardId, isGenerating: true });
       const cardData = await getNewCardData(dispatch, word, languageMode, languageLevel, userId, cardId, timeStamp)
+      // delete card if sample sentence was not successfully generated
       if (typeof(cardData.sampleSentence) == 'undefined') {
         dispatch({
           type: "delete-card",

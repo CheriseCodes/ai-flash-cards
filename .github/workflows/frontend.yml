@@ -50,7 +50,7 @@ jobs:
       - name: Build
         uses: docker/build-push-action@v5
         with:
-          context: .
+          context: ./frontend
           load: true
           tags: cherisecodes/ai-flash-cards-frontend:latest
       - name: Login to Docker Hub

@@ -160,7 +160,7 @@ export const generateNewCard = async (
     }
 };
 
-
+// Update an existing card with a new generation
 export const generateNextCard = async (
   dispatch: Dispatch<AnyAction>,
   word: string,

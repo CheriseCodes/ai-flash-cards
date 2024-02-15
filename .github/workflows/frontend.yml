@@ -62,6 +62,8 @@ jobs:
         run: |
           local_image_hash=$(docker inspect --type=image cherisecodes/ai-flash-cards-frontend -f '{{ .Id }}')
           remote_image_hash=$(docker inspect --type=image docker.io/cherisecodes/ai-flash-cards-frontend -f '{{ .Id }}')
+          echo $local_image_hash
+          echo $remote_image_hash
           if [[ "$local_image_hash" != "$remote_image_hash" ]];
           then
             docker push cherisecodes/ai-flash-cards-frontend:latest

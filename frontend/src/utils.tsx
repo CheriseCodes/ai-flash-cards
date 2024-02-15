@@ -4,7 +4,6 @@ import { v4 as uuidv4 } from "uuid";
 
 // TODO: Stop updating card data object directly... only update with update-card reducer
 const PORT = process.env.VITE_BACKEND_PORT;
-const BACKEND_DOMAIN = process.env.VITE_BACKEND_HOST;
 
 const getNewCardText = async (word: string, languageMode: string, languageLevel: string, userId: string, cardId: string, timeStamp: number) => {
 

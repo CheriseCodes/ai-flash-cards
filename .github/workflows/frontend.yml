@@ -61,7 +61,8 @@ jobs:
       - name: CompareAndPush
         run: |
           local_image_hash="${{ steps.Build.outputs.digest }}"
-          remote_image_hash=$(docker inspect --type=image docker.io/cherisecodes/ai-flash-cards-frontend -f '{{index .RepoDigests 0}}' | awk '{split($0,a,"@"); print a[2]}')
+          remote_image_hash=$(docker inspect --type=image docker.io/cherisecodes/ai-flash-cards-frontend)
+          echo $remote_image_hash
           if [[ "$local_image_hash" != "$remote_image_hash" ]];
           then
             echo "Pushing latest image..."

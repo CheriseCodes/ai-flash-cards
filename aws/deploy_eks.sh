@@ -1,3 +1,4 @@
+# Create a standard cluster with all required components
 eksctl create cluster --name ai-flash-cards-cluster --region ca-central-1 --fargate
 eksctl create iamidentitymapping \
     --cluster ai-flash-cards-cluster \

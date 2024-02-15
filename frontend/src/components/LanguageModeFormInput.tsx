@@ -9,6 +9,7 @@ const LanguageModeFormInput = ({ languageModeID } : { languageModeID: string }) 
   const handleChange = (e: any) => {
     console.log(e);
     console.log(`LanguageModeFormInput.handleChange - ${languageMode}`);
+    // If language mode changes, update redux
     if (languageMode !== e.target.value) {
       console.log(`setting language mode to: ${e.target.value}`);
       dispatch({ type: "update-language-mode", langMode: e.target.value });

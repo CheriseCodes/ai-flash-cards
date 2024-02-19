@@ -3,7 +3,11 @@ kind: Ingress
 metadata:
   name: main-ingress
   annotations:
-    nginx.ingress.kubernetes.io/rewrite-target: /$1
+    kubernetes.io/ingress.class: alb
+    alb.ingress.kubernetes.io/group.name: ai-flash-cards-ingress-group
+    alb.ingress.kubernetes.io/load-balancer-name: ai-flash-cards-load-balancer
+    alb.ingress.kubernetes.io/scheme: internet-facing
+    alb.ingress.kubernetes.io/target-type: instance
 spec:
   rules:
   - host: ai-flash-cards-feb-4-2024.info

@@ -1,8 +1,11 @@
 # Create an EKS cluster
-eksctl create cluster --name ai-flash-cards --region ca-central-1 --nodegroup-name node-group --node-type t3.small --nodes 1 --nodes-min 1 --nodes-max 1 --managed
+cluster_name=ai-flash-cards
+# Min instance size is t3.medium
+eksctl create cluster --name $cluster_name --region ca-central-1 --nodegroup-name node-group --node-type t3.medium --nodes 1 --nodes-min 1 --nodes-max 1 --managed
 
 # Create config maps
 kubectl apply -f ../kubernetes/eks/configmap/backend-config.yaml     
+kubectl apply -f ../kubernetes/eks/configmap/frontend-config.yaml   
 
 # Create secrets
 kubectl apply -f ../kubernetes/eks/secrets/api-secret.yaml  
@@ -15,7 +18,39 @@ kubectl apply -f ../kubernetes/eks/deploy/frontend.yaml
 kubectl apply -f ../kubernetes/eks/svc/backend.yaml    
 kubectl apply -f ../kubernetes/eks/svc/frontend.yaml  
 
-# Create nginx ingress
-# TODO: Try AWS native load balancer https://kubernetes-sigs.github.io/aws-load-balancer-controller/v2.4/examples/echo_server/
-kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/controller-v1.8.2/deploy/static/provider/aws/deploy.yaml
+# Install AWS Load Balancer Controller add-on
+# create new IAM OIDC provider
+eksctl utils associate-iam-oidc-provider --cluster $cluster_name --approve 
+curl -O https://raw.githubusercontent.com/kubernetes-sigs/aws-load-balancer-controller/v2.5.4/docs/install/iam_policy.json # download policy template for controller
+# create the policy using downloaded template
+aws iam create-policy \
+    --policy-name AWSLoadBalancerControllerIAMPolicy \
+    --policy-document file://iam_policy.json 
+# create eks service account
+eksctl create iamserviceaccount \
+  --cluster=$cluster_name \
+  --namespace=kube-system \
+  --name=aws-load-balancer-controller \
+  --role-name AmazonEKSLoadBalancerControllerRole \
+  --attach-policy-arn=arn:aws:iam::$AWS_ACCOUNT_ID:policy/AWSLoadBalancerControllerIAMPolicy \
+  --approve 
+# instll cert manager
+kubectl apply \
+    --validate=false \
+    -f https://github.com/jetstack/cert-manager/releases/download/v1.13.3/cert-manager.yaml
+# download controller spec
+curl -Lo v2_5_4_full.yaml https://github.com/kubernetes-sigs/aws-load-balancer-controller/releases/download/v2.5.4/v2_5_4_full.yaml 
+# modify the controller spec if downloaded v2_5_4
+sed -i.bak -e '596,604d' ./v2_5_4_full.yaml
+# (optional) use privately uploaded aws-load-balancer-controller image
+# sed -i.bak -e 's|public.ecr.aws/eks/aws-load-balancer-controller|$AWS_ACCOUNT_ID.dkr.ecr.region-code.amazonaws.com/eks/aws-load-balancer-controller|' ./v2_5_4_full.yaml
+
+# install load balancer controller
+kubectl apply -f v2_5_4_full.yaml
+
+# install load balancer controller ingress class
+curl -Lo v2_5_4_ingclass.yaml https://github.com/kubernetes-sigs/aws-load-balancer-controller/releases/download/v2.5.4/v2_5_4_ingclass.yaml
+kubectl apply -f v2_5_4_ingclass.yaml
+
+# create new ingress
 kubectl apply -f ../kubernetes/eks/ing/main-ingress.yaml   

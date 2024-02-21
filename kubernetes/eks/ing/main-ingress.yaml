@@ -3,24 +3,24 @@ kind: Ingress
 metadata:
   name: main-ingress
   annotations:
-    spec.ingressClassName: alb
     alb.ingress.kubernetes.io/group.name: ai-flash-cards-ingress-group
     alb.ingress.kubernetes.io/load-balancer-name: ai-flash-cards-load-balancer
     alb.ingress.kubernetes.io/scheme: internet-facing
     alb.ingress.kubernetes.io/target-type: instance
 spec:
+  ingressClassName: alb
   rules:
   - http:
       paths:
       - path: /?(.*)
-        pathType: ImplementationSpecific
+        pathType: Prefix
         backend:
           service:
             name: frontend-service
             port:
               number: 80
       - path: /backend/?(.*)
-        pathType: ImplementationSpecific
+        pathType: Prefix
         backend:
           service:
             name: backend-service

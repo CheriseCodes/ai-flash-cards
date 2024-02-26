@@ -78,4 +78,4 @@ kubectl apply -f ../kubernetes/eks/ing/main-ingress.yaml
 #   --default-actions Type=forward,TargetGroupArn="arn:aws:elasticloadbalancing:$AWS_REGION:$AWS_ACCOUNT_ID:targetgroup/k8s-default-frontend"
 #   --ssl-policy ELBSecurityPolicy-TLS13-1-2-2021-06
 
-rm iam_policy.json v2_5_4_full.yaml v2_5_4_full.yaml.bak v2_5_4_ingclass.yaml
+rm iam_policy.json v2_5_4_full.yaml v2_5_4_full.yaml.bak v2_5_4_ingclass.yaml aws-load-balancer-webhook-service.yaml aws-load-balancer-webhook-service.yaml.bak

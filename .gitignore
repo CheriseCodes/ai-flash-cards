@@ -32,6 +32,7 @@ built
 .env.production.local
 
 # security
+private-main-ingress.yaml
 kubernetes/**/secrets/
 backend-config.yaml
 frontend-config.yaml

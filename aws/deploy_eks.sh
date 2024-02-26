@@ -1,5 +1,5 @@
 # Create an EKS cluster
-cluster_name=ai-flash-cards-v2
+cluster_name=ai-flash-cards
 # Min instance size is t3.medium
 eksctl create cluster --name $cluster_name --region ca-central-1 --nodegroup-name node-group --node-type t3.medium --nodes 1 --nodes-min 1 --nodes-max 1 --managed
 
@@ -54,9 +54,28 @@ kubectl apply -f v2_5_4_full.yaml
 curl -Lo v2_5_4_ingclass.yaml https://github.com/kubernetes-sigs/aws-load-balancer-controller/releases/download/v2.5.4/v2_5_4_ingclass.yaml
 kubectl apply -f v2_5_4_ingclass.yaml
 
-# TODO: Add script that automates this quick fix: https://github.com/kubernetes-sigs/aws-load-balancer-controller/issues/2289#issuecomment-1953389964k
+# Script that automates this fix: https://github.com/kubernetes-sigs/aws-load-balancer-controller/issues/2289#issuecomment-1953389964k
+kubectl get svc aws-load-balancer-webhook-service -n kube-system -o yaml > aws-load-balancer-webhook-service.yaml
+sed -i.bak 's/\- port\: 443/\- port\: 9443/g' aws-load-balancer-webhook-service.yaml
+kubectl apply -f aws-load-balancer-webhook-service.yaml
+kubectl get svc aws-load-balancer-webhook-service -n kube-system -o yaml > aws-load-balancer-webhook-service.yaml
+sed -i.bak 's/\- port\: 9443/\- port\: 443/g' aws-load-balancer-webhook-service.yaml
+kubectl apply -f aws-load-balancer-webhook-service.yaml
 
 # create new ingress
 kubectl apply -f ../kubernetes/eks/ing/main-ingress.yaml   
+
+# TODO: Automate adding https
+# References:
+# - https://docs.aws.amazon.com/acm/latest/userguide/gs-acm-request-public.html
+# - https://repost.aws/knowledge-center/elb-redirect-http-to-https-using-alb
+# - https://www.youtube.com/watch?v=Hh0bU3ABJyE
+# 1. Create public hosted zone with public domain name you want for the app
+# 2. Create an A record Alias that maps to the load balancer DNS name
+# aws elbv2 create-listener --name https-listener \
+#   --load-balancer-arn "arn:aws:elasticloadbalancing:$AWS_REGION:$AWS_ACCOUNT_ID:loadbalancer/app/$cluster_name-balancer" \
+#   --protocol HTTPS --port 443 \ 
+#   --default-actions Type=forward,TargetGroupArn="arn:aws:elasticloadbalancing:$AWS_REGION:$AWS_ACCOUNT_ID:targetgroup/k8s-default-frontend"
+#   --ssl-policy ELBSecurityPolicy-TLS13-1-2-2021-06
 
 rm iam_policy.json v2_5_4_full.yaml v2_5_4_full.yaml.bak v2_5_4_ingclass.yaml

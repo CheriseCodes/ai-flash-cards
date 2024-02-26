@@ -5,6 +5,8 @@
 # https://docs.docker.com/engine/reference/builder/
 
 ARG NODE_VERSION=20.8.0
+ARG NODE_ENV_VAL='test'
+ARG OPENAI_API_KEY_VAL='sk-default'
 
 ################################################################################
 # Use node image for base image for all stages.
@@ -61,8 +63,8 @@ COPY --from=deps /usr/src/app/node_modules ./node_modules
 # COPY --from=build /usr/src/app/build ./build
 
 # Set environmet variables
-ENV OPENAI_API_KEY='sk-default'
-ENV NODE_ENV='test'
+ENV OPENAI_API_KEY=${OPENAI_API_KEY_VAL}
+ENV NODE_ENV=${NODE_ENV_VAL}
 
 # Expose the port that the application listens on.
 EXPOSE 8000

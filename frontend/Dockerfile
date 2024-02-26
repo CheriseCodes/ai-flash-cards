@@ -9,6 +9,7 @@ FROM node:${NODE_VERSION}-alpine as build
 WORKDIR /app
 
 ARG BACKEND_DOMAIN=http://localhost:8000
+ARG NODE_ENV_VAL=dev
 
 # Copy package.json and package-lock.json to the working directory
 COPY package*.json ./
@@ -29,7 +30,7 @@ RUN npm run build
 FROM nginx:alpine
 
 # Set environment variables
-ENV NODE_ENV=dev
+ENV NODE_ENV=${NODE_ENV_VAL}
 
 # Copy the built React app to Nginx's web server directory
 COPY --from=build /app/dist /usr/share/nginx/html

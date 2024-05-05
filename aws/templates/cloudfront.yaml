@@ -41,12 +41,6 @@ Resources:
           TargetOriginId: OpenAIS3
           ViewerProtocolPolicy: allow-all
           CachePolicyId: 658327ea-f89d-4fab-a63d-7e88639e58f6
-          # ForwardedValues:
-          #   QueryString: true
-          #   Cookies:
-          #     Forward: none
-          #   Headers:
-          #     - Cache-Control
         Comment: "Distribute OpenAI S3 image objects"
         Enabled: true
         PriceClass: PriceClass_100

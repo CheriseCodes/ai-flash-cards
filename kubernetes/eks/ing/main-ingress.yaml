@@ -13,16 +13,17 @@ metadata:
 spec:
   ingressClassName: alb
   rules:
-  - http:
+  - host: your-domain.com
+    http:
       paths:
-      - path: /*
+      - path: /
         pathType: Prefix
         backend:
           service:
             name: frontend-service
             port:
               number: 80
-      - path: /backend/*
+      - path: /backend/
         pathType: Prefix
         backend:
           service:

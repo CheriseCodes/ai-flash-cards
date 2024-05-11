@@ -1,4 +1,4 @@
-import appConfig from "./config";
+import { languageConfig } from "./config";
 
 const reducer = (state: any, action: any) => {
   switch (action.type) {
@@ -91,9 +91,9 @@ const reducer = (state: any, action: any) => {
     }
     case "update-language-mode": {
       console.log(`update-language-mode state: ${JSON.stringify(state)}`);
-      let langLevel = appConfig.cferLanguageLevels.A1;
-      if (action.langMode === appConfig.languageModes.KOREAN) {
-        langLevel = appConfig.koreanLanguageLevels.TOPIK1;
+      let langLevel = languageConfig.cferLanguageLevels.A1;
+      if (action.langMode === languageConfig.languageModes.KOREAN) {
+        langLevel = languageConfig.koreanLanguageLevels.TOPIK1;
       }
       return {
         ...state,

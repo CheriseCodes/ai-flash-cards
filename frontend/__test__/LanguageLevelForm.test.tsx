@@ -3,7 +3,7 @@
  */
 import React from 'react';
 import { renderWithProviders } from './test-utils';
-import appConfig from "../src/config";
+import { languageConfig } from "../src/config";
 import LanguageLevelForm from '../src/components/LanguageLevelForm';
 import { it, expect } from '@jest/globals';
 
@@ -17,8 +17,8 @@ it("should be set to korean by default and have levels Topik 1-6", () => {
 it("should set levels to A1-C2 when french is selected", () => {
     const { container } = renderWithProviders(<LanguageLevelForm></LanguageLevelForm>, {preloadedState : {
         cards: [],
-        languageMode: appConfig.languageModes.FRENCH,
-        languageLevel: appConfig.cferLanguageLevels.A1,
+        languageMode: languageConfig.languageModes.FRENCH,
+        languageLevel: languageConfig.cferLanguageLevels.A1,
         selectedCards: [],
     }});
     const langLevels: NodeListOf<HTMLInputElement> = container.querySelectorAll("input[type=radio]");
@@ -35,8 +35,8 @@ it("should set levels to A1-C2 when french is selected", () => {
 it("should set levels to A1-C2 when spanish is selected", () => {
     const { container } = renderWithProviders(<LanguageLevelForm></LanguageLevelForm>, {preloadedState : {
         cards: [],
-        languageMode: appConfig.languageModes.SPANISH,
-        languageLevel: appConfig.cferLanguageLevels.A1,
+        languageMode: languageConfig.languageModes.SPANISH,
+        languageLevel: languageConfig.cferLanguageLevels.A1,
         selectedCards: [],
     }});
     const langLevels: NodeListOf<HTMLInputElement> = container.querySelectorAll("input[type=radio]");

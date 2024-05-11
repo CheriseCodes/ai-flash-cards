@@ -1,4 +1,4 @@
-const appConfig = {
+export const languageConfig: any = {
   languageModes: {
     KOREAN: "Korean",
     FRENCH: "French",
@@ -22,4 +22,27 @@ const appConfig = {
   },
 };
 
-export default appConfig;
+export const serviceConfig = {
+  BACKEND_ENDPOINT: (() => {
+    if (import.meta.env.VITE_APP_ENV == 'kubernetes.production') {
+      return 'http://TODO'
+    } else if (import.meta.env.VITE_APP_ENV == 'local.development') {
+      return 'http://localhost:3000'
+    } else if (import.meta.env.VITE_APP_ENV == 'docker.development') {
+      return 'http://localhost:3000'
+    } else if (import.meta.env.VITE_APP_ENV == 'local.production') {
+      return 'http://localhost:8000'
+    }
+  })(),
+  BACKEND_PATH: (() => {
+      if (import.meta.env.VITE_APP_ENV == 'kubernetes.production') {
+        return ''
+      } else if (import.meta.env.VITE_APP_ENV == 'local.development') {
+        return ''
+      } else if (import.meta.env.VITE_APP_ENV == 'docker.development') {
+        return ''
+      } else if (import.meta.env.VITE_APP_ENV == 'local.production') {
+        return ''
+      }
+  })()
+}

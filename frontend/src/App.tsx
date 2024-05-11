@@ -10,7 +10,9 @@ import { v4 as uuidv4 } from "uuid";
 import LoginButton from "./components/LoginButton";
 import Profile from "./components/Profile";
 
-console.log(`Backend set to ${process.env.VITE_BACKEND_DOMAIN}`)
+import { serviceConfig } from "./config";
+
+console.log(`Backend set to ${serviceConfig.BACKEND_ENDPOINT}${serviceConfig.BACKEND_PATH}`)
 
 const App = () => {
   const cards = useSelector((state: CardState) => state.cards);
@@ -31,7 +33,7 @@ const App = () => {
       if (authToken) {
         console.log("token:", authToken)
         const response = await fetch(
-          `${process.env.VITE_BACKEND_DOMAIN}/flashcards?userId=${userId}`,
+          `${serviceConfig.BACKEND_ENDPOINT}${serviceConfig.BACKEND_PATH}/flashcards?userId=${userId}`,
           {
             headers: {
               "Content-Type": "application/json",

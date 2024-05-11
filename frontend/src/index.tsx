@@ -12,7 +12,8 @@ import App from "./App";
 
 async function enableMocking() {
   console.log(`NODE_ENV is ${process.env.NODE_ENV}`)
-  if (process.env.NODE_ENV !== 'dev') {
+  console.log(`APP_ENV is ${import.meta.env.VITE_APP_ENV}`)
+  if (!((import.meta.env.VITE_APP_ENV == 'local.development') || (import.meta.env.VITE_APP_ENV == 'docker.development'))) {
     return
   }
  

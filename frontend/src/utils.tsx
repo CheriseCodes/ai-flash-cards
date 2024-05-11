@@ -2,12 +2,13 @@ import { AnyAction } from "@reduxjs/toolkit";
 import { deepStrictEqual } from "assert";
 import { Dispatch, SetStateAction } from "react";
 import { v4 as uuidv4 } from "uuid";
+import { serviceConfig } from "./config";
 
 // TODO: Stop updating card data object directly... only update with update-card reducer
-const PORT = process.env.VITE_BACKEND_PORT;
-const BACKEND_DOMAIN = process.env.VITE_BACKEND_HOST;
-const SECURE_TRANSPORT = (PORT == "443") ? "s" : ""; 
-const DOMAIN_PREFIX = (PORT == "443") ? "/backend" : ""; 
+// const PORT = import.meta.env.VITE_BACKEND_PORT;
+// const BACKEND_DOMAIN = import.meta.env.VITE_BACKEND_HOST;
+// const SECURE_TRANSPORT = (PORT == "443") ? "s" : ""; 
+// const DOMAIN_PREFIX = (PORT == "443") ? "/backend" : ""; 
 
 const getNewCardText = async (word: string, languageMode: string, languageLevel: string, userId: string, cardId: string, timeStamp: number) => {
 
@@ -18,7 +19,7 @@ const getNewCardText = async (word: string, languageMode: string, languageLevel:
       .find((row) => row.startsWith("afc_app="))
       ?.split("=")[1];
     const response = await fetch(
-      `${process.env.VITE_BACKEND_DOMAIN}/generations/sentences?word=${word}&lang_mode=${languageMode}&lang_level=${languageLevel}&userId=${userId}&cardId=${cardId}&timeStamp=${timeStamp}`,
+      `${serviceConfig.BACKEND_ENDPOINT}${serviceConfig.BACKEND_PATH}/generations/sentences?word=${word}&lang_mode=${languageMode}&lang_level=${languageLevel}&userId=${userId}&cardId=${cardId}&timeStamp=${timeStamp}`,
       {
         headers: {
           "Content-Type": "application/json",
@@ -58,7 +59,7 @@ const getNewCardImage = async (dispatch: Dispatch<AnyAction>, cardData: FlashCar
       // TODO: Just have a single BACKEND DOMAIN variable that covers http(s), root domain, port, etc.
       // TODO: Update k8s config to change this at runtime
       const imageResponse = await fetch(
-        `${process.env.VITE_BACKEND_DOMAIN}/generations/images?sentence=${cardData.translatedSampleSentence}&lang_mode=${languageMode}&word=${word}&cardId=${cardData.id}&userId=${userId}`,
+        `${serviceConfig.BACKEND_ENDPOINT}${serviceConfig.BACKEND_PATH}/generations/images?sentence=${cardData.translatedSampleSentence}&lang_mode=${languageMode}&word=${word}&cardId=${cardData.id}&userId=${userId}`,
         {
           headers: {
             "Content-Type": "application/json",
@@ -69,7 +70,7 @@ const getNewCardImage = async (dispatch: Dispatch<AnyAction>, cardData: FlashCar
       const imageJson = await imageResponse.json();
       // 3rd fetch to persist the image in s3 then update references with persisted url
       const uploadResponse = await fetch(
-        `${process.env.VITE_BACKEND_DOMAIN}/upload/image`,
+        `${serviceConfig.BACKEND_ENDPOINT}${serviceConfig.BACKEND_PATH}/upload/image`,
         {
           method: "POST",
           headers: {

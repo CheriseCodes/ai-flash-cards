@@ -14,7 +14,7 @@ export default defineConfig(({command, mode}) => {
         port: 3000, 
     },
     define: {
-        'process.env.VITE_BACKEND_DOMAIN': JSON.stringify(env.VITE_BACKEND_DOMAIN),
+        'import.meta.env.VITE_BACKEND_DOMAIN': JSON.stringify(env.VITE_BACKEND_DOMAIN),
     },
 }
 })

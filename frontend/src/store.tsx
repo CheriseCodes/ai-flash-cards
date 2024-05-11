@@ -1,5 +1,5 @@
 import reducer from "./reducer";
-import appConfig from "./config";
+import { languageConfig } from "./config";
 import { configureStore } from "@reduxjs/toolkit";
 import storage from "redux-persist/lib/storage";
 import {
@@ -24,8 +24,8 @@ const persistedReducer = persistReducer(persistConfig, reducer);
 
 const preloadedState = {
   cards: [],
-  languageMode: appConfig.languageModes.KOREAN,
-  languageLevel: appConfig.koreanLanguageLevels.TOPIK1,
+  languageMode: languageConfig.languageModes.KOREAN,
+  languageLevel: languageConfig.koreanLanguageLevels.TOPIK1,
   selectedCards: [],
   // isAuthenticated: false
 };

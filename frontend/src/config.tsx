@@ -26,22 +26,30 @@ export const serviceConfig = {
   BACKEND_ENDPOINT: (() => {
     if (import.meta.env.VITE_APP_ENV == 'kubernetes.production') {
       return 'http://TODO'
-    } else if (import.meta.env.VITE_APP_ENV == 'local.development') {
+    } else if (import.meta.env.VITE_APP_ENV == 'kubernetes.staging') {
+      return 'http://TODO'
+    } else if (import.meta.env.VITE_APP_ENV == 'kubernetes.test') {
+      return 'http://TODO'
+    } else if (import.meta.env.VITE_APP_ENV == 'kubernetes.development') {
+      return 'http://TODO'
+    } else if (import.meta.env.VITE_APP_ENV == 'docker.production') {
+      return 'http://localhost:8000'
+    } else if (import.meta.env.VITE_APP_ENV == 'docker.staging') {
+      return 'http://localhost:8000'
+    } else if (import.meta.env.VITE_APP_ENV == 'docker.test') {
       return 'http://localhost:3000'
     } else if (import.meta.env.VITE_APP_ENV == 'docker.development') {
       return 'http://localhost:3000'
-    } else if (import.meta.env.VITE_APP_ENV == 'local.production') {
-      return 'http://localhost:8000'
+    } else {
+      return 'http://localhost:3000'
     }
   })(),
   BACKEND_PATH: (() => {
-      if (import.meta.env.VITE_APP_ENV == 'kubernetes.production') {
+      if (import.meta.env.VITE_APP_ENV.includes('kubernetes')) {
         return ''
-      } else if (import.meta.env.VITE_APP_ENV == 'local.development') {
+      } else if (import.meta.env.VITE_APP_ENV.includes('docker')) {
         return ''
-      } else if (import.meta.env.VITE_APP_ENV == 'docker.development') {
-        return ''
-      } else if (import.meta.env.VITE_APP_ENV == 'local.production') {
+      } else {
         return ''
       }
   })()

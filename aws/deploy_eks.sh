@@ -32,9 +32,9 @@ eksctl create iamserviceaccount \
   --namespace=kube-system \
   --name=aws-load-balancer-controller \
   --role-name AmazonEKSLoadBalancerControllerRole \
-  --attach-policy-arn=arn:aws:iam::$AWS_ACCOUNT_ID:policy/AWSLoadBalancerControllerIAMPolicy \
+  --attach-policy-arn=arn:aws:iam::$1:policy/AWSLoadBalancerControllerIAMPolicy \
   --approve 
-# instll cert manager
+# install cert manager
 kubectl apply \
     --validate=false \
     -f https://github.com/jetstack/cert-manager/releases/download/v1.13.3/cert-manager.yaml
@@ -66,12 +66,9 @@ kubectl apply -f aws-load-balancer-webhook-service.yaml
 kubectl apply -f ../kubernetes/eks/ing/main-ingress.yaml   
 
 # TODO: Automate adding https
-# References:
-# - https://docs.aws.amazon.com/acm/latest/userguide/gs-acm-request-public.html
-# - https://repost.aws/knowledge-center/elb-redirect-http-to-https-using-alb
-# - https://www.youtube.com/watch?v=Hh0bU3ABJyE
-# 1. Create public hosted zone with public domain name you want for the app
-# 2. Create an A record Alias that maps to the load balancer DNS name
+# 1. Get domain from AWS
+# 2. Create public hosted zone with public domain name you want for the app
+# 3. Create an A record Alias that maps to the load balancer DNS name
 # aws elbv2 create-listener --name https-listener \
 #   --load-balancer-arn "arn:aws:elasticloadbalancing:$AWS_REGION:$AWS_ACCOUNT_ID:loadbalancer/app/$cluster_name-balancer" \
 #   --protocol HTTPS --port 443 \ 

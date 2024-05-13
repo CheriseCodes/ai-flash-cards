@@ -75,7 +75,6 @@ const FlashCard = ({ cardData, setErrors, userId }: { cardData: FlashCard, setEr
   };
 
   const reloadImage = (e: any) => {
-    // TODO: if error indicates that the image was deleted (404), change the image to OOPS image
     if (reloadCount > 3) {
       console.log("Hit max reloads:", reloadCount)
       e.target.src = "https://m.media-amazon.com/images/I/418Jmnejj8L.jpg";

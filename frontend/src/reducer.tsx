@@ -6,7 +6,6 @@ const currentStateSummary = (state: any) => {
     console.log(`Card #${index}: ${card}`)
   }
 }
-// TODO: Current state of cards should be exclusively stored in the database and sped up with a cache
 const reducer = (state: any, action: any) => {
   switch (action.type) {
     case "add-card": {

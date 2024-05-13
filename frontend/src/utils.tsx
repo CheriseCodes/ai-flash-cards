@@ -4,12 +4,6 @@ import { Dispatch, SetStateAction } from "react";
 import { v4 as uuidv4 } from "uuid";
 import { serviceConfig } from "./config";
 
-// TODO: Stop updating card data object directly... only update with update-card reducer
-// const PORT = process.env.VITE_BACKEND_PORT;
-// const BACKEND_DOMAIN = process.env.VITE_BACKEND_HOST;
-// const SECURE_TRANSPORT = (PORT == "443") ? "s" : ""; 
-// const DOMAIN_PREFIX = (PORT == "443") ? "/backend" : ""; 
-
 const getNewCardText = async (word: string, languageMode: string, languageLevel: string, userId: string, cardId: string, timeStamp: number) => {
 
   console.log("start getNewCardText");
@@ -56,8 +50,6 @@ const getNewCardImage = async (dispatch: Dispatch<AnyAction>, cardData: FlashCar
       ?.split("=")[1];
       cardData.generatingImage = true;
       dispatch({ type: "update-card", cardData: cardData, cardId: cardId });
-      // TODO: Just have a single BACKEND DOMAIN variable that covers http(s), root domain, port, etc.
-      // TODO: Update k8s config to change this at runtime
       const imageResponse = await fetch(
         `${serviceConfig.BACKEND_ENDPOINT}${serviceConfig.BACKEND_PATH}/generations/images?sentence=${cardData.translatedSampleSentence}&lang_mode=${languageMode}&word=${word}&cardId=${cardData.id}&userId=${userId}`,
         {
@@ -104,8 +96,6 @@ const getNewCardData = async (dispatch: Dispatch<AnyAction>, word: string, langu
   if (typeof(cardData.sampleSentence) == 'undefined') {
     return {}
   }
-  // TODO: handle failure to generate text properly
-  // promise1.then((values) => {
     console.log("getNewCardText values", cardData)
     dispatch({
     type: "update-card",
@@ -173,7 +163,7 @@ export const generateNextCard = async (
   word: string,
   languageMode: string,
   languageLevel: string,
-  cardData: FlashCard, // TODO: swap to cardId cause that's all that's used
+  cardData: FlashCard,
   setErrors: Dispatch<SetStateAction<Array<ErrorMessage>>>,
   userId: string,
 ) => {

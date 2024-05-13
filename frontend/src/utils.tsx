@@ -157,7 +157,6 @@ export const generateNewCard = async (
     }
 };
 
-
 export const generateNextCard = async (
   dispatch: Dispatch<AnyAction>,
   word: string,

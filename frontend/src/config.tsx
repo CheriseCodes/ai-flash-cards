@@ -37,11 +37,15 @@ export const serviceConfig = {
     } else if (process.env.VITE_APP_ENV == 'docker.staging') {
       return 'http://localhost:8000'
     } else if (process.env.VITE_APP_ENV == 'docker.test') {
-      return 'http://localhost:3000'
+      return 'http://localhost'
     } else if (process.env.VITE_APP_ENV == 'docker.development') {
+      return 'http://localhost'
+    } else if (process.env.VITE_APP_ENV == 'local.test') {
+      return 'http://localhost:3000'
+    } else if (process.env.VITE_APP_ENV == 'local.development') {
       return 'http://localhost:3000'
     } else {
-      return 'http://localhost:3000'
+      return 'http://localhost'
     }
   })(),
   BACKEND_PATH: (() => {

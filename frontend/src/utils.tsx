@@ -5,8 +5,8 @@ import { v4 as uuidv4 } from "uuid";
 import { serviceConfig } from "./config";
 
 // TODO: Stop updating card data object directly... only update with update-card reducer
-// const PORT = import.meta.env.VITE_BACKEND_PORT;
-// const BACKEND_DOMAIN = import.meta.env.VITE_BACKEND_HOST;
+// const PORT = process.env.VITE_BACKEND_PORT;
+// const BACKEND_DOMAIN = process.env.VITE_BACKEND_HOST;
 // const SECURE_TRANSPORT = (PORT == "443") ? "s" : ""; 
 // const DOMAIN_PREFIX = (PORT == "443") ? "/backend" : ""; 
 
@@ -116,6 +116,7 @@ const getNewCardData = async (dispatch: Dispatch<AnyAction>, word: string, langu
   cardData = await getNewCardImage(dispatch, cardData, languageMode, languageLevel, userId, cardId, word);
   // let promise1 = Promise.resolve(cardData);
   // promise1.then((values) => {
+    console.log("Final state of getNewCardData", cardData)
     dispatch({
     type: "update-card",
     cardId: cardId,

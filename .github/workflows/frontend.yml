@@ -16,7 +16,7 @@ on:
       - "frontend/__test__/**"
 
 env:
-  NODE_ENV: "dev"
+-  NODE_ENV: "production" # testing production build behviour
 
 defaults:
  run:
@@ -36,6 +36,7 @@ jobs:
     - uses: oven-sh/setup-bun@v1
       with:
         bun-version: latest
+    - run: echo "VITE_APP_ENV=\"docker.test\"" > .env
     - run: bun install --frozen-lockfile
     - run: bun run build
     - run: bun run test

@@ -31,7 +31,7 @@ export const serviceConfig = {
     } else if (process.env.VITE_APP_ENV == 'kubernetes.test') {
       return 'http://TODO'
     } else if (process.env.VITE_APP_ENV == 'kubernetes.development') {
-      return 'http://TODO'
+      return 'https://demo.localdev.me'
     } else if (process.env.VITE_APP_ENV == 'docker.production') {
       return 'http://localhost:8000'
     } else if (process.env.VITE_APP_ENV == 'docker.staging') {
@@ -51,7 +51,7 @@ export const serviceConfig = {
   BACKEND_PATH: (() => {
     if (process.env.VITE_APP_ENV) {
       if (process.env.VITE_APP_ENV.includes('kubernetes')) {
-        return ''
+        return '/backend'
       } else if (process.env.VITE_APP_ENV.includes('docker')) {
         return ''
       } else {

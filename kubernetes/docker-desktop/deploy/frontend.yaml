@@ -1,0 +1,36 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: frontend-deployment
+  labels:
+    app: frontend
+spec:
+  replicas: 3 # Helm var
+  selector:
+    matchLabels:
+      app: frontend
+  template:
+    metadata:
+      labels:
+        app: frontend
+    spec:
+      containers:
+        - name: frontend
+          image: ai-flash-cards-frontend:0.4.0 # Helm var image and tag
+          env:
+          - name: NODE_ENV
+            valueFrom:
+              configMapKeyRef:
+                name: frontend-config
+                key: NODE_ENV
+          imagePullPolicy: Never # Helm var
+          ports:
+            - name: http
+              containerPort: 80
+          livenessProbe:
+            httpGet:
+              path: /healthz
+              port: 80
+            initialDelaySeconds: 10
+            periodSeconds: 30
+            failureThreshold: 2

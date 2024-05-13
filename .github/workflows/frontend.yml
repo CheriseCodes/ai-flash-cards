@@ -16,7 +16,7 @@ on:
       - "frontend/__test__/**"
 
 env:
--  NODE_ENV: "production" # testing production build behviour
+-  NODE_ENV: "test"
 
 defaults:
  run:

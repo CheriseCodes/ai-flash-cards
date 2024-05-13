@@ -4,13 +4,13 @@
 name: Frontend React CI
 
 on:
-  # push:
-  #   branches: [ "frontend", "fullstack-release", ]
-  #   paths:
-  #     - "frontend/src/**"
-  #     - "frontend/__test__/**"
+  push:
+    branches: [ "frontend", "fullstack-release", "frontend-release" ]
+    paths:
+      - "frontend/src/**"
+      - "frontend/__test__/**"
   pull_request:
-    branches: [ "main" , "fullstack-release", "frontend-release" ]
+    branches: [ "main" ]
     paths:
       - "frontend/src/**"
       - "frontend/__test__/**"

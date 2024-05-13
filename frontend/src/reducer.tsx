@@ -1,17 +1,25 @@
 import { languageConfig } from "./config";
 
+const currentStateSummary = (state: any) => {
+  console.log(`# of cards is ${state.cards.length}`)
+  for (let [index, card] of state.cards.entries()) {
+    console.log(`Card #${index}: ${card}`)
+  }
+}
+// TODO: Current state of cards should be exclusively stored in the database and sped up with a cache
 const reducer = (state: any, action: any) => {
   switch (action.type) {
     case "add-card": {
-      console.log(`add-card state: ${JSON.stringify(state)}`);
-      return {
+      const newState = {
         ...state,
         cards: [...state.cards, ...[JSON.stringify(action.cardData)]],
-      };
+      }
+      console.log("add-card state:");
+      currentStateSummary(newState)
+      return newState;
     }
     case "update-card": {
-      console.log(`update-card state: ${JSON.stringify(state)}`);
-      return {
+      const newState = {
         ...state,
         cards: state.cards.map((item: string) => {
           if (item.includes(action.cardId)) {
@@ -19,19 +27,24 @@ const reducer = (state: any, action: any) => {
           }
           return item;
         }),
-      };
+      }
+      console.log("update-card state:");
+      currentStateSummary(newState)
+      return newState;
     }
     case "delete-card": {
-      console.log(`delete-card state: ${JSON.stringify(state)}`);
-      return {
+      const newState = {
         ...state,
         cards: state.cards.filter((prevCardData: string) => {
           return !prevCardData.includes(action.cardId);
         }),
-      };
+      }
+      console.log("delete-card state");
+      currentStateSummary(newState)
+      return newState;
     }
     case "toggle-generating-text": {
-      return {
+      const newState = {
         ...state,
         cards: state.cards.map((item: string) => {
           if (item.includes(action.cardId)) {
@@ -41,7 +54,8 @@ const reducer = (state: any, action: any) => {
           }
           return item;
         }),
-      };
+      }
+      return newState;
     }
     case "toggle-generating-image": {
       return {
@@ -83,23 +97,27 @@ const reducer = (state: any, action: any) => {
       };
     }
     case "update-language-level": {
-      console.log(`update-language-level state: ${JSON.stringify(state)}`);
-      return {
+      const newState = {
         ...state,
         languageLevel: action.langLevel,
-      };
+      }
+      console.log("update-language-level state:");
+      currentStateSummary(newState)
+      return newState;
     }
     case "update-language-mode": {
-      console.log(`update-language-mode state: ${JSON.stringify(state)}`);
       let langLevel = languageConfig.cferLanguageLevels.A1;
       if (action.langMode === languageConfig.languageModes.KOREAN) {
         langLevel = languageConfig.koreanLanguageLevels.TOPIK1;
       }
-      return {
+      const newState = {
         ...state,
         languageLevel: langLevel,
         languageMode: action.langMode,
-      };
+      }
+      console.log("update-language-mode state:");
+      currentStateSummary(newState)
+      return newState;
     }
     case "add-selected-card": {
       return {

@@ -1,6 +1,6 @@
 INGRESS_HOST=$1
 
-# Deplot config and secrets
+# Deploy config and secrets
 kubectl create -f configmap/frontend-config.yaml
 kubectl create -f configmap/backend-config.yaml
 kubectl create -f secrets/api-secret.yaml

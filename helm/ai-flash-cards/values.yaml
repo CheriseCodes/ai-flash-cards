@@ -80,6 +80,12 @@ backend:
       appEnv: kubernetes.production
   secret:
     name: api-secret
+    type: Opaque
+    data:
+      awsAccessKeyId: ""
+      awsSecretAccessKey: ""
+      awsSessionToken: ""
+      openaiApiKet: ""
   resources: {}
   volumeMounts: []
   volumes: []

@@ -72,6 +72,12 @@ backend:
     failureThreshold: 2
   config:
     name: backend-config
+    data:
+      awsDefaultRegion: ""
+      bucketName: ""
+      cloudfrontUrl: ""
+      nodeEnv: production
+      appEnv: kubernetes.production
   secret:
     name: api-secret
   resources: {}

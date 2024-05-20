@@ -43,6 +43,51 @@ frontend:
   podLabels: {}
   podSecurityContext: {}
 
+backend:
+  image:
+    registry: ""
+    repository: ai-flash-cards-backend
+    pullPolicy: Never
+    # Overrides the image tag whose default is the chart appVersion.
+    tag: ""
+  service:
+    type: ClusterIP
+    targetPort: 8000
+    port: 8000
+  readinessProbe:
+    httpGet:
+      path: /service/readyz
+      port: 8000
+    initialDelaySeconds: 10
+    periodSeconds: 5
+    failureThreshold: 2
+  livenessProbe:
+    httpGet:
+      path: /service/livez
+      port: 8000
+    initialDelaySeconds: 10
+    periodSeconds: 30
+    failureThreshold: 2
+  config:
+    name: backend-config
+  secret:
+    name: api-secret
+  resources: {}
+  volumeMounts: []
+  volumes: []
+  nodeSelector: {}
+  tolerations: []
+  affinity: {}
+  autoscaling:
+    enabled: false
+    minReplicas: 1
+    maxReplicas: 100
+    targetCPUUtilizationPercentage: 80
+  replicaCount: 3
+  podAnnotations: {}
+  podLabels: {}
+  podSecurityContext: {}
+
 imagePullSecrets: []
 nameOverride: ""
 fullnameOverride: ""

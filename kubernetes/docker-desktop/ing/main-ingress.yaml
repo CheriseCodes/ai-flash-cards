@@ -1,0 +1,35 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: main-ingress
+  annotations:
+    nginx.ingress.kubernetes.io/use-regex: 'true'
+    nginx.ingress.kubernetes.io/rewrite-target: /$1
+    # nginx.ingress.kubernetes.io/rewrite-target: /$1 # Helm var, annotations vary drastically between ingresses
+spec:
+  ingressClassName: nginx
+  tls:
+  - hosts:
+    - demo.localdev.me
+    secretName: nginx-ingress-cert
+  rules:
+  # Helm var for host, if none assigned, then it defaults to localhost
+  - host: demo.localdev.me
+    http:
+      paths:
+      - path: /?(.*) # Helm var
+        # pathType: Prefix
+        pathType: ImplementationSpecific # Helm var
+        backend:
+          service:
+            name: frontend-service
+            port:
+              number: 80 # Helm var
+      - path: /backend/?(.*) # Helm var
+        # pathType: Exact
+        pathType: ImplementationSpecific # Helm var
+        backend:
+          service:
+            name: backend-service
+            port:
+              number: 8000 # Helm var

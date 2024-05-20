@@ -1,6 +1,6 @@
 import React from "react";
 import PropTypes from "prop-types";
-import appConfig from "../config";
+import { languageConfig } from "../config";
 
 import { useSelector, useDispatch } from "react-redux";
 
@@ -28,7 +28,7 @@ const LanguageLevelFormInput = ({ languageLevelID } : { languageLevelID: string 
         onChange={handleChange}
       ></input>
       <label htmlFor={languageLevelID.toLowerCase()}>
-        {languageMode === appConfig.languageModes.KOREAN
+        {languageMode === languageConfig.languageModes.KOREAN
           ? `${languageLevelID.slice(0, -1)} ${languageLevelID.slice(-1)}`
           : languageLevelID}
       </label>

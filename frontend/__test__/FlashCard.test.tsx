@@ -31,7 +31,7 @@ it("should have the correct values for a valid flashcard", () => {
 });
 it("should display loading spinner when image is being generated", () => {
     const id = "abc123";
-    const cardData: FlashCard = {
+    const cardData: any = {
                         id: id, 
                         generatingText: false,
                         generatingImage: true,
@@ -48,7 +48,7 @@ it("should display loading spinner when image is being generated", () => {
 });
 it("should display loading spinner when text is being generated", () => {
     const id = "abc123";
-    const cardData: FlashCard = {
+    const cardData: any = {
                         id: id, 
                         generatingText: true,
                         generatingImage: false,

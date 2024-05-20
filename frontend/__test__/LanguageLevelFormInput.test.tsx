@@ -3,15 +3,15 @@
  */
 import React from 'react';
 import { renderWithProviders } from './test-utils';
-import appConfig from "../src/config";
+import { languageConfig } from "../src/config";
 import LanguageLevelFormInput from '../src/components/LanguageLevelFormInput';
 import { it, expect } from '@jest/globals';
 
 it("should parse TOPIK levels correctly", () => {
-    const { container } = renderWithProviders(<LanguageLevelFormInput languageLevelID={appConfig.koreanLanguageLevels.TOPIK1}></LanguageLevelFormInput>, {preloadedState : {
+    const { container } = renderWithProviders(<LanguageLevelFormInput languageLevelID={languageConfig.koreanLanguageLevels.TOPIK1}></LanguageLevelFormInput>, {preloadedState : {
         cards: [],
-        languageMode: appConfig.languageModes.KOREAN,
-        languageLevel: appConfig.koreanLanguageLevels.TOPIK1,
+        languageMode: languageConfig.languageModes.KOREAN,
+        languageLevel: languageConfig.koreanLanguageLevels.TOPIK1,
         selectedCards: [],
     }});
     const inputEl: HTMLInputElement | null = container.querySelector("input")
@@ -23,10 +23,10 @@ it("should parse TOPIK levels correctly", () => {
     expect(inputEl!.value).toBe("TOPIK1")
 });
 it("should parse CFER levels correctly", () => {
-    const { container } = renderWithProviders(<LanguageLevelFormInput languageLevelID={appConfig.cferLanguageLevels.A1}></LanguageLevelFormInput>, {preloadedState : {
+    const { container } = renderWithProviders(<LanguageLevelFormInput languageLevelID={languageConfig.cferLanguageLevels.A1}></LanguageLevelFormInput>, {preloadedState : {
         cards: [],
-        languageMode: appConfig.languageModes.FRENCH,
-        languageLevel: appConfig.cferLanguageLevels.A1,
+        languageMode: languageConfig.languageModes.FRENCH,
+        languageLevel: languageConfig.cferLanguageLevels.A1,
         selectedCards: [],
     }});
     const inputEl: HTMLInputElement | null = container.querySelector("input")

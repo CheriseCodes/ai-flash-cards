@@ -7,22 +7,26 @@ const Profile = () => {
   let profileData = (<div></div>);
   useEffect(() => {
     const getUserMetadata = async () => {
-      try {
-        const accessToken = await getAccessTokenSilently();
-        if (accessToken) {
-          console.log("got access token");
-          // TODO: Store cookie securely with HttpOnly and/or Secure settings
-          document.cookie = `afc_app=${accessToken}; SameSite=Lax`;
-        } else {
-          console.error("didn't get access token")
+      if (process.env.VITE_APP_ENV) {
+        if (process.env.VITE_APP_ENV.includes("production")) {
+          try {
+            const accessToken = await getAccessTokenSilently();
+            if (accessToken) {
+              console.log("got access token");
+              // TODO: Store cookie securely with HttpOnly and/or Secure settings
+              document.cookie = `afc_app=${accessToken}; SameSite=Lax`;
+            } else {
+              console.error("didn't get access token")
+            }
+              
+            } catch (e: any) {
+              console.log(e.message);
+            }
+            };
+          
+            getUserMetadata();
         }
-        
-      } catch (e: any) {
-        console.log(e.message);
       }
-    };
-  
-    getUserMetadata();
   }, [getAccessTokenSilently, user?.sub]);
 
   if (user) {

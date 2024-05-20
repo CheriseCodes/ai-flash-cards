@@ -32,6 +32,8 @@ built
 .env.production.local
 
 # security
+*.crt
+*.key
 *-ignore.*
 kubernetes/**/secrets/
 backend-config.yaml

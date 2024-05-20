@@ -11,5 +11,5 @@ spec:
     - name: wget
       image: busybox
       command: ['wget']
-      args: ['{{ include "ai-flash-cards.fullname" . }}:{{ .Values.frontend.service.port }}']
+      args: ['ai-flash-cards-{{ .Values.frontend.service.name }}:{{ .Values.frontend.service.port }}']
   restartPolicy: Never

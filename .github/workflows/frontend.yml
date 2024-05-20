@@ -16,7 +16,7 @@ on:
       - "frontend/__test__/**"
 
 env:
--  NODE_ENV: "test"
+  NODE_ENV: "test"
 
 defaults:
  run:

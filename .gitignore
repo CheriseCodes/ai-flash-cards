@@ -38,3 +38,5 @@ frontend-config.yaml
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
+ingress_patch.json
+kubernetes/docker-desktop/kustomization.yaml

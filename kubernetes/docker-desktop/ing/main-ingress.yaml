@@ -11,7 +11,7 @@ spec:
   tls:
   - hosts:
     - demo.localdev.me
-    secretName: ingress-cert
+    secretName: nginx-ingress-cert
   rules:
   # Helm var for host, if none assigned, then it defaults to localhost
   - host: demo.localdev.me

@@ -59,7 +59,6 @@ describe("GET /flashcards", () => {
         },
       },
     );
-    console.log(response);
     const json = await response.json();
     assert.deepStrictEqual(json, { cards: queryResult.Items });
   });

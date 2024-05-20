@@ -29,6 +29,8 @@
 **/secrets.dev.yaml
 **/values.dev.yaml
 **/build
+**/built
 **/dist
+**/private
 LICENSE
 README.md

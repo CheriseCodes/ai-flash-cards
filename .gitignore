@@ -13,13 +13,13 @@ notes.txt
 sample_sentences_data.json
 test_import.txt
 /aws/ignore/
-helm*/
 ai-code-review.yml
 .nginx/
 reverse_proxy/
 # production
 build
 dist
+kubernetes/eks
 
 # typescript
 built
@@ -32,12 +32,24 @@ built
 .env.production.local
 
 # security
+<<<<<<< HEAD
 private-main-ingress.yaml
 kubernetes/**/secrets/
 backend-config.yaml
 frontend-config.yaml
 kubernetes/eks/deploy/backend.yaml 
 kubernetes/eks/deploy/frontend.yaml 
+=======
+*.crt
+*.key
+*-ignore.*
+kubernetes/**/secrets/
+backend-config.yaml
+frontend-config.yaml
+!helm/**/*-config.yaml
+>>>>>>> b88ad810d622f1b897f3a15e36b47983a643708a
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
+ingress_patch.json
+kubernetes/docker-desktop/kustomization.yaml

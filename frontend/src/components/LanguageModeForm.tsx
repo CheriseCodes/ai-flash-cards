@@ -1,5 +1,5 @@
 import React from "react";
-import appConfig from "../config";
+import { languageConfig } from "../config";
 
 import LanguageModeFormInput from "./LanguageModeFormInput";
 
@@ -10,13 +10,13 @@ const LanguageModeForm = () => {
       <form>
         <div className="language-mode-container">
           <LanguageModeFormInput
-            languageModeID={appConfig.languageModes.KOREAN}
+            languageModeID={languageConfig.languageModes.KOREAN}
           />
           <LanguageModeFormInput
-            languageModeID={appConfig.languageModes.FRENCH}
+            languageModeID={languageConfig.languageModes.FRENCH}
           />
           <LanguageModeFormInput
-            languageModeID={appConfig.languageModes.SPANISH}
+            languageModeID={languageConfig.languageModes.SPANISH}
           />
         </div>
       </form>

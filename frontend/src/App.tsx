@@ -10,7 +10,9 @@ import { v4 as uuidv4 } from "uuid";
 import LoginButton from "./components/LoginButton";
 import Profile from "./components/Profile";
 
-console.log(`Backend set to ${process.env.VITE_BACKEND_DOMAIN}`)
+import { serviceConfig } from "./config";
+
+console.log(`Backend set to ${serviceConfig.BACKEND_ENDPOINT}${serviceConfig.BACKEND_PATH}`)
 
 const App = () => {
   const cards = useSelector((state: CardState) => state.cards);
@@ -31,7 +33,7 @@ const App = () => {
       if (authToken) {
         console.log("token:", authToken)
         const response = await fetch(
-          `${process.env.VITE_BACKEND_DOMAIN}/flashcards?userId=${userId}`,
+          `${serviceConfig.BACKEND_ENDPOINT}${serviceConfig.BACKEND_PATH}/flashcards?userId=${userId}`,
           {
             headers: {
               "Content-Type": "application/json",
@@ -44,11 +46,6 @@ const App = () => {
         }
         const json = await response.json()
         console.log("/flashcards", JSON.stringify(json))
-        // TODO: check if the ids of the returned results don't match what is currently shown
-  
-        // TODO: If there isn't a with ID, add the data to card data list
-  
-        // TODO: If the ID mathes cut the data doesn't overwrite backend data with frontend data
       }
     } catch (e: any) {
       const errItem = { id: uuidv4(), message: e.message };

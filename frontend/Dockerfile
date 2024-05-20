@@ -8,7 +8,8 @@ FROM node:${NODE_VERSION}-alpine as build
 # Set the working directory in the container
 WORKDIR /app
 
-ARG BACKEND_DOMAIN=http://localhost:8000
+# Set stage the image is built for
+ARG APP_ENV="kubernetes.production"
 
 # Copy package.json and package-lock.json to the working directory
 COPY package*.json ./
@@ -20,7 +21,7 @@ RUN npm install
 COPY . .
 
 # Set backend url
-RUN printf "VITE_BACKEND_DOMAIN=${BACKEND_DOMAIN}" > .env
+RUN printf "VITE_APP_ENV="${APP_ENV}"" > .env
 
 # Build the React app for production
 RUN npm run build
@@ -29,7 +30,7 @@ RUN npm run build
 FROM nginx:alpine
 
 # Set environment variables
-ENV NODE_ENV=dev
+ENV NODE_ENV=production
 
 # Copy the built React app to Nginx's web server directory
 COPY --from=build /app/dist /usr/share/nginx/html

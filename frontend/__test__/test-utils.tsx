@@ -4,15 +4,15 @@ import { configureStore } from '@reduxjs/toolkit'
 import { Provider } from 'react-redux'
 // As a basic setup, import your same slice reducers
 import reducer from '../src/reducer'
-import appConfig from '../src/config'
+import { languageConfig } from '../src/config'
 
 export function renderWithProviders(
   ui,
   {
     preloadedState = {
         cards: [],
-        languageMode: appConfig.languageModes.KOREAN,
-        languageLevel: appConfig.koreanLanguageLevels.TOPIK1,
+        languageMode: languageConfig.languageModes.KOREAN,
+        languageLevel: languageConfig.koreanLanguageLevels.TOPIK1,
         selectedCards: [],
     },
     // Automatically create a store instance if no store was passed in

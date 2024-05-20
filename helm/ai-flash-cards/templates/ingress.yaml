@@ -1,6 +1,7 @@
 {{- if .Values.ingress.enabled -}}
 {{- $fullName := include "ai-flash-cards.fullname" . -}}
 {{- $svcPort := .Values.service.port -}}
+{{- $ingressName := .Values.ingress.name -}}
 {{- if and .Values.ingress.className (not (semverCompare ">=1.18-0" .Capabilities.KubeVersion.GitVersion)) }}
   {{- if not (hasKey .Values.ingress.annotations "kubernetes.io/ingress.class") }}
   {{- $_ := set .Values.ingress.annotations "kubernetes.io/ingress.class" .Values.ingress.className}}
@@ -15,7 +16,7 @@ apiVersion: extensions/v1beta1
 {{- end }}
 kind: Ingress
 metadata:
-  name: {{ $fullName }}
+  name: {{ $fullName }}-{{ $ingressName }}
   labels:
     {{- include "ai-flash-cards.labels" . | nindent 4 }}
   {{- with .Values.ingress.annotations }}
@@ -49,9 +50,9 @@ spec:
             backend:
               {{- if semverCompare ">=1.19-0" $.Capabilities.KubeVersion.GitVersion }}
               service:
-                name: {{ $fullName }}
+                name: {{ $fullName }}-{{ .backend.service.name }}
                 port:
-                  number: {{ $svcPort }}
+                  number: {{ .backend.service.port.number }}
               {{- else }}
               serviceName: {{ $fullName }}
               servicePort: {{ $svcPort }}

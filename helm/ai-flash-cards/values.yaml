@@ -12,6 +12,7 @@ frontend:
     # Overrides the image tag whose default is the chart appVersion.
     tag: ""
   service:
+    name: backend-service
     type: ClusterIP
     targetPort: 80
     port: 80

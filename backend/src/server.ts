@@ -5,8 +5,6 @@ import cors from "cors";
 import bcrypt from "bcrypt";
 import { auth } from 'express-oauth2-jwt-bearer';
 
-// import { csrf } from 'csurf';
-
 import { open, rm } from "node:fs/promises";
 import https from "https";
 
@@ -75,7 +73,7 @@ const openAIChatCompletion = async (model, temperature, messages) => {
   return response
 }
 
-const authMiddleware = process.env.NODE_ENV == "dev" ? (req, res, next) => { console.log('Auth middleware executed'); next();} : jwtCheck;
+const authMiddleware = (process.env.APP_ENV.includes("production") || process.env.APP_ENV.includes("staging")) ? jwtCheck : (req, res, next) => { console.log('Auth middleware executed'); next();};
 
 const putItemFlashCardTable = async (userId, timeStamp, cardId, response, messages) => {
   const awsInput: PutItemCommandInput = {

@@ -5,10 +5,14 @@
 # https://docs.docker.com/engine/reference/builder/
 
 ARG NODE_VERSION=20.8.0
+# Set stage the image is built for
+ARG APP_ENV="kubernetes.production"
 
 ################################################################################
 # Use node image for base image for all stages.
 FROM node:${NODE_VERSION}-alpine as base
+ARG NODE_VERSION
+ARG APP_ENV
 
 # Set working directory for all build stages.
 WORKDIR /usr/src/app
@@ -48,6 +52,9 @@ RUN npm run build
 # where the necessary files are copied from the build stage.
 FROM base as final
 
+ARG NODE_VERSION
+ARG APP_ENV
+
 # Run the application as a non-root user.
 USER node
 
@@ -58,11 +65,11 @@ COPY . .
 # Copy the production dependencies from the deps stage and also
 # the built application from the build stage into the image.
 COPY --from=deps /usr/src/app/node_modules ./node_modules
-# COPY --from=build /usr/src/app/build ./build
+COPY --from=build /usr/src/app/built ./built
 
 # Set environmet variables
-ENV OPENAI_API_KEY='sk-default'
-ENV NODE_ENV='test'
+ENV NODE_ENV="production"
+ENV APP_ENV=$APP_ENV
 
 # Expose the port that the application listens on.
 EXPOSE 8000

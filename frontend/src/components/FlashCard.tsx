@@ -75,7 +75,6 @@ const FlashCard = ({ cardData, setErrors, userId }: { cardData: FlashCard, setEr
   };
 
   const reloadImage = (e: any) => {
-    // TODO: if error indicates that the image was deleted (404), change the image to OOPS image
     if (reloadCount > 3) {
       console.log("Hit max reloads:", reloadCount)
       e.target.src = "https://m.media-amazon.com/images/I/418Jmnejj8L.jpg";
@@ -141,7 +140,7 @@ const FlashCard = ({ cardData, setErrors, userId }: { cardData: FlashCard, setEr
               ></textarea>
               <div className="image-container">
                 {!cardData.generatingImage ? (
-                  <img height={250} width={250} src={cardData.img} crossOrigin="anonymous" alt={`Visualization of "${cardData.translatedSampleSentence}"`} onError={(process.env.NODE_ENV == "prod") ? reloadImage : () => {}} onLoad={loadedImage} hidden></img>
+                  <img height={250} width={250} src={cardData.img} crossOrigin="anonymous" alt={`Visualization of "${cardData.translatedSampleSentence}"`} onError={(process.env.VITE_APP_ENV?.includes("production")) ? reloadImage : () => {}} onLoad={loadedImage} hidden></img>
                 ) : (
                   <LoadingSpinner />
                 )}

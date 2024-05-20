@@ -32,6 +32,7 @@ built
 .env.production.local
 
 # security
+*-ignore.*
 kubernetes/**/secrets/
 backend-config.yaml
 frontend-config.yaml

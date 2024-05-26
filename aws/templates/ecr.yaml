@@ -13,3 +13,7 @@ Resources:
     Type: AWS::ECR::Repository
     Properties:
       RepositoryName: ai-flash-cards/reverse-proxy
+  LBCRepo:
+    Type: AWS::ECR::Repository
+    Properties:
+      RepositoryName: eks/aws-load-balancer-controller

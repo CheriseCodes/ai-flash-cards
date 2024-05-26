@@ -3,7 +3,7 @@ kind: ConfigMap
 metadata:
   name: backend-config
 data:
-  AWS_DEFAULT_REGION: <the region your aws resources exist in>
-  BUCKET_NAME: <your s3 bucket name>
-  CLOUDFRONT_URL: <your cloudfront url>
-  NODE_ENV: <"dev" | "staging" | "prod">
+  AWS_DEFAULT_REGION: DEFAULT_REGION
+  BUCKET_NAME: S3_BUCKET
+  CLOUDFRONT_URL: CLOUDFRONT_URL
+  NODE_ENV: NODE_ENV # should be production to keep build setting consistent

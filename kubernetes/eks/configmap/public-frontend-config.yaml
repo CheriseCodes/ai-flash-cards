@@ -3,4 +3,4 @@ kind: ConfigMap
 metadata:
   name: frontend-config
 data:
-  NODE_ENV: <"dev" | "staging" | "prod">
+  NODE_ENV: NODE_ENV # should be production to keep build setting consistent

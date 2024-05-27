@@ -7,13 +7,13 @@ metadata:
     alb.ingress.kubernetes.io/load-balancer-name: ai-flash-cards-load-balancer
     alb.ingress.kubernetes.io/scheme: internet-facing
     alb.ingress.kubernetes.io/target-type: instance
-    alb.ingress.kubernetes.io/certificate-arn: arn:aws:ca-central-1:xxxx:certificate/xxxxxx
+    alb.ingress.kubernetes.io/certificate-arn: arn:aws:acm:REGION:ACCOUNT_ID:certificate/ID
     alb.ingress.kubernetes.io/listen-ports: '[{"HTTP": 80}, {"HTTPS":443}]'
     alb.ingress.kubernetes.io/ssl-redirect: '443'
 spec:
   ingressClassName: alb
   rules:
-  - host: demo.localdev.me
+  - host: YOUR_DOMAIN
     http:
       paths:
       - path: /

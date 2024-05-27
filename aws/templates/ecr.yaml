@@ -1,5 +1,5 @@
 AWSTemplateFormatVersion: "2010-09-09"
-Description: DynamoDB resources to store data for GenAI flash card application
+Description: ECR resources to store container images for GenAI flash card application
 Resources:
   FrontendRepo:
     Type: AWS::ECR::Repository

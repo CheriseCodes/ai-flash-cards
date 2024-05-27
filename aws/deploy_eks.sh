@@ -1,6 +1,7 @@
 # Create an EKS cluster
 cluster_name=ai-flash-cards
 AWS_ACCOUNT_ID=$1
+AWS_REGION=$2
 # Min instance size is t3.medium
 eksctl create cluster --name $cluster_name --region ca-central-1 --nodegroup-name node-group --node-type t3.medium --nodes 1 --nodes-min 1 --nodes-max 1 --managed
 
@@ -44,10 +45,9 @@ sleep 120
 # download controller spec
 curl -Lo v2_7_2_full.yaml https://github.com/kubernetes-sigs/aws-load-balancer-controller/releases/download/v2.7.2/v2_7_2_full.yaml 
 # modify the controller spec if downloaded v2_7_2
-sed -i.bak -e '596,604d' ./v2_7_2_full.yaml
 sed -i.bak -e "s|your-cluster-name|$cluster_name|" ./v2_7_2_full.yaml
 # (optional) use privately uploaded aws-load-balancer-controller image
-sed -i.bak -e 's|public.ecr.aws/eks/aws-load-balancer-controller|$AWS_ACCOUNT_ID.dkr.ecr.region-code.amazonaws.com/eks/aws-load-balancer-controller|' ./v2_7_2_full.yaml
+sed -i.bak -e "s|public.ecr.aws/eks/aws-load-balancer-controller|$AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/eks/aws-load-balancer-controller|" ./v2_7_2_full.yaml
 
 # install load balancer controller
 kubectl apply -f v2_7_2_full.yaml
@@ -56,25 +56,16 @@ kubectl apply -f v2_7_2_full.yaml
 curl -Lo v2_7_2_ingclass.yaml https://github.com/kubernetes-sigs/aws-load-balancer-controller/releases/download/v2.7.2/v2_7_2_ingclass.yaml
 kubectl apply -f v2_7_2_ingclass.yaml
 
-# Script that automates this fix: https://github.com/kubernetes-sigs/aws-load-balancer-controller/issues/2289#issuecomment-1953389964k
-kubectl get svc aws-load-balancer-webhook-service -n kube-system -o yaml > aws-load-balancer-webhook-service.yaml
-sed -i.bak 's/\- port\: 443/\- port\: 9443/g' aws-load-balancer-webhook-service.yaml
-kubectl apply -f aws-load-balancer-webhook-service.yaml
-kubectl get svc aws-load-balancer-webhook-service -n kube-system -o yaml > aws-load-balancer-webhook-service.yaml
-sed -i.bak 's/\- port\: 9443/\- port\: 443/g' aws-load-balancer-webhook-service.yaml
-kubectl apply -f aws-load-balancer-webhook-service.yaml
-
 # create new ingress
 kubectl apply -f ../kubernetes/eks/ing/main-ingress.yaml   
 
-# TODO: Automate adding https
+# Manually enable TLS
 # 1. Get domain from AWS
-# 2. Create public hosted zone with public domain name you want for the app
-# 3. Create an A record Alias that maps to the load balancer DNS name
-# aws elbv2 create-listener --name https-listener \
-#   --load-balancer-arn "arn:aws:elasticloadbalancing:$AWS_REGION:$AWS_ACCOUNT_ID:loadbalancer/app/$cluster_name-balancer" \
-#   --protocol HTTPS --port 443 \ 
-#   --default-actions Type=forward,TargetGroupArn="arn:aws:elasticloadbalancing:$AWS_REGION:$AWS_ACCOUNT_ID:targetgroup/k8s-default-frontend"
-#   --ssl-policy ELBSecurityPolicy-TLS13-1-2-2021-06
+# 2. If a public hosted zone wasn't automatically created, create it
+# 3. Request an ACM cert for this domain
+# 4. Use ACM to automatically update your hosted zone to use the certificate
+# 5. Create an Alias A record that maps to the load balancer's DNS name
+# 4. Uncomment TLS annotations on main-ingress.yaml and run `kubectl replace -f main-ingress.yaml`
 
-rm iam_policy.json v2_7_2_full.yaml v2_7_2_full.yaml.bak v2_7_2_ingclass.yaml aws-load-balancer-webhook-service.yaml aws-load-balancer-webhook-service.yaml.bak
+# Uncomment to clean up downloaded manifests
+# rm iam_policy.json v2_7_2_full.yaml v2_7_2_full.yaml.bak v2_7_2_ingclass.yaml aws-load-balancer-webhook-service.yaml aws-load-balancer-webhook-service.yaml.bak

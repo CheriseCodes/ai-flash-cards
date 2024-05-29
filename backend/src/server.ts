@@ -298,44 +298,46 @@ app.post("/image", authMiddleware, async (req, res) => {
     const localFileName = `./private/images/${imgName}.png`;
     const remoteFileName = `users/${userId}/images/${imgName}.png`;
 
-    https.get(imgUrl, async (res) => {
-      const fdWrite = await open(localFileName, "w");
-      const writeStream = res.pipe(fdWrite.createWriteStream());
-      writeStream.on("finish", async () => {
-        // Read content of downloaded file
-        const fdRead = await open(localFileName);
-        // Create a stream from some character device.
-        const stream = fdRead.createReadStream();
-        stream.on("close", () => {
-          rm(localFileName);
+    if (process.env.NODE_ENV != 'test') { // don't run in test environment
+      https.get(imgUrl, async (res) => {
+        const fdWrite = await open(localFileName, "w");
+        const writeStream = res.pipe(fdWrite.createWriteStream());
+        writeStream.on("finish", async () => {
+          // Read content of downloaded file
+          const fdRead = await open(localFileName);
+          // Create a stream from some character device.
+          const stream = fdRead.createReadStream();
+          stream.on("close", () => {
+            rm(localFileName);
+          });
+          const input = {
+            // PutObjectRequest
+            Body: stream,
+            Bucket: process.env.BUCKET_NAME, // required
+            Key: remoteFileName, // required
+            ACL: ObjectCannedACL.public_read,
+            ContentType: "image/png",
+            CacheControl: "public, max-age=31536000",
+          };
+          const command = new PutObjectCommand(input);
+          await s3Client.send(command);
+          stream.close();
+          // TODO: Update DynamoDB Table with correct image link
+          const ddbInput: UpdateItemCommandInput = {
+            Key: { FlashCardId: { S: cardId } },
+            TableName: "FlashCardGenAITable",
+            UpdateExpression:
+              "SET ImageLink = :imgl",
+            ExpressionAttributeValues: {
+              ":imgl": { S: remoteFileName },
+            },
+            ReturnValues: "ALL_NEW",
+          };
+          const ddbCommand = new UpdateItemCommand(ddbInput);
+          await dynamoDbClient.send(ddbCommand);
         });
-        const input = {
-          // PutObjectRequest
-          Body: stream,
-          Bucket: process.env.BUCKET_NAME, // required
-          Key: remoteFileName, // required
-          ACL: ObjectCannedACL.public_read,
-          ContentType: "image/png",
-          CacheControl: "public, max-age=31536000",
-        };
-        const command = new PutObjectCommand(input);
-        await s3Client.send(command);
-        stream.close();
-        // TODO: Update DynamoDB Table with correct image link
-        const ddbInput: UpdateItemCommandInput = {
-          Key: { FlashCardId: { S: cardId } },
-          TableName: "FlashCardGenAITable",
-          UpdateExpression:
-            "SET ImageLink = :imgl",
-          ExpressionAttributeValues: {
-            ":imgl": { S: remoteFileName },
-          },
-          ReturnValues: "ALL_NEW",
-        };
-        const ddbCommand = new UpdateItemCommand(ddbInput);
-        await dynamoDbClient.send(ddbCommand);
       });
-    });
+    }
     const domainName = process.env.CLOUDFRONT_URL;
     // const domainName = `https://${process.env.BUCKET_NAME}.s3.ca-central-1.amazonaws.com`
     res.status(200).send({ url: `${domainName}/${remoteFileName}` });

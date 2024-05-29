@@ -5,7 +5,7 @@ name: Frontend React CI
 
 on:
   push:
-    branches: [ "frontend", "fullstack-release", "frontend-release" ]
+    branches: [ "frontend", "fullstack-release", "frontend-release" , "docker-cicd"]
     paths:
       - "frontend/src/**"
       - "frontend/__test__/**"
@@ -23,7 +23,7 @@ defaults:
   working-directory: ./frontend
 
 jobs:
-  build:
+  build-test-app:
 
     runs-on: ubuntu-latest
 

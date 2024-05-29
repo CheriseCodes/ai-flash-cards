@@ -10,6 +10,13 @@ Parameters:
     Description: Where logs will be stored
 
 Resources:
+  LoggingBucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: !Ref LogBucketName
+      OwnershipControls:
+        Rules:
+        - ObjectOwnership: BucketOwnerPreferred
   OriginAccessControl:
     Type: AWS::CloudFront::OriginAccessControl
     Properties:
@@ -30,16 +37,10 @@ Resources:
           CachedMethods: 
             - GET
             - HEAD
-          Compress: true
+          Compress: false
           TargetOriginId: OpenAIS3
           ViewerProtocolPolicy: allow-all
           CachePolicyId: 658327ea-f89d-4fab-a63d-7e88639e58f6
-          ForwardedValues:
-            QueryString: true
-            Cookies:
-              Forward: none
-            Headers:
-              - Cache-Control
         Comment: "Distribute OpenAI S3 image objects"
         Enabled: true
         PriceClass: PriceClass_100
@@ -54,5 +55,6 @@ Resources:
           IncludeCookies: true
           Prefix: cloudfront
       Tags:
-        - Key: Purpose
-          Value: Testing
+        - Key: app
+          Value: ai-flash-cards
+    DependsOn: LoggingBucket

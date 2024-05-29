@@ -1,5 +1,4 @@
 import { AnyAction } from "@reduxjs/toolkit";
-import { deepStrictEqual } from "assert";
 import { Dispatch, SetStateAction } from "react";
 import { v4 as uuidv4 } from "uuid";
 import { serviceConfig } from "./config";
@@ -157,6 +156,7 @@ export const generateNewCard = async (
     }
 };
 
+// Update an existing card with a new generation
 export const generateNextCard = async (
   dispatch: Dispatch<AnyAction>,
   word: string,
@@ -171,6 +171,7 @@ export const generateNextCard = async (
     try {
       dispatch({ type: "set-generating-text", cardId: cardId, isGenerating: true });
       const cardData = await getNewCardData(dispatch, word, languageMode, languageLevel, userId, cardId, timeStamp)
+      // delete card if sample sentence was not successfully generated
       if (typeof(cardData.sampleSentence) == 'undefined') {
         dispatch({
           type: "delete-card",

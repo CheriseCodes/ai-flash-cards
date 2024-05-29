@@ -9,11 +9,11 @@ on:
     paths:
       - "frontend/src/**"
       - "backend/src/**"
-
-defaults:
- run:
-  working-directory: ./frontend
-
+  push:
+    branches: [ "fullstack_release"]
+    paths:
+      - "frontend/src/**"
+      - "backend/src/**"
 jobs:
   build-push-docker:
     runs-on: ubuntu-latest
@@ -30,6 +30,7 @@ jobs:
       - name: Build and push
         uses: docker/build-push-action@v5
         with:
+          context: ./frontend
           build-args: APP_ENV="kubernetes.development"
           push: true
           tags: cherisecodes/ai-flash-cards-frontend:latest

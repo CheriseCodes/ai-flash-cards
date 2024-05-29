@@ -12,12 +12,10 @@ import { mockClient } from "aws-sdk-client-mock";
 import { openai, app } from "../src/server";
 import { dynamoDbClient, s3Client } from "../src/aws-clients";
 import { GetItemCommand, DeleteItemCommand } from "@aws-sdk/client-dynamodb";
-
-const PORT = 8000;
+import request from "supertest";
 
 const ddbMock = mockClient(dynamoDbClient);
 const s3Mock = mockClient(s3Client);
-let server;
 describe("GET /flashcards", () => {
   beforeEach(() => {
     ddbMock.reset();
@@ -28,11 +26,6 @@ describe("GET /flashcards", () => {
     ddbMock.restore();
     s3Mock.restore();
     mock.restoreAll();
-  });
-  before(() => {
-    server = app.listen(PORT, () =>
-      console.log("server is running on port " + PORT),
-    ); // IMPORTANT: First test should start the server
   });
   test("existent user should have non-empty cards response", async () => {
     const queryResult = {
@@ -50,17 +43,11 @@ describe("GET /flashcards", () => {
     ddbMock.onAnyCommand().resolves(queryResult);
     s3Mock.onAnyCommand().resolves({});
     const userId = "default";
-    const response = await fetch(
-      `http://localhost:${PORT}/flashcards?userId=${userId}`,
-      {
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: "Bearer abc123",
-        },
-      },
-    );
-    const json = await response.json();
-    assert.deepStrictEqual(json, { cards: queryResult.Items });
+    const response = await request(app)
+                              .get(`/flashcards?userId=${userId}`)
+                              .set("Content-Type", "application/json")
+                              .set("Authorization", "Bearer abc123")
+    assert.deepStrictEqual(response.body, { cards: queryResult.Items });
   });
   test("non-existent user should have non-empty cards response", async () => {
     const queryResult = {
@@ -69,17 +56,11 @@ describe("GET /flashcards", () => {
     ddbMock.onAnyCommand().resolves(queryResult);
     s3Mock.onAnyCommand().resolves({});
     const userId = "default";
-    const response = await fetch(
-      `http://localhost:${PORT}/flashcards?userId=${userId}`,
-      {
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: "Bearer abc123",
-        },
-      },
-    );
-    const json = await response.json();
-    assert.deepStrictEqual(json, { cards: queryResult.Items });
+    const response = await request(app)
+                              .get(`/flashcards?userId=${userId}`)
+                              .set("Content-Type", "application/json")
+                              .set("Authorization", "Bearer abc123")
+    assert.deepStrictEqual(response.body, { cards: queryResult.Items });
   });
 });
 
@@ -101,19 +82,15 @@ describe("DELETE /flashcard", () => {
     ddbMock.on(DeleteItemCommand).resolves({});
     s3Mock.onAnyCommand().resolves({});
     const cardId = "abc123";
-    const response = await fetch(`http://localhost:${PORT}/flashcard`, {
-      method: "DELETE",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: "Bearer abc123",
-      },
-      body: JSON.stringify({
-        cardId: cardId,
-        userId: "default",
-      }),
-    });
-    const json = await response.json();
-    assert.deepStrictEqual(json, { cardId: cardId });
+    const response = await request(app)
+                              .delete(`/flashcard`)
+                              .set("Content-Type", "application/json")
+                              .set("Authorization", "Bearer abc123")
+                              .send({
+                                cardId: cardId,
+                                userId: "default",
+                              })
+    assert.deepStrictEqual(response.body, { cardId: cardId });
   });
 });
 
@@ -146,17 +123,11 @@ describe("GET /generations/images", () => {
       return expectedResult;
     });
     ddbMock.onAnyCommand().resolves({});
-    const response = await fetch(
-      `http://localhost:${PORT}/generations/images?sentence=${sentence}&lang_mode=${langMode}&word=${word}&cardId=${cardId}&userId=${userId}&timeStamp=123`,
-      {
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: "Bearer abc123",
-        },
-      },
-    );
-    const json = await response.json();
-    assert.deepStrictEqual(json, expectedResult);
+    const response = await request(app)
+                              .get(`/generations/images?sentence=${sentence}&lang_mode=${langMode}&word=${word}&cardId=${cardId}&userId=${userId}&timeStamp=123`)
+                              .set("Content-Type", "application/json")
+                              .set("Authorization", "Bearer abc123")
+    assert.deepStrictEqual(response.body, expectedResult);
   });
   test("Unallowed word should return a error image", async () => {
     const word = "rentrée";
@@ -168,24 +139,18 @@ describe("GET /generations/images", () => {
     mock.method(openai.images, "generate", () => {
       return {};
     });
-    const response = await fetch(
-      `http://localhost:${PORT}/generations/images?sentence=${sentence}&lang_mode=${langMode}&word=${word}&cardId=${cardId}`,
-      {
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: "Bearer abc123",
-        },
-      },
-    );
-    const json = await response.json();
-    assert.deepStrictEqual(json, {
+    const response = await request(app)
+                              .get(`/generations/images?sentence=${sentence}&lang_mode=${langMode}&word=${word}&cardId=${cardId}`)
+                              .set("Content-Type", "application/json")
+                              .set("Authorization", "Bearer abc123")
+    assert.deepStrictEqual(response.body, {
       status: 400,
       message: "Unsupported word: rentrée",
     });
   });
 });
 
-describe("POST /upload/image", () => {
+describe("POST /image", () => {
   beforeEach(() => {
     ddbMock.reset();
     s3Mock.reset();
@@ -201,33 +166,27 @@ describe("POST /upload/image", () => {
     const languageMode = "French";
     const languageLevel = "C2";
     const imgUrl =
-      "https://www.usatoday.com/gcdn/presto/2022/05/25/USAT/719946ca-660e-4ebf-805a-2c3b7d221a85-Hero-3.jpg";
+      "https://picsum.photos/250";
     const imgName = `${cardId}-${languageMode}-${languageLevel}-123`;
     s3Mock.onAnyCommand().resolves({});
-    const response = await fetch(`http://localhost:${PORT}/image`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: "Bearer abc123",
-      },
-      body: JSON.stringify({
-        imgUrl: imgUrl,
-        imgName: imgName,
-        userId: "default",
-        cardId: cardId,
-      }),
-    });
-    const json = await response.json();
-    assert.deepStrictEqual(json, {
+    ddbMock.onAnyCommand().resolves({});
+    const response = await request(app)
+                              .post(`/image`)
+                              .set("Content-Type", "application/json")
+                              .set("Authorization", "Bearer abc123")
+                              .send({
+                                imgUrl: imgUrl,
+                                imgName: imgName,
+                                userId: "default",
+                                cardId: cardId,
+                              })
+    assert.deepStrictEqual(response.body, {
       url: `${process.env.CLOUDFRONT_URL}/users/default/images/${imgName}.png`,
     });
   });
 });
 
 describe("POST /generations/sentences", () => {
-  after(() => {
-    server.close(); // IMPORTANT: Last test should close the server
-  });
   beforeEach(() => {
     ddbMock.reset();
     s3Mock.reset();
@@ -269,17 +228,11 @@ describe("POST /generations/sentences", () => {
         ],
       };
     });
-    const response = await fetch(
-      `http://localhost:${PORT}/generations/sentences?word=${word}&lang_mode=${languageMode}&lang_level=${languageLevel}&userId=${userId}&cardId=${cardId}&timeStamp=123`,
-      {
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: "Bearer abc123",
-        },
-      },
-    );
-    const json = await response.json();
-    assert.deepStrictEqual(json, {
+    const response = await request(app)
+                              .get(`/generations/sentences?word=${word}&lang_mode=${languageMode}&lang_level=${languageLevel}&userId=${userId}&cardId=${cardId}&timeStamp=123`)
+                              .set("Content-Type", "application/json")
+                              .set("Authorization", "Bearer abc123")
+    assert.deepStrictEqual(response.body, {
       status: 400,
       message: "Invalid words: hello",
     });
@@ -290,17 +243,11 @@ describe("POST /generations/sentences", () => {
     const cardId = "93960a65-ce5e-4d4d-ba2a-8d9e8eeb57d9";
     const languageMode = "Finnish";
     const languageLevel = "YKI1";
-    const response = await fetch(
-      `http://localhost:${PORT}/generations/sentences?word=${word}&lang_mode=${languageMode}&lang_level=${languageLevel}&userId=${userId}&cardId=${cardId}&timeStamp=123`,
-      {
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: "Bearer abc123",
-        },
-      },
-    );
-    const json = await response.json();
-    assert.deepStrictEqual(json, {
+    const response = await request(app)
+                              .get(`/generations/sentences?word=${word}&lang_mode=${languageMode}&lang_level=${languageLevel}&userId=${userId}&cardId=${cardId}&timeStamp=123`)
+                              .set("Content-Type", "application/json")
+                              .set("Authorization", "Bearer abc123")
+    assert.deepStrictEqual(response.body, {
       status: 400,
       message: "Unsupported language: Finnish",
     });
@@ -311,17 +258,11 @@ describe("POST /generations/sentences", () => {
     const cardId = "93960a65-ce5e-4d4d-ba2a-8d9e8eeb57d9";
     const languageMode = "French";
     const languageLevel = "G2";
-    const response = await fetch(
-      `http://localhost:${PORT}/generations/sentences?word=${word}&lang_mode=${languageMode}&lang_level=${languageLevel}&userId=${userId}&cardId=${cardId}&timeStamp=123`,
-      {
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: "Bearer abc123",
-        },
-      },
-    );
-    const json = await response.json();
-    assert.deepStrictEqual(json, {
+    const response = await request(app)
+                              .get(`/generations/sentences?word=${word}&lang_mode=${languageMode}&lang_level=${languageLevel}&userId=${userId}&cardId=${cardId}&timeStamp=123`)
+                              .set("Content-Type", "application/json")
+                              .set("Authorization", "Bearer abc123")
+    assert.deepStrictEqual(response.body, {
       status: 400,
       message: "Invalid language level: G2",
     });
@@ -357,25 +298,12 @@ describe("POST /generations/sentences", () => {
         ],
       };
     });
-    const response = await fetch(
-      `http://localhost:${PORT}/generations/sentences?word=${word}&lang_mode=${languageMode}&lang_level=${languageLevel}&userId=${userId}&cardId=${cardId}&timeStamp=123`,
-      {
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: "Bearer abc123",
-        },
-      },
-    ).catch((err) => {
-      return new Response(new Blob(), {
-        status: err.status,
-        statusText: err.message,
-      });
-    });
-    const json = await response.json().catch((err) => {
-      return { error: err.error };
-    });
-    assert.notStrictEqual(json.content, "");
-    const parsedContent = JSON.parse(json.content);
+    const response = await request(app)
+                              .get(`/generations/sentences?word=${word}&lang_mode=${languageMode}&lang_level=${languageLevel}&userId=${userId}&cardId=${cardId}&timeStamp=123`)
+                              .set("Content-Type", "application/json")
+                              .set("Authorization", "Bearer abc123")
+    assert.notStrictEqual(response.body.content, "");
+    const parsedContent = JSON.parse(response.body.content);
     assert.deepStrictEqual(parsedContent, expectedResult);
   });
 });

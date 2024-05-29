@@ -17,6 +17,22 @@ defaults:
   working-directory: ./frontend
 
 jobs:
+  test-in-container:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+      - name: Build and test
+        uses: docker/build-push-action@v5
+        with:
+          context: ./frontend
+          build-args: APP_ENV=docker.test
+          progress: plain
+          no-cache: true
+          target: test
+          tags: cherisecodes/ai-flash-cards-frontend:latest
   build-push-docker:
     runs-on: ubuntu-latest
     steps:

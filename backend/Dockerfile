@@ -4,13 +4,14 @@
 # If you need more help, visit the Dockerfile reference guide at
 # https://docs.docker.com/engine/reference/builder/
 
-ARG NODE_VERSION=20.8.0
+ARG NODE_VERSION=22
 # Set stage the image is built for
 ARG APP_ENV="kubernetes.production"
+ARG OPENAI_API_KEY="sk-test"
 
 ################################################################################
 # Use node image for base image for all stages.
-FROM node:${NODE_VERSION}-alpine as base
+FROM node:${NODE_VERSION}-slim as base
 ARG NODE_VERSION
 ARG APP_ENV
 
@@ -46,6 +47,28 @@ RUN --mount=type=bind,source=package.json,target=package.json \
 COPY . .
 # Run the build script.
 RUN npm run build
+
+################################################################################
+# Create a new stage to test the application with minimal runtime dependencies
+# where the necessary files are copied from the build stage.
+FROM build as test
+
+ENV NODE_ENV test
+ENV OPENAI_API_KEY $OPENAI_API_KEY
+ENV BUCKET_NAME "bucket-name"
+ENV CLOUDFRONT_URL "cloudfront-url"
+ENV  AWS_PROFILE "aws-profile"
+ENV  NODE_ENV "test"
+ENV  APP_ENV $APP_ENV
+
+RUN --mount=type=bind,source=package.json,target=package.json \
+    --mount=type=bind,source=package-lock.json,target=package-lock.json \
+    --mount=type=cache,target=/root/.npm \
+    npm ci --include=dev
+USER node
+COPY . .
+# RUN npm run start &
+RUN npm run test
 
 ################################################################################
 # Create a new stage to run the application with minimal runtime dependencies

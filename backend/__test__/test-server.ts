@@ -19,6 +19,14 @@ const ddbMock = mockClient(dynamoDbClient);
 const s3Mock = mockClient(s3Client);
 let server;
 describe("GET /flashcards", () => {
+  before(() => {
+    server = app.listen(PORT, () =>
+      console.log("server is running on port " + PORT),
+    ); // IMPORTANT: First test should start the server
+  });
+  after(() => {
+    server.close(); // IMPORTANT: Last test should close the server
+  });
   beforeEach(() => {
     ddbMock.reset();
     s3Mock.reset();
@@ -84,6 +92,14 @@ describe("GET /flashcards", () => {
 });
 
 describe("DELETE /flashcard", () => {
+  before(() => {
+    server = app.listen(PORT, () =>
+      console.log("server is running on port " + PORT),
+    ); // IMPORTANT: First test should start the server
+  });
+  after(() => {
+    server.close(); // IMPORTANT: Last test should close the server
+  });
   beforeEach(() => {
     ddbMock.reset();
     s3Mock.reset();
@@ -118,6 +134,14 @@ describe("DELETE /flashcard", () => {
 });
 
 describe("GET /generations/images", () => {
+  before(() => {
+    server = app.listen(PORT, () =>
+      console.log("server is running on port " + PORT),
+    ); // IMPORTANT: First test should start the server
+  });
+  after(() => {
+    server.close(); // IMPORTANT: Last test should close the server
+  });
   beforeEach(() => {
     ddbMock.reset();
     s3Mock.reset();
@@ -186,6 +210,14 @@ describe("GET /generations/images", () => {
 });
 
 describe("POST /upload/image", () => {
+  before(() => {
+    server = app.listen(PORT, () =>
+      console.log("server is running on port " + PORT),
+    ); // IMPORTANT: First test should start the server
+  });
+  after(() => {
+    server.close(); // IMPORTANT: Last test should close the server
+  });
   beforeEach(() => {
     ddbMock.reset();
     s3Mock.reset();
@@ -201,7 +233,7 @@ describe("POST /upload/image", () => {
     const languageMode = "French";
     const languageLevel = "C2";
     const imgUrl =
-      "https://www.usatoday.com/gcdn/presto/2022/05/25/USAT/719946ca-660e-4ebf-805a-2c3b7d221a85-Hero-3.jpg";
+      "https://picsum.photos/250";
     const imgName = `${cardId}-${languageMode}-${languageLevel}-123`;
     s3Mock.onAnyCommand().resolves({});
     const response = await fetch(`http://localhost:${PORT}/image`, {
@@ -225,6 +257,11 @@ describe("POST /upload/image", () => {
 });
 
 describe("POST /generations/sentences", () => {
+  before(() => {
+    server = app.listen(PORT, () =>
+      console.log("server is running on port " + PORT),
+    ); // IMPORTANT: First test should start the server
+  });
   after(() => {
     server.close(); // IMPORTANT: Last test should close the server
   });

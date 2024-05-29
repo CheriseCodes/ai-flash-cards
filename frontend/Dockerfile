@@ -1,9 +1,9 @@
 # Use the official Node.js runtime as the base image
-ARG NODE_VERSION=20.8.0
+ARG NODE_VERSION=22
 
 ################################################################################
 # Use node image for base image for all stages.
-FROM node:${NODE_VERSION}-alpine as build
+FROM node:${NODE_VERSION}-slim as build
 
 # Set the working directory in the container
 WORKDIR /app
@@ -25,6 +25,17 @@ RUN printf "VITE_APP_ENV="${APP_ENV}"" > .env
 
 # Build the React app for production
 RUN npm run build
+
+FROM build as test
+
+ENV NODE_ENV test
+RUN --mount=type=bind,source=package.json,target=package.json \
+    --mount=type=bind,source=package-lock.json,target=package-lock.json \
+    --mount=type=cache,target=/root/.npm \
+    npm ci --include=dev
+USER node
+COPY . .
+RUN npm run test
 
 # Use Nginx as the production server
 FROM nginx:alpine

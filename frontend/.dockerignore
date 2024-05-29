@@ -5,4 +5,3 @@ dist
 **/.git
 **/.DS_Store
 **/node_modules
-__test__

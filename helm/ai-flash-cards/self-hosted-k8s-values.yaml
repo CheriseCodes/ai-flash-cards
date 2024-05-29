@@ -11,7 +11,7 @@ frontend:
     tag: ""
   service:
     name: frontend-service
-    type: ClusterIP # NodePort for EKS
+    type: ClusterIP
     targetPort: 80
     port: 80
   livenessProbe:
@@ -51,7 +51,7 @@ backend:
     tag: ""
   service:
     name: backend-service
-    type: ClusterIP # NodePort for EKS
+    type: ClusterIP
     targetPort: 8000
     port: 8000
   readinessProbe:
@@ -80,7 +80,7 @@ backend:
     name: api-secret
     type: Opaque
     data:
-      awsAccessKeyId: "" # Use Instance Profile for EKS instead
+      awsAccessKeyId: ""
       awsSecretAccessKey: ""
       awsSessionToken: ""
       openaiApiKet: ""
@@ -107,8 +107,6 @@ ingress:
   annotations:
     nginx.ingress.kubernetes.io/use-regex: 'true'
     nginx.ingress.kubernetes.io/rewrite-target: /$1
-    # kubernetes.io/ingress.class: nginx
-    # kubernetes.io/tls-acme: "true"
   hosts:
     - host: demo.localdev.me
       paths:

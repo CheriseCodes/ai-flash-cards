@@ -4,7 +4,7 @@
 name: Continuous Deployment to Docker and ECR
 
 on:
-  pull_request:
+  push:
     branches: [ "main"]
     paths:
       - "frontend/src/**"

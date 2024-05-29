@@ -1,0 +1,17 @@
+apiVersion: eksctl.io/v1alpha5
+kind: ClusterConfig
+
+metadata:
+  name: ai-flash-cards-managed
+  region: ca-central-1
+
+nodeGroups:
+  - name: node-group
+    instanceType: t3.medium
+    desiredCapacity: 1
+    minSize: 1
+    maxSize: 1
+    ssh:
+      allow: true                     
+      publicKeyPath: ~/.ssh/key-pair.pem 
+

@@ -2,6 +2,7 @@
   margin: 50px;
 }
 
+/* Highlight flashcard when selected for download */
 .selected-flashcard {
   background-color: aqua;
 }

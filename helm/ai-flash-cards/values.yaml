@@ -11,7 +11,7 @@ frontend:
     tag: ""
   service:
     name: frontend-service
-    type: ClusterIP
+    type: ClusterIP # NodePort for EKS
     targetPort: 80
     port: 80
   livenessProbe:
@@ -51,7 +51,7 @@ backend:
     tag: ""
   service:
     name: backend-service
-    type: ClusterIP
+    type: ClusterIP # NodePort for EKS
     targetPort: 8000
     port: 8000
   readinessProbe:
@@ -80,7 +80,7 @@ backend:
     name: api-secret
     type: Opaque
     data:
-      awsAccessKeyId: ""
+      awsAccessKeyId: "" # Use Instance Profile for EKS instead
       awsSecretAccessKey: ""
       awsSessionToken: ""
       openaiApiKet: ""
@@ -130,9 +130,6 @@ ingress:
   - hosts:
     - demo.localdev.me
     secretName: nginx-ingress-cert
-  #  - secretName: chart-example-tls
-  #    hosts:
-  #      - chart-example.local
 
 service:
   type: ClusterIP

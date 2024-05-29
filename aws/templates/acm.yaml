@@ -1,0 +1,11 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Description: ACM resources to store container images for GenAI flash card application
+Parameters:
+  DomainName:
+    Type: String
+    Description: Domain name that the TLS cert is associated with
+Resources:
+  LoadBalancerCert:
+    Type: AWS::CertificateManager::Certificate
+    Properties:
+      DomainName: !Ref DomainName

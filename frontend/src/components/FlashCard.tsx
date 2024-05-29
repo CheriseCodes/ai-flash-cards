@@ -74,6 +74,7 @@ const FlashCard = ({ cardData, setErrors, userId }: { cardData: FlashCard, setEr
     setSelected((curr) => !curr);
   };
 
+  // TODO: remove reload
   const reloadImage = (e: any) => {
     if (reloadCount > 3) {
       console.log("Hit max reloads:", reloadCount)

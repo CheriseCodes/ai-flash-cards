@@ -32,6 +32,12 @@ built
 .env.production.local
 
 # security
+private-main-ingress.yaml
+kubernetes/**/secrets/
+backend-config.yaml
+frontend-config.yaml
+kubernetes/eks/deploy/backend.yaml 
+kubernetes/eks/deploy/frontend.yaml 
 *.crt
 *.key
 *-ignore.*

@@ -44,9 +44,9 @@ describe("GET /flashcards", () => {
     s3Mock.onAnyCommand().resolves({});
     const userId = "default";
     const response = await request(app)
-                              .get(`/flashcards?userId=${userId}`)
-                              .set("Content-Type", "application/json")
-                              .set("Authorization", "Bearer abc123")
+      .get(`/flashcards?userId=${userId}`)
+      .set("Content-Type", "application/json")
+      .set("Authorization", "Bearer abc123");
     assert.deepStrictEqual(response.body, { cards: queryResult.Items });
   });
   test("non-existent user should have non-empty cards response", async () => {
@@ -57,9 +57,9 @@ describe("GET /flashcards", () => {
     s3Mock.onAnyCommand().resolves({});
     const userId = "default";
     const response = await request(app)
-                              .get(`/flashcards?userId=${userId}`)
-                              .set("Content-Type", "application/json")
-                              .set("Authorization", "Bearer abc123")
+      .get(`/flashcards?userId=${userId}`)
+      .set("Content-Type", "application/json")
+      .set("Authorization", "Bearer abc123");
     assert.deepStrictEqual(response.body, { cards: queryResult.Items });
   });
 });
@@ -83,13 +83,13 @@ describe("DELETE /flashcard", () => {
     s3Mock.onAnyCommand().resolves({});
     const cardId = "abc123";
     const response = await request(app)
-                              .delete(`/flashcard`)
-                              .set("Content-Type", "application/json")
-                              .set("Authorization", "Bearer abc123")
-                              .send({
-                                cardId: cardId,
-                                userId: "default",
-                              })
+      .delete(`/flashcard`)
+      .set("Content-Type", "application/json")
+      .set("Authorization", "Bearer abc123")
+      .send({
+        cardId: cardId,
+        userId: "default",
+      });
     assert.deepStrictEqual(response.body, { cardId: cardId });
   });
 });
@@ -124,9 +124,11 @@ describe("GET /generations/images", () => {
     });
     ddbMock.onAnyCommand().resolves({});
     const response = await request(app)
-                              .get(`/generations/images?sentence=${sentence}&lang_mode=${langMode}&word=${word}&cardId=${cardId}&userId=${userId}&timeStamp=123`)
-                              .set("Content-Type", "application/json")
-                              .set("Authorization", "Bearer abc123")
+      .get(
+        `/generations/images?sentence=${sentence}&lang_mode=${langMode}&word=${word}&cardId=${cardId}&userId=${userId}&timeStamp=123`,
+      )
+      .set("Content-Type", "application/json")
+      .set("Authorization", "Bearer abc123");
     assert.deepStrictEqual(response.body, expectedResult);
   });
   test("Unallowed word should return a error image", async () => {
@@ -140,9 +142,11 @@ describe("GET /generations/images", () => {
       return {};
     });
     const response = await request(app)
-                              .get(`/generations/images?sentence=${sentence}&lang_mode=${langMode}&word=${word}&cardId=${cardId}`)
-                              .set("Content-Type", "application/json")
-                              .set("Authorization", "Bearer abc123")
+      .get(
+        `/generations/images?sentence=${sentence}&lang_mode=${langMode}&word=${word}&cardId=${cardId}`,
+      )
+      .set("Content-Type", "application/json")
+      .set("Authorization", "Bearer abc123");
     assert.deepStrictEqual(response.body, {
       status: 400,
       message: "Unsupported word: rentrée",
@@ -165,21 +169,20 @@ describe("POST /image", () => {
     const cardId = "93960a65-ce5e-4d4d-ba2a-8d9e8eeb57d9";
     const languageMode = "French";
     const languageLevel = "C2";
-    const imgUrl =
-      "https://picsum.photos/250";
+    const imgUrl = "https://picsum.photos/250";
     const imgName = `${cardId}-${languageMode}-${languageLevel}-123`;
     s3Mock.onAnyCommand().resolves({});
     ddbMock.onAnyCommand().resolves({});
     const response = await request(app)
-                              .post(`/image`)
-                              .set("Content-Type", "application/json")
-                              .set("Authorization", "Bearer abc123")
-                              .send({
-                                imgUrl: imgUrl,
-                                imgName: imgName,
-                                userId: "default",
-                                cardId: cardId,
-                              })
+      .post(`/image`)
+      .set("Content-Type", "application/json")
+      .set("Authorization", "Bearer abc123")
+      .send({
+        imgUrl: imgUrl,
+        imgName: imgName,
+        userId: "default",
+        cardId: cardId,
+      });
     assert.deepStrictEqual(response.body, {
       url: `${process.env.CLOUDFRONT_URL}/users/default/images/${imgName}.png`,
     });
@@ -229,9 +232,11 @@ describe("POST /generations/sentences", () => {
       };
     });
     const response = await request(app)
-                              .get(`/generations/sentences?word=${word}&lang_mode=${languageMode}&lang_level=${languageLevel}&userId=${userId}&cardId=${cardId}&timeStamp=123`)
-                              .set("Content-Type", "application/json")
-                              .set("Authorization", "Bearer abc123")
+      .get(
+        `/generations/sentences?word=${word}&lang_mode=${languageMode}&lang_level=${languageLevel}&userId=${userId}&cardId=${cardId}&timeStamp=123`,
+      )
+      .set("Content-Type", "application/json")
+      .set("Authorization", "Bearer abc123");
     assert.deepStrictEqual(response.body, {
       status: 400,
       message: "Invalid words: hello",
@@ -244,9 +249,11 @@ describe("POST /generations/sentences", () => {
     const languageMode = "Finnish";
     const languageLevel = "YKI1";
     const response = await request(app)
-                              .get(`/generations/sentences?word=${word}&lang_mode=${languageMode}&lang_level=${languageLevel}&userId=${userId}&cardId=${cardId}&timeStamp=123`)
-                              .set("Content-Type", "application/json")
-                              .set("Authorization", "Bearer abc123")
+      .get(
+        `/generations/sentences?word=${word}&lang_mode=${languageMode}&lang_level=${languageLevel}&userId=${userId}&cardId=${cardId}&timeStamp=123`,
+      )
+      .set("Content-Type", "application/json")
+      .set("Authorization", "Bearer abc123");
     assert.deepStrictEqual(response.body, {
       status: 400,
       message: "Unsupported language: Finnish",
@@ -259,9 +266,11 @@ describe("POST /generations/sentences", () => {
     const languageMode = "French";
     const languageLevel = "G2";
     const response = await request(app)
-                              .get(`/generations/sentences?word=${word}&lang_mode=${languageMode}&lang_level=${languageLevel}&userId=${userId}&cardId=${cardId}&timeStamp=123`)
-                              .set("Content-Type", "application/json")
-                              .set("Authorization", "Bearer abc123")
+      .get(
+        `/generations/sentences?word=${word}&lang_mode=${languageMode}&lang_level=${languageLevel}&userId=${userId}&cardId=${cardId}&timeStamp=123`,
+      )
+      .set("Content-Type", "application/json")
+      .set("Authorization", "Bearer abc123");
     assert.deepStrictEqual(response.body, {
       status: 400,
       message: "Invalid language level: G2",
@@ -299,9 +308,11 @@ describe("POST /generations/sentences", () => {
       };
     });
     const response = await request(app)
-                              .get(`/generations/sentences?word=${word}&lang_mode=${languageMode}&lang_level=${languageLevel}&userId=${userId}&cardId=${cardId}&timeStamp=123`)
-                              .set("Content-Type", "application/json")
-                              .set("Authorization", "Bearer abc123")
+      .get(
+        `/generations/sentences?word=${word}&lang_mode=${languageMode}&lang_level=${languageLevel}&userId=${userId}&cardId=${cardId}&timeStamp=123`,
+      )
+      .set("Content-Type", "application/json")
+      .set("Authorization", "Bearer abc123");
     assert.notStrictEqual(response.body.content, "");
     const parsedContent = JSON.parse(response.body.content);
     assert.deepStrictEqual(parsedContent, expectedResult);

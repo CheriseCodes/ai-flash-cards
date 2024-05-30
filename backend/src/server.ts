@@ -27,6 +27,7 @@ import { dynamoDbClient, s3Client } from "../src/aws-clients";
 import appConfig from "./config";
 import * as sh from "./server-helpers";
 import * as ah from "./auth-helpers";
+import { ChatCompletion } from "openai/resources/index.mjs";
 
 export const app: Application = express();
 app.use(cors());
@@ -65,7 +66,7 @@ export const openai = new OpenAI({
 });
 
 const openAIChatCompletion = async (model, temperature, messages) => {
-  const response = await openai.chat.completions.create({
+  const response: ChatCompletion = await openai.chat.completions.create({
     model: model,
     temperature: temperature,
     messages,

@@ -99,7 +99,7 @@ jobs:
           yq e -i '.frontend.image.registry = "$ECR_REGISTRY"' ai-flash-cards/eks-values.yaml
           yq e -i '.backend.image.registry = "$ECR_REGISTRY"' ai-flash-cards/eks-values.yaml
           yq e -i '.backend.image.tag = "$IMAGE_TAG"' ai-flash-cards/eks-values.yaml
-          yq e -i '.ingress.hosts.host = "$DOMAIN_NAME"' ai-flash-cards/eks-values.yaml
+          yq e -i '.ingress.hosts[0].host = "$DOMAIN_NAME"' ai-flash-cards/eks-values.yaml
           sed -i.bak "s|AWS_REGION|$AWS_REGION|g" ai-flash-cards/eks-values.yaml  
           sed -i.bak "s|AWS_ACCOUNT_ID|$AWS_ACCOUNT_ID|g" ai-flash-cards/eks-values.yaml 
           helm upgrade -i ai-flash-cards ./ai-flash-cards -f ./ai-flash-cards/eks-values.yaml -n ai-flash-cards --create-namespace

@@ -10,7 +10,7 @@ import "./index.css";
 import "bootstrap/dist/css/bootstrap.css";
 import App from "./App";
 
-async function enableMocking() {
+const enableMocking = async () => {
   console.log(`NODE_ENV is ${process.env.NODE_ENV}`)
   console.log(`APP_ENV is ${process.env.VITE_APP_ENV}`)
   if (!((process.env.VITE_APP_ENV == 'local.development') || (process.env.VITE_APP_ENV == 'docker.development'))) {

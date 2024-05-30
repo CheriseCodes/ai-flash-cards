@@ -2,7 +2,7 @@ import { languageConfig } from "./config";
 
 const currentStateSummary = (state: any) => {
   console.log(`# of cards is ${state.cards.length}`)
-  for (let [index, card] of state.cards.entries()) {
+  for (const [index, card] of state.cards.entries()) {
     console.log(`Card #${index}: ${card}`)
   }
 }

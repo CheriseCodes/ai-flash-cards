@@ -132,12 +132,6 @@ const reducer = (state: any, action: any) => {
         }),
       };
     }
-    // case "set-authenticated": {
-    //   return {
-    //     ...state,
-    //     isAuthenticated: action.authenticated
-    //   }
-    // }
     default: {
       return { ...state };
     }

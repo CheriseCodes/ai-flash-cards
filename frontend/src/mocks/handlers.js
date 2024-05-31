@@ -30,10 +30,9 @@ export const handlers = [
             ]
         })
     }),
-    http.post(`${backendDomain}/upload/image`,({request}) => {
-        const url = new URL(request.url)
+    http.post(`${backendDomain}/upload/image`,({}) => {
         return HttpResponse.json(
-            { url: "https://picsum.photos/250" }
+            { url: "https://picsum.photos/256" }
         )
     })
 ]

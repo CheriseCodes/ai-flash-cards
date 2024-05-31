@@ -1,10 +1,4 @@
-import {
-  describe,
-  test,
-  beforeEach,
-  afterEach,
-  mock,
-} from "node:test";
+import { describe, test, beforeEach, afterEach, mock } from "node:test";
 import assert from "node:assert";
 import { mockClient } from "aws-sdk-client-mock";
 import { openai, app } from "../src/server";

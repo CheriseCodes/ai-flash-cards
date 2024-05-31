@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
         - name: frontend
-          image: cherisecodes/ai-flash-cards-frontend:latest
+          image: 00000000000.dkr.ecr.ca-central-1.amazonaws.com/ai-flash-cards/frontend:latest # cherisecodes/ai-flash-cards-backend:latest
           env:
           - name: NODE_ENV
             valueFrom:

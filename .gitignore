@@ -19,7 +19,6 @@ reverse_proxy/
 # production
 build
 dist
-kubernetes/eks
 
 # typescript
 built
@@ -34,17 +33,10 @@ built
 # security
 private-main-ingress.yaml
 kubernetes/**/secrets/
-backend-config.yaml
-frontend-config.yaml
-kubernetes/eks/deploy/backend.yaml 
-kubernetes/eks/deploy/frontend.yaml 
 *.crt
 *.key
 *-ignore.*
 kubernetes/**/secrets/
-backend-config.yaml
-frontend-config.yaml
-!helm/**/*-config.yaml
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*

@@ -16,12 +16,18 @@ frontend:
     port: 80
   livenessProbe:
     httpGet:
-      path: /healthz
+      path: /livez
       port: 80
     initialDelaySeconds: 10
     periodSeconds: 30
     failureThreshold: 2
-  readinessProbe: {}
+  readinessProbe:
+    httpGet:
+      path: /readyz
+      port: 80
+    initialDelaySeconds: 10
+    periodSeconds: 30
+    failureThreshold: 2
   config:
     name: frontend-config
     data:
@@ -80,7 +86,7 @@ backend:
     name: api-secret
     type: Opaque
     data:
-      openaiApiKet: ""
+      openaiApiKey: ""
   resources: {}
   volumeMounts: []
   volumes: []

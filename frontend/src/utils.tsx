@@ -26,7 +26,7 @@ const getNewCardText = async (word: string, languageMode: string, languageLevel:
     console.log("getNewCardText fetch successful")
     const json = await response.json();
     let cardData;
-    cardData = json.choices[0].message.content; // stringified JSON
+    cardData = json.content; // stringified JSON
     cardData = JSON.parse(cardData);
     cardData.wordTranslated = cardData.wordTranslated.toLowerCase();
     cardData.id = cardId;
@@ -34,7 +34,7 @@ const getNewCardText = async (word: string, languageMode: string, languageLevel:
     console.log("end getNewCardText");
     return cardData;
   } catch (e) {
-    console.error(e)
+    console.error(e);
     return {}
   }
   
@@ -43,10 +43,11 @@ const getNewCardText = async (word: string, languageMode: string, languageLevel:
 const getNewCardImage = async (dispatch: Dispatch<AnyAction>, cardData: FlashCard, languageMode: string, languageLevel: string, userId: string, cardId: string, word: string) => {
     console.log("start getNewCardImage...");
     try {
-      const authToken = document.cookie
-      .split("; ")
-      .find((row) => row.startsWith("afc_app="))
-      ?.split("=")[1];
+      // const authToken = document.cookie
+      // .split("; ")
+      // .find((row) => row.startsWith("afc_app="))
+      // ?.split("=")[1];
+      const authToken = "fake"
       cardData.generatingImage = true;
       dispatch({ type: "update-card", cardData: cardData, cardId: cardId });
       const imageResponse = await fetch(
@@ -61,7 +62,7 @@ const getNewCardImage = async (dispatch: Dispatch<AnyAction>, cardData: FlashCar
       const imageJson = await imageResponse.json();
       // 3rd fetch to persist the image in s3 then update references with persisted url
       const uploadResponse = await fetch(
-        `${serviceConfig.BACKEND_ENDPOINT}${serviceConfig.BACKEND_PATH}/upload/image`,
+        `${serviceConfig.BACKEND_ENDPOINT}${serviceConfig.BACKEND_PATH}/image`,
         {
           method: "POST",
           headers: {
@@ -71,7 +72,8 @@ const getNewCardImage = async (dispatch: Dispatch<AnyAction>, cardData: FlashCar
           body: JSON.stringify({
             imgUrl: imageJson.data[0].url,
             imgName: `${cardId}-${languageMode}-${languageLevel}-${Date.now()}`,
-            userId: userId
+            userId: userId,
+            cardId: cardId
           }),
         },
       );
@@ -82,7 +84,7 @@ const getNewCardImage = async (dispatch: Dispatch<AnyAction>, cardData: FlashCar
       console.log("end getNewCardImage...")
       return cardData;
     } catch (e) {
-      console.error(e)
+      console.error(e);
       return {}
     }
 }

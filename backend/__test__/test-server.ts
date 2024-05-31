@@ -4,8 +4,6 @@ import {
   beforeEach,
   afterEach,
   mock,
-  before,
-  after,
 } from "node:test";
 import assert from "node:assert";
 import { mockClient } from "aws-sdk-client-mock";

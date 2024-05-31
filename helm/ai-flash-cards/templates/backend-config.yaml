@@ -5,8 +5,8 @@ metadata:
   labels:
     {{- include "ai-flash-cards.labels" . | nindent 4 }}
 data:
-  AWS_DEFAULT_REGION: {{ .Values.frontend.config.data.awsDefaultRegion }}
-  BUCKET_NAME: {{ .Values.frontend.config.data.bucketName }}
-  CLOUDFRONT_URL: {{ .Values.frontend.config.data.cloudfrontUrl }}
-  NODE_ENV: {{ .Values.frontend.config.data.nodeEnv }}
-  APP_ENV: {{ .Values.frontend.config.data.appEnv }}
+  AWS_DEFAULT_REGION: {{ .Values.backend.config.data.awsDefaultRegion }}
+  BUCKET_NAME: {{ .Values.backend.config.data.bucketName }}
+  CLOUDFRONT_URL: {{ .Values.backend.config.data.cloudfrontUrl }}
+  NODE_ENV: {{ .Values.backend.config.data.nodeEnv }}
+  APP_ENV: {{ .Values.backend.config.data.appEnv }}

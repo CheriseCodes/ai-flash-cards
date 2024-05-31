@@ -38,7 +38,7 @@ COPY . .
 RUN npm run test
 
 # Use Nginx as the production server
-FROM nginx:alpine
+FROM nginx:alpine as final
 
 # Set environment variables
 ENV NODE_ENV=production

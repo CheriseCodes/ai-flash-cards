@@ -62,6 +62,8 @@ jobs:
           ignore-base: true
           ignore-unchanged: true
           only-fixed: true
+          orgnization: cherisecodes
+          image: cherisecodes/ai-flash-cards-frontend:latest
   build-push-ecr-eks:
     runs-on: ubuntu-latest
     environment: production

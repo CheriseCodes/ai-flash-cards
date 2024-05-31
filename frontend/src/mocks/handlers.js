@@ -13,11 +13,17 @@ export const handlers = [
         const word = url.searchParams.get("word")
         const langMode = url.searchParams.get("lang_mode")
         const langLevel = url.searchParams.get("lang_level")
-        const data = {id: 123, created: 123, usage: {
-                      prompt_tokens: 123,
-                   completion_tokens: 123,
-                        total_tokens: 123
-                     }, choices:[{ finish_reason: "stop", message: {content: JSON.stringify({word: `${word}`,sampleSentence: `Example sentence using ${word} in ${langMode} at level ${langLevel}`,translatedSampleSentence:"English translation of the example sentence",wordTranslated: `English translation of ${word}`})}}]}
+        const data = {
+                        id: 123,
+                        created: 123,
+                        usage: {
+                            prompt_tokens: 123,
+                            completion_tokens: 123,
+                            total_tokens: 123
+                        }, 
+                        choices: [
+                            { 
+                                finish_reason: "stop", message: {content: JSON.stringify({word: `${word}`,sampleSentence: `Example sentence using ${word} in ${langMode} at level ${langLevel}`,translatedSampleSentence:"English translation of the example sentence",wordTranslated: `English translation of ${word}`})}}]}
         return HttpResponse.json(data)
     }),
     http.get(`${backendDomain}/generations/images`, () => {

@@ -301,19 +301,16 @@ app.post("/image", authMiddleware, async (req, res) => {
 
     if (process.env.NODE_ENV != 'test') { // don't run in test environment
       https.get(imgUrl, async (res) => {
-        console.log("starting image download...")
         const fdWrite = await open(localFileName, "w");
         const writeStream = res.pipe(fdWrite.createWriteStream());
         writeStream.on("finish", async () => {
           // Read content of downloaded file
-          console.log("completed image download...")
           const fdRead = await open(localFileName);
           // Create a stream from some character device.
           const stream = fdRead.createReadStream();
           stream.on("close", () => {
             rm(localFileName);
           });
-          console.log("starting image upload...")
           const input = {
             // PutObjectRequest
             Body: stream,
@@ -325,9 +322,7 @@ app.post("/image", authMiddleware, async (req, res) => {
           };
           const command = new PutObjectCommand(input);
           await s3Client.send(command);
-          console.log("completed image upload...")
           stream.close();
-          console.log("starting image upload to ddb...")
           // TODO: Update DynamoDB Table with correct image link
           const ddbInput: UpdateItemCommandInput = {
             Key: { FlashCardId: { S: cardId } },
@@ -339,7 +334,6 @@ app.post("/image", authMiddleware, async (req, res) => {
             },
             ReturnValues: "ALL_NEW",
           };
-          console.log("completed image upload to ddb...")
           const ddbCommand = new UpdateItemCommand(ddbInput);
           await dynamoDbClient.send(ddbCommand);
         });

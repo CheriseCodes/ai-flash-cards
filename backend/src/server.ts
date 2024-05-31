@@ -538,7 +538,3 @@ app.post("/logout", async (req, res) => {
     res.sendStatus(500)
   }
 });
-
-// app.get('/csrf-token', (req, res) => {
-//   res.json({ csrfToken: req.csrfToken() });
-// });

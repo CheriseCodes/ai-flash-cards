@@ -25,7 +25,7 @@ export const handlers = [
             created: Date.now(),
             data: [
               {
-                url: "https://picsum.photos/250"
+                url: "https://picsum.photos/256"
               }
             ]
         })

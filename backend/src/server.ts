@@ -61,9 +61,7 @@ export const jwtCheck = auth({
 
 const maxAge = 3 * 24 * 60 * 60;
 
-export const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY,
-});
+export const openai = process.env.APP_ENV.includes("test") ? new OpenAI({apiKey: "sk-test"}) : new OpenAI({apiKey: process.env.OPENAI_API_KEY})
 
 const openAIChatCompletion = async (model, temperature, messages) => {
   const response: ChatCompletion = await openai.chat.completions.create({

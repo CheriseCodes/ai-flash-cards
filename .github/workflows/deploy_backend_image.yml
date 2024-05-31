@@ -52,6 +52,17 @@ jobs:
           build-args: APP_ENV=kubernetes.development
           push: true
           tags: cherisecodes/ai-flash-cards-backend:latest
+      - name: Docker Scout
+        id: docker-scout
+        uses: docker/scout-action@v1
+        with:
+          command: cves,recommendations,compare
+          to-latest: true
+          ignore-base: true
+          ignore-unchanged: true
+          only-fixed: true
+          organization: cherisecodes
+          image: cherisecodes/ai-flash-cards-backend:latest
   build-push-ecr:
     runs-on: ubuntu-latest
     environment: production

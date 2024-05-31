@@ -339,8 +339,8 @@ app.post("/image", authMiddleware, async (req, res) => {
         });
       });
     }
-    // const domainName = process.env.CLOUDFRONT_URL;
-    const domainName = `https://${process.env.BUCKET_NAME}.s3.ca-central-1.amazonaws.com`
+    const domainName = process.env.CLOUDFRONT_URL;
+    // const domainName = `https://${process.env.BUCKET_NAME}.s3.ca-central-1.amazonaws.com`
     res.status(200).send({ url: `${domainName}/${remoteFileName}` });
   } catch (err) {
     console.error(err);

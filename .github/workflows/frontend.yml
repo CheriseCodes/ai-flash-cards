@@ -31,7 +31,8 @@ jobs:
     - uses: oven-sh/setup-bun@v1
       with:
         bun-version: latest
-    - run: echo "VITE_APP_ENV=\"docker.test\"" > .env
-    - run: bun install --frozen-lockfile
-    - run: bun run build
-    - run: bun run test
+    - run: |
+        echo "VITE_APP_ENV=\"docker.test\"" > .env
+        bun install --frozen-lockfile
+        bun run build
+        bun run test

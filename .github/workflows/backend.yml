@@ -10,7 +10,6 @@ on:
       - "backend/src/**"
       - "backend/__test__/**"
 env:
-  OPENAI_API_KEY: "sk-123abc"
   BUCKET_NAME: "bucket-name"
   CLOUDFRONT_URL: "cloudfront-url"
   AWS_PROFILE: "aws-profile"
@@ -35,7 +34,7 @@ jobs:
       with:
         bun-version: latest
     - uses: actions/checkout@v3
-    - run: bun install --frozen-lockfile
-    - run: bun run build
-    - run: bun run start &
-    - run: bun run test
+    - run: |
+        bun install --frozen-lockfile
+        bun run build
+        bun run test

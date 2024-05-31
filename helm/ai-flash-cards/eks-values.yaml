@@ -5,10 +5,10 @@
 frontend:
   image:
     registry: ""
-    repository: ai-flash-cards-frontend
-    pullPolicy: Never
+    repository: ai-flash-cards/frontend
+    pullPolicy: Always
     # Overrides the image tag whose default is the chart appVersion.
-    tag: ""
+    tag: "latest"
   service:
     name: frontend-service
     type: NodePort
@@ -16,12 +16,18 @@ frontend:
     port: 80
   livenessProbe:
     httpGet:
-      path: /healthz
+      path: /livez
       port: 80
     initialDelaySeconds: 10
     periodSeconds: 30
     failureThreshold: 2
-  readinessProbe: {}
+  readinessProbe:
+    httpGet:
+      path: /readyz
+      port: 80
+    initialDelaySeconds: 10
+    periodSeconds: 30
+    failureThreshold: 2
   config:
     name: frontend-config
     data:
@@ -45,10 +51,10 @@ frontend:
 backend:
   image:
     registry: ""
-    repository: ai-flash-cards-backend
-    pullPolicy: Never
+    repository: ai-flash-cards/backend
+    pullPolicy: Always
     # Overrides the image tag whose default is the chart appVersion.
-    tag: ""
+    tag: "latest"
   service:
     name: backend-service
     type: NodePort
@@ -80,7 +86,7 @@ backend:
     name: api-secret
     type: Opaque
     data:
-      openaiApiKet: ""
+      openaiApiKey: ""
   resources: {}
   volumeMounts: []
   volumes: []
@@ -106,7 +112,7 @@ ingress:
     alb.ingress.kubernetes.io/load-balancer-name: ai-flash-cards-load-balancer
     alb.ingress.kubernetes.io/scheme: internet-facing
     alb.ingress.kubernetes.io/target-type: instance
-    alb.ingress.kubernetes.io/certificate-arn: arn:aws:acm:REGION:ACCOUNT_ID:certificate/ID
+    alb.ingress.kubernetes.io/certificate-arn: arn:aws:acm:AWS_REGION:AWS_ACCOUNT_ID:certificate/CERT_ID
     alb.ingress.kubernetes.io/listen-ports: '[{"HTTP": 80}, {"HTTPS":443}]'
     alb.ingress.kubernetes.io/ssl-redirect: '443'
   hosts:

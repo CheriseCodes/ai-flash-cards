@@ -22,7 +22,7 @@ const Profile = () => {
             } catch (e: any) {
               console.log(e.message);
             }
-            };
+            }
           
             getUserMetadata();
         }

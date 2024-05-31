@@ -25,11 +25,9 @@ export const languageConfig: any = {
 export const serviceConfig = {
   BACKEND_ENDPOINT: (() => {
     if (process.env.VITE_APP_ENV == 'kubernetes.production') {
-      return 'http://TODO'
+      return 'https://YOUR_DOMAIN'
     } else if (process.env.VITE_APP_ENV == 'kubernetes.staging') {
-      return 'http://TODO'
-    } else if (process.env.VITE_APP_ENV == 'kubernetes.test') {
-      return 'http://TODO'
+      return 'https://YOUR_DOMAIN'
     } else if (process.env.VITE_APP_ENV == 'kubernetes.development') {
       return 'https://demo.localdev.me'
     } else if (process.env.VITE_APP_ENV == 'docker.production') {

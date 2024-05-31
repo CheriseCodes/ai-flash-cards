@@ -7,7 +7,6 @@
 ARG NODE_VERSION=22
 # Set stage the image is built for
 ARG APP_ENV="kubernetes.production"
-ARG OPENAI_API_KEY="sk-test"
 
 ################################################################################
 # Use node image for base image for all stages.
@@ -46,6 +45,7 @@ RUN --mount=type=bind,source=package.json,target=package.json \
 # Copy the rest of the source files into the image.
 COPY . .
 # Run the build script.
+ENV NODE_ENV="production"
 RUN npm run build
 
 ################################################################################
@@ -54,11 +54,6 @@ RUN npm run build
 FROM build as test
 
 ENV NODE_ENV test
-ENV OPENAI_API_KEY $OPENAI_API_KEY
-ENV BUCKET_NAME "bucket-name"
-ENV CLOUDFRONT_URL "cloudfront-url"
-ENV  AWS_PROFILE "aws-profile"
-ENV  NODE_ENV "test"
 ENV  APP_ENV $APP_ENV
 
 RUN --mount=type=bind,source=package.json,target=package.json \
@@ -73,7 +68,7 @@ RUN npm run test
 ################################################################################
 # Create a new stage to run the application with minimal runtime dependencies
 # where the necessary files are copied from the build stage.
-FROM base as final
+FROM build as final
 
 ARG NODE_VERSION
 ARG APP_ENV

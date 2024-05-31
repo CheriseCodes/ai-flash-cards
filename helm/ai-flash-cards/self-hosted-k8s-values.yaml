@@ -8,7 +8,7 @@ frontend:
     repository: ai-flash-cards-frontend
     pullPolicy: Never
     # Overrides the image tag whose default is the chart appVersion.
-    tag: ""
+    tag: "latest"
   service:
     name: frontend-service
     type: ClusterIP
@@ -16,12 +16,18 @@ frontend:
     port: 80
   livenessProbe:
     httpGet:
-      path: /healthz
+      path: /livez
       port: 80
     initialDelaySeconds: 10
     periodSeconds: 30
     failureThreshold: 2
-  readinessProbe: {}
+  readinessProbe:
+    httpGet:
+      path: /readyz
+      port: 80
+    initialDelaySeconds: 10
+    periodSeconds: 30
+    failureThreshold: 2
   config:
     name: frontend-config
     data:
@@ -37,7 +43,7 @@ frontend:
     minReplicas: 1
     maxReplicas: 100
     targetCPUUtilizationPercentage: 80
-  replicaCount: 1
+  replicaCount: 2
   podAnnotations: {}
   podLabels: {}
   podSecurityContext: {}
@@ -48,7 +54,7 @@ backend:
     repository: ai-flash-cards-backend
     pullPolicy: Never
     # Overrides the image tag whose default is the chart appVersion.
-    tag: ""
+    tag: "latest"
   service:
     name: backend-service
     type: ClusterIP
@@ -75,7 +81,7 @@ backend:
       bucketName: ""
       cloudfrontUrl: ""
       nodeEnv: production
-      appEnv: kubernetes.production
+      appEnv: kubernetes.development
   secret:
     name: api-secret
     type: Opaque
@@ -83,7 +89,7 @@ backend:
       awsAccessKeyId: ""
       awsSecretAccessKey: ""
       awsSessionToken: ""
-      openaiApiKet: ""
+      openaiApiKey: ""
   resources: {}
   volumeMounts: []
   volumes: []
@@ -95,7 +101,7 @@ backend:
     minReplicas: 1
     maxReplicas: 100
     targetCPUUtilizationPercentage: 80
-  replicaCount: 1
+  replicaCount: 2
   podAnnotations: {}
   podLabels: {}
   podSecurityContext: {}

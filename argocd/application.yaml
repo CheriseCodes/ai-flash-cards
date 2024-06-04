@@ -1,0 +1,44 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: ai-flash-cards
+  namespace: argocd
+  labels:
+    name: ai-flash-cards
+spec:
+  # The project the application belongs to.
+  project: default
+  destination:
+    # cluster API URL
+    server: https://kubernetes.default.svc
+    # The namespace will only be set for namespace-scoped resources that have not set a value for .metadata.namespace
+    namespace: ai-flash-cards
+  # Source of the application manifests
+  source:
+    repoURL: 'https://github.com/cherisecodes/ai-flash-cards.git'
+    path: helm/ai-flash-cards
+    helm:
+      releaseName: ai-flash-cards
+      valueFiles:
+        - eks-values.yaml
+      parameters:
+        - name: frontend.image.registry
+          value: ECR_REGISTRY
+        - name: backend.image.registry
+          value: ECR_REGISTRY
+        - name: backend.image.repository
+          value: BACKEND_REPOSITORY
+        - name: frontend.image.repository
+          value: FRONTEND_REPOSITORY
+        - name: backend.secret.data.openaiApiKey
+          value: OPENAI_API_KEY # base64 encoded
+        - name: backend.config.data.awsDefaultRegion
+          value: DEFAULT_REGION
+        - name: backend.config.data.bucketName
+          value: BUCKET_NAME
+        - name: backend.config.data.cloudfrontUrl
+          value: CLOUDFRONT_URL
+        - name: ingress.annotations.alb\.ingress\.kubernetes\.io/certificate-arn
+          value: ACM_TLS_CERT_ARN
+        - name: 'ingress.hosts[0].host'
+          value: HOST

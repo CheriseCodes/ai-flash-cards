@@ -1,23 +1,50 @@
-# install ingress controller
-INGRESS_HOST=$1
+# Create an EKS cluster
+cluster_name=ai-flash-cards
+AWS_ACCOUNT_ID=$1
+AWS_REGION=$2
+# Min instance size is t3.medium
+eksctl create cluster --name $cluster_name --region $AWS_REGION --nodegroup-name node-group --node-type t3.medium --nodes 1 --nodes-min 1 --nodes-max 1 --managed
 
-# Install ingress controller
-helm upgrade --install ingress-nginx ingress-nginx \
-  --repo https://kubernetes.github.io/ingress-nginx \
-  --namespace ingress-nginx --create-namespace
-kubectl wait --namespace ingress-nginx \
-  --for=condition=ready pod \
-  --selector=app.kubernetes.io/component=controller \
-  --timeout=120s
+# Install AWS Load Balancer Controller add-on
+# create new IAM OIDC provider
+eksctl utils associate-iam-oidc-provider --cluster $cluster_name --approve 
+curl -O https://raw.githubusercontent.com/kubernetes-sigs/aws-load-balancer-controller/v2.7.2/docs/install/iam_policy.json # download policy template for controller
+# create the policy using downloaded template
+aws iam create-policy \
+    --policy-name AWSLoadBalancerControllerIAMPolicy \
+    --policy-document file://iam_policy.json 
+# create eks service account
+eksctl create iamserviceaccount \
+  --cluster=$cluster_name \
+  --namespace=kube-system \
+  --name=aws-load-balancer-controller \
+  --role-name AmazonEKSLoadBalancerControllerRole \
+  --attach-policy-arn=arn:aws:iam::$AWS_ACCOUNT_ID:policy/AWSLoadBalancerControllerIAMPolicy \
+  --approve 
+# install cert manager
+kubectl apply \
+    --validate=false \
+    -f https://github.com/jetstack/cert-manager/releases/download/v1.13.5/cert-manager.yaml
+# wait for cert manager resources to be available
+sleep 120
+# download controller spec
+curl -Lo v2_7_2_full.yaml https://github.com/kubernetes-sigs/aws-load-balancer-controller/releases/download/v2.7.2/v2_7_2_full.yaml 
+# modify the controller spec if downloaded v2_7_2
+sed -i.bak -e "s|your-cluster-name|$cluster_name|" ./v2_7_2_full.yaml
+# (optional) use privately uploaded aws-load-balancer-controller image
+sed -i.bak -e "s|public.ecr.aws/eks/aws-load-balancer-controller|$AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/eks/aws-load-balancer-controller|" ./v2_7_2_full.yaml
 
-# Set up TLS
-# Create self-signed certificate
-# WARNING: Will give the error NET::ERR_CERT_AUTHORITY_INVALID but is sufficient for development purposes
-openssl req -x509 -nodes -days 365 -newkey rsa:2048 -keyout nginx-ingress.key -out nginx-ingress.crt -subj "/CN=$INGRESS_HOST/O=$INGRESS_HOST" -addext "subjectAltName = DNS:$INGRESS_HOST"
-kubectl  -n ai-flash-cards create secret tls nginx-ingress-cert --key nginx-ingress.key --cert nginx-ingress.crt
+# install load balancer controller
+kubectl apply -f v2_7_2_full.yaml
+
+# install load balancer controller ingress class
+curl -Lo v2_7_2_ingclass.yaml https://github.com/kubernetes-sigs/aws-load-balancer-controller/releases/download/v2.7.2/v2_7_2_ingclass.yaml
+kubectl apply -f v2_7_2_ingclass.yaml
 
 # set namespace for argocd
 kubectl config set-context --current --namespace=argocd
+
+# login and create argocd application
 argocd login localhost:8080 --username admin --password PASSWORD
 argocd app create -f application.yaml
 argocd app sync ai-flash-cards

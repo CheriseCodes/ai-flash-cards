@@ -41,10 +41,24 @@ kubectl apply -f v2_7_2_full.yaml
 curl -Lo v2_7_2_ingclass.yaml https://github.com/kubernetes-sigs/aws-load-balancer-controller/releases/download/v2.7.2/v2_7_2_ingclass.yaml
 kubectl apply -f v2_7_2_ingclass.yaml
 
-# set namespace for argocd
-kubectl config set-context --current --namespace=argocd
 
-# login and create argocd application
-argocd login localhost:8080 --username admin --password PASSWORD
+# Start ArgoCD config
+# TODO: Check if argocd cli is installed, if not install it
+
+# install argocd
+kubectl config set-context --current --namespace=argocd
+kubectl create namespace argocd
+kubectl apply -n argocd -f https://raw.githubusercontent.com/argoproj/argo-cd/stable/manifests/install.yaml
+
+# create loadbalancer to expose the argocd server
+kubectl patch svc argocd-server -n argocd -p '{"spec": {"type": "LoadBalancer"}}'
+
+# enable access through https://localhost:8080
+# TODO: Make output go to the background so script can continue
+kubectl port-forward svc/argocd-server -n argocd 8080:443
+
+PASSWORD=$(argocd admin initial-password -n argocd | head -n 1)
+argocd login localhost:8080 --username admin --password $PASSWORD --insecure # TODO: Add ACM config so don't need to use insecure
+kubectl create ns ai-flash-cards
 argocd app create -f application.yaml
 argocd app sync ai-flash-cards

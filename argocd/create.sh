@@ -46,7 +46,6 @@ kubectl apply -f v2_7_2_ingclass.yaml
 # TODO: Check if argocd cli is installed, if not install it
 
 # install argocd
-kubectl config set-context --current --namespace=argocd
 kubectl create namespace argocd
 kubectl apply -n argocd -f https://raw.githubusercontent.com/argoproj/argo-cd/stable/manifests/install.yaml
 
@@ -57,6 +56,8 @@ kubectl patch svc argocd-server -n argocd -p '{"spec": {"type": "LoadBalancer"}}
 # TODO: Make output go to the background so script can continue
 kubectl port-forward svc/argocd-server -n argocd 8080:443
 
+# set namespace to argocd for using argocd cli
+kubectl config set-context --current --namespace=argocd
 PASSWORD=$(argocd admin initial-password -n argocd | head -n 1)
 argocd login localhost:8080 --username admin --password $PASSWORD --insecure # TODO: Add ACM config so don't need to use insecure
 kubectl create ns ai-flash-cards

@@ -5,21 +5,6 @@ AWS_REGION=$2
 # Min instance size is t3.medium
 eksctl create cluster --name $cluster_name --region $AWS_REGION --nodegroup-name node-group --node-type t3.large --nodes 1 --nodes-min 1 --nodes-max 1 --managed
 
-# Create config maps
-kubectl apply -f ../kubernetes/eks/configmap/backend-config.yaml     
-kubectl apply -f ../kubernetes/eks/configmap/frontend-config.yaml   
-
-# Create secrets
-kubectl apply -f ../kubernetes/eks/secrets/api-secret.yaml  
-
-# Create deployments
-kubectl apply -f ../kubernetes/eks/deploy/backend.yaml    
-kubectl apply -f ../kubernetes/eks/deploy/frontend.yaml  
-
-# Create services
-kubectl apply -f ../kubernetes/eks/svc/backend.yaml    
-kubectl apply -f ../kubernetes/eks/svc/frontend.yaml  
-
 # Install AWS Load Balancer Controller add-on
 # create new IAM OIDC provider
 eksctl utils associate-iam-oidc-provider --cluster $cluster_name --approve 
@@ -56,16 +41,25 @@ kubectl apply -f v2_7_2_full.yaml
 curl -Lo v2_7_2_ingclass.yaml https://github.com/kubernetes-sigs/aws-load-balancer-controller/releases/download/v2.7.2/v2_7_2_ingclass.yaml
 kubectl apply -f v2_7_2_ingclass.yaml
 
-# create new ingress
-kubectl apply -f ../kubernetes/eks/ing/main-ingress.yaml   
 
-# Manually enable TLS
-# 1. Get domain from AWS
-# 2. If a public hosted zone wasn't automatically created, create it
-# 3. Request an ACM cert for this domain
-# 4. Use ACM to automatically update your hosted zone to use the certificate
-# 5. Create an Alias A record that maps to the load balancer's DNS name
-# 4. Uncomment TLS annotations on main-ingress.yaml and run `kubectl replace -f main-ingress.yaml`
+# Start ArgoCD config
+# TODO: Check if argocd cli is installed, if not install it
 
-# Uncomment to clean up downloaded manifests
-# rm iam_policy.json v2_7_2_full.yaml v2_7_2_full.yaml.bak v2_7_2_ingclass.yaml aws-load-balancer-webhook-service.yaml aws-load-balancer-webhook-service.yaml.bak
+# install argocd
+kubectl create namespace argocd
+kubectl apply -n argocd -f https://raw.githubusercontent.com/argoproj/argo-cd/stable/manifests/install.yaml
+
+# create loadbalancer to expose the argocd server
+kubectl patch svc argocd-server -n argocd -p '{"spec": {"type": "LoadBalancer"}}'
+
+# enable access through https://localhost:8080
+# TODO: Make output go to the background so script can continue
+kubectl port-forward svc/argocd-server -n argocd 8080:443
+
+# set namespace to argocd for using argocd cli
+kubectl config set-context --current --namespace=argocd
+PASSWORD=$(argocd admin initial-password -n argocd | head -n 1)
+argocd login localhost:8080 --username admin --password $PASSWORD --insecure # TODO: Add ACM config so don't need to use insecure
+kubectl create ns ai-flash-cards
+argocd app create -f application.yaml
+argocd app sync ai-flash-cards

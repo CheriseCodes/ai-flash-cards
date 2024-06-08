@@ -93,7 +93,6 @@ const getNewCardData = async (dispatch: Dispatch<AnyAction>, word: string, langu
   console.log("start getNewCardData")
   let cardData = await getNewCardText(word, languageMode, languageLevel, userId, cardId, timeStamp);
   console.log("getNewCardData cardData", cardData);
-  // let promise1 = Promise.resolve(cardData);
   if (typeof(cardData.sampleSentence) == 'undefined') {
     return {}
   }

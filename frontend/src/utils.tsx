@@ -105,14 +105,11 @@ const getNewCardData = async (dispatch: Dispatch<AnyAction>, word: string, langu
     });
   // });
   cardData = await getNewCardImage(dispatch, cardData, languageMode, languageLevel, userId, cardId, word);
-  // let promise1 = Promise.resolve(cardData);
-  // promise1.then((values) => {
     console.log("Final state of getNewCardData", cardData)
     dispatch({
     type: "update-card",
     cardId: cardId,
     cardData: cardData,
-  // });
   })
   console.log("end getNewCardData")
   return cardData;

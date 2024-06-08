@@ -100,22 +100,3 @@ jobs:
           docker build -t "$ECR_REGISTRY/$ECR_REPOSITORY:latest" -t "$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG" --build-arg APP_ENV=kubernetes.production .
           docker push --all-tags "$ECR_REGISTRY/$ECR_REPOSITORY"
           echo "image=$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG" >> $GITHUB_OUTPUT
-      # - name: Update kube config
-      #   run: aws eks update-kubeconfig --name $EKS_CLUSTER_NAME --region $AWS_REGION
-      # - name: Deploy to EKS
-      #   env:
-      #     ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}        
-      #     IMAGE_TAG: ${{ github.sha }}
-      #     AWS_ACCOUNT_ID: ${{ secrets.AWS_ACCOUNT_ID }}
-      #     CERT_ID: ${{ secrets.CERT_ID }}
-      #     DOMAIN_NAME: ${{ secrets.DOMAIN_NAME }}
-      #     AWS_REGION: ${{ env.AWS_REGION }}
-      #   run: |
-      #     cd ../helm/
-      #     yq e -i '.frontend.image.registry = "$ECR_REGISTRY"' ai-flash-cards/eks-values.yaml
-      #     yq e -i '.backend.image.registry = "$ECR_REGISTRY"' ai-flash-cards/eks-values.yaml
-      #     yq e -i '.backend.image.tag = "$IMAGE_TAG"' ai-flash-cards/eks-values.yaml
-      #     yq e -i '.ingress.hosts[0].host = "$DOMAIN_NAME"' ai-flash-cards/eks-values.yaml
-      #     sed -i.bak "s|AWS_REGION|$AWS_REGION|g" ai-flash-cards/eks-values.yaml  
-      #     sed -i.bak "s|AWS_ACCOUNT_ID|$AWS_ACCOUNT_ID|g" ai-flash-cards/eks-values.yaml 
-      #     helm upgrade -i ai-flash-cards ./ai-flash-cards -f ./ai-flash-cards/eks-values.yaml -n ai-flash-cards --create-namespace

@@ -9,6 +9,7 @@ on:
     paths:
       - "backend/src/**"
       - "backend/__test__/**"
+      - "backend/types/**"
 env:
   BUCKET_NAME: "bucket-name"
   CLOUDFRONT_URL: "cloudfront-url"

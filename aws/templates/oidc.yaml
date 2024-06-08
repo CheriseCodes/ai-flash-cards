@@ -1,0 +1,64 @@
+---
+AWSTemplateFormatVersion: 2010-09-09
+Description: GitHub OIDC for when GitHub wants to communicate with AWS.
+Resources:
+
+  # This is the bare-bones role.
+  GitHubActionsRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: GitHub_Actions_Role
+      AssumeRolePolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Effect: Allow
+            Principal:
+              Federated: !Sub arn:aws:iam::${AWS::AccountId}:oidc-provider/token.actions.githubusercontent.com
+            Action: sts:AssumeRoleWithWebIdentity
+            Condition:
+              StringLike:
+                ## THESE ARE CASE SENSITIVE!
+                'token.actions.githubusercontent.com:sub': ['repo:CheriseCodes/*'] # TODO: try 'repo:CheriseCodes/ai-flash-cards:ref:refs/heads/main'
+              StringEqualsIgnoreCase:
+                'token.actions.githubusercontent.com:aud': sts.amazonaws.com
+      Policies:
+        - PolicyName: OidcSafetyPolicy
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Sid: OidcSafeties # Don't allow role to assume any other roles to escalate privileges
+                Effect: Deny
+                Action:
+                  - sts:AssumeRole
+                Resource: "*"
+        - PolicyName: GitHubActionsDeployPolicy # Allow pushing images to known ECR repos
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:        
+              - Sid: AllowECRPush
+                Effect: Allow
+                Action:
+                  - ecr:CompleteLayerUpload
+                  - ecr:UploadLayerPart
+                  - ecr:InitiateLayerUpload
+                  - ecr:BatchCheckLayerAvailability
+                  - ecr:PutImage
+                Resource:
+                  - !Sub arn:aws:ecr:${AWS::Region}:${AWS::AccountId}:repository/ai-flash-cards/frontend
+                  - !Sub arn:aws:ecr:${AWS::Region}:${AWS::AccountId}:repository/ai-flash-cards/backend
+              - Sid: AllowECRToken
+                Effect: Allow
+                Action: 
+                  - ecr:GetAuthorizationToken
+                Resource: "*"
+
+  # This is the OIDC provider hookup itself. This tells AWS to delegate authN GitHub
+  GitHubActionsOidcProvider:
+    Type: AWS::IAM::OIDCProvider
+    Properties:
+      ClientIdList:
+        - sts.amazonaws.com
+      ThumbprintList: # Public values provided by GitHub: https://github.blog/changelog/2023-06-27-github-actions-update-on-oidc-integration-with-aws/
+        - 6938fd4d98bab03faadb97b34396831e3780aea1
+        - 1c58a3a8518e8759bf075b76b750d4f2df264fcd
+      Url: https://token.actions.githubusercontent.com

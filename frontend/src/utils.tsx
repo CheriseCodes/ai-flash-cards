@@ -102,7 +102,6 @@ const getNewCardData = async (dispatch: Dispatch<AnyAction>, word: string, langu
     cardId: cardId,
     cardData: cardData,
     });
-  // });
   cardData = await getNewCardImage(dispatch, cardData, languageMode, languageLevel, userId, cardId, word);
     console.log("Final state of getNewCardData", cardData)
     dispatch({

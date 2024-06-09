@@ -8,7 +8,7 @@ https://github.com/CheriseCodes/ai-flash-cards/assets/51966982/deb572ee-dd7c-4f3
 
 In the project directory, you can run:
 
-### `npm run staart`
+### `npm run start`
 
 Run the frontend (if in `frontend/`) or backend (if in `backend/`) service
 
@@ -22,7 +22,4 @@ Automatically fix code quality issues identified by eslint
 
 ### `npm run build`
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
-
-The build is minified and the filenames include the hashes.\
+Builds the app for production to the `built` folder.

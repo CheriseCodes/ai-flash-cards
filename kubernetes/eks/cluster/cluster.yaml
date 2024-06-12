@@ -2,12 +2,12 @@ apiVersion: eksctl.io/v1alpha5
 kind: ClusterConfig
 
 metadata:
-  name: ai-flash-cards-managed
+  name: ai-flash-cards
   region: ca-central-1
 
 nodeGroups:
   - name: node-group
-    instanceType: t3.medium
+    instanceType: t3.large
     desiredCapacity: 1
     minSize: 1
     maxSize: 1
@@ -19,3 +19,6 @@ cloudWatch:
   clusterLogging:
     enableTypes: ["audit", "authenticator"]
     logRetentionInDays: 7
+
+secretsEncryption:
+  keyARN: arn:aws:kms:REGION:ACCOUNT_ID:key/SECRETS_KMS_ID

@@ -12,8 +12,7 @@ nodeGroups:
     minSize: 1
     maxSize: 1
     ssh:
-      allow: true                     
-      publicKeyPath: ~/.ssh/key-pair.pem 
+      publicKeyName: EC2_KP_NAME
 
 cloudWatch:
   clusterLogging:

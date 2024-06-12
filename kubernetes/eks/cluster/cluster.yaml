@@ -15,3 +15,7 @@ nodeGroups:
       allow: true                     
       publicKeyPath: ~/.ssh/key-pair.pem 
 
+cloudWatch:
+  clusterLogging:
+    enableTypes: ["audit", "authenticator"]
+    logRetentionInDays: 7

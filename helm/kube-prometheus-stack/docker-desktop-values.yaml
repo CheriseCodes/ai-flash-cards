@@ -1,0 +1,19 @@
+prometheus:
+  prometheusSpec:
+    serviceMonitorSelectorNilUsesHelmValues: false
+    podMonitorSelectorNilUsesHelmValues: false
+    serviceMonitorSelector: {}
+    serviceMonitorNamespaceSelector: {}
+    scrapeTimeout: "90s"
+    scrapeInterval: "90s"
+
+prometheus-node-exporter:
+  hostRootFsMount:
+    enabled: false
+    mountPropagation: "HostToContainer"
+
+grafana:
+  enabled: true
+  sidecar:
+    datasources:
+    defaultDatasourceEnabled: true

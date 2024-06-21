@@ -1,3 +1,4 @@
+#!/bin/bash
 INGRESS_HOST=$1
 
 # Install ingress controller

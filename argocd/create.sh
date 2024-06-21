@@ -1,3 +1,4 @@
+#!/bin/bash
 # Create an EKS cluster
 cluster_name=ai-flash-cards
 AWS_ACCOUNT_ID=$1

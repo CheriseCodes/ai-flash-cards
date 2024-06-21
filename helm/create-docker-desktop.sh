@@ -133,7 +133,7 @@ fi
 
 if [[ $INSTALL_HELM_CHART_FLAG == 1 ]]
 then
-    helm diff upgrade --install kube-prometheus-stack prometheus-community/kube-prometheus-stack --version 59.1.0 --values ./kube-prometheus-stack/docker-desktop-values.yaml --namespace monitoring --create-namespace
+    helm upgrade --install kube-prometheus-stack prometheus-community/kube-prometheus-stack --version 59.1.0 --values ./kube-prometheus-stack/docker-desktop-values.yaml --namespace monitoring --create-namespace
 fi
 
 # # (Optional) Forward to local port as needed

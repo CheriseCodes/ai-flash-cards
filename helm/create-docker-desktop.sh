@@ -1,6 +1,14 @@
 #!/bin/bash
 INGRESS_HOST=$1
 
+if [[ -z $INGRESS_HOST ]]
+then
+    echo "[ERROR] Ingress hostname undefined. Please pass it as the first parameter."
+    exit 1
+else
+    echo "[INFO] Creating AI Flashcards app at https://$INGRESS_HOST"
+fi
+
 # Install helm-diff plugin
 PLUGINS_LIST=$(helm plugin list)
 if [[ "$PLUGINS_LIST" !=  *"Preview helm upgrade changes as a diff"* ]] 

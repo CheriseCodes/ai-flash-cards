@@ -54,8 +54,7 @@ kubectl apply -n argocd -f https://raw.githubusercontent.com/argoproj/argo-cd/st
 kubectl patch svc argocd-server -n argocd -p '{"spec": {"type": "LoadBalancer"}}'
 
 # enable access through https://localhost:8080
-# TODO: Make output go to the background so script can continue
-kubectl port-forward svc/argocd-server -n argocd 8080:443
+kubectl port-forward svc/argocd-server -n argocd 8080:443 &
 
 # set namespace to argocd for using argocd cli
 kubectl config set-context --current --namespace=argocd

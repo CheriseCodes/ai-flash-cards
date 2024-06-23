@@ -5,9 +5,13 @@ metadata:
   name: ai-flash-cards
   region: ca-central-1
 
+iam:
+  withOIDC: true
+
 nodeGroups:
   - name: node-group
-    instanceType: t3.large
+    instanceType: t3.small
+    maxPodsPerNode: 110
     desiredCapacity: 1
     minSize: 1
     maxSize: 1
@@ -18,6 +22,10 @@ cloudWatch:
   clusterLogging:
     enableTypes: ["audit", "authenticator"]
     logRetentionInDays: 7
+
+addons:
+  - name: vpc-cni # Get more IPs (for pods) per node
+    version: latest
 
 secretsEncryption:
   keyARN: arn:aws:kms:REGION:ACCOUNT_ID:key/SECRETS_KMS_ID

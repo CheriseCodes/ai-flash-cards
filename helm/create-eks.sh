@@ -63,41 +63,34 @@ eksctl create iamserviceaccount \
   --role-name AmazonEKSLoadBalancerControllerRole \
   --attach-policy-arn=arn:aws:iam::$AWS_ACCOUNT_ID:policy/AWSLoadBalancerControllerIAMPolicy \
   --approve 
-# install cert manager
-kubectl apply \
-    --validate=false \
-    -f https://github.com/jetstack/cert-manager/releases/download/v1.13.5/cert-manager.yaml
-# wait for cert manager resources to be available
-sleep 120
-# download controller spec
-curl -Lo v2_7_2_full.yaml https://github.com/kubernetes-sigs/aws-load-balancer-controller/releases/download/v2.7.2/v2_7_2_full.yaml 
-# modify the controller spec if downloaded v2_7_2
-sed -i.bak -e "s|your-cluster-name|$cluster_name|" ./v2_7_2_full.yaml
-# (optional) use privately uploaded aws-load-balancer-controller image
-sed -i.bak -e "s|public.ecr.aws/eks/aws-load-balancer-controller|$AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/eks/aws-load-balancer-controller|" ./v2_7_2_full.yaml
-
 # install load balancer controller
-kubectl apply -f v2_7_2_full.yaml
+helm repo add eks https://aws.github.io/eks-charts
+helm repo update eks
+helm install aws-load-balancer-controller eks/aws-load-balancer-controller \
+  -n kube-system \
+  --set clusterName=$cluster_name \
+  --set serviceAccount.create=false \
+  --set serviceAccount.name=aws-load-balancer-controller 
 
-# install load balancer controller ingress class
-curl -Lo v2_7_2_ingclass.yaml https://github.com/kubernetes-sigs/aws-load-balancer-controller/releases/download/v2.7.2/v2_7_2_ingclass.yaml
-kubectl apply -f v2_7_2_ingclass.yaml
+# wait for load balancer controller service to be ready
+sleep 30
 
+# install ai-flash-cards app
 helm upgrade  --install ai-flash-cards ./ai-flash-cards --timeout 3600s  --namespace ai-flash-cards --create-namespace --values ./ai-flash-cards/eks-values.yaml
 
-# (Optional) Install Prometheus
-helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
-helm repo update
+# # (Optional) Install Prometheus
+# helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
+# helm repo update
 
-# Using version 59.1.0 because it uses the same Grafana version as AWS
-helm upgrade --install kube-prometheus-stack prometheus-community/kube-prometheus-stack --version 59.1.0 --values ./kube-prometheus-stack/shared-values.yaml --namespace monitoring --create-namespace
+# # Using version 59.1.0 because it uses the same Grafana version as AWS
+# helm upgrade --install kube-prometheus-stack prometheus-community/kube-prometheus-stack --version 59.1.0 --values ./kube-prometheus-stack/shared-values.yaml --namespace monitoring --create-namespace
 
-# install argocd
-kubectl create namespace argocd
-kubectl apply -n argocd -f https://raw.githubusercontent.com/argoproj/argo-cd/stable/manifests/install.yaml
+# # (Optional) install argocd
+# kubectl create namespace argocd
+# kubectl apply -n argocd -f https://raw.githubusercontent.com/argoproj/argo-cd/stable/manifests/install.yaml
 
-# create loadbalancer to expose the argocd server
-kubectl patch svc argocd-server -n argocd -p '{"spec": {"type": "LoadBalancer"}}'
+# # create loadbalancer to expose the argocd server
+# kubectl patch svc argocd-server -n argocd -p '{"spec": {"type": "LoadBalancer"}}'
 
 # # (Optional) Forward to local port as needed
 # kubectl port-forward -n monitoring service/kube-prometheus-stack-grafana 3000:80

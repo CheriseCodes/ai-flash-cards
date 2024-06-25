@@ -86,9 +86,6 @@ backend:
     name: api-secret
     type: Opaque
     data:
-      awsAccessKeyId: ""
-      awsSecretAccessKey: ""
-      awsSessionToken: ""
       openaiApiKey: ""
   resources: {}
   volumeMounts: []

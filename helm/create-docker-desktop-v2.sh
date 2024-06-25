@@ -40,7 +40,7 @@ helm repo add prometheus-community https://prometheus-community.github.io/helm-c
 helm repo update
 
 # Using version 59.1.0 because it uses the same Grafana version as AWS
-helm upgrade --install kube-prometheus-stack prometheus-community/kube-prometheus-stack --version 59.1.0 --values ./kube-prometheus-stack/docker-desktop-values.yaml --namespace monitoring --create-namespace
+helm upgrade --install kube-prometheus-stack prometheus-community/kube-prometheus-stack --version 59.1.0 --values ./kube-prometheus-stack/shared-values.yaml --namespace monitoring --create-namespace
 
 # # (Optional) Forward to local port as needed
 # kubectl port-forward -n ingress-nginx service/ingress-nginx-controller 8080:80

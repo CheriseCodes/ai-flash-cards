@@ -118,7 +118,7 @@ then
     echo "[INFO] monitoring namespace exists"
     echo "[INFO] Checking if there are any changes to be made"
 
-    HELM_DIFF=$(helm diff upgrade --install kube-prometheus-stack prometheus-community/kube-prometheus-stack --version 59.1.0 --values ./kube-prometheus-stack/docker-desktop-values.yaml --namespace monitoring)
+    HELM_DIFF=$(helm diff upgrade --install kube-prometheus-stack prometheus-community/kube-prometheus-stack --version 59.1.0 --values ./kube-prometheus-stack/shared-values.yaml --namespace monitoring)
     if [[ ! -z $HELM_DIFF ]]
     then
         INSTALL_HELM_CHART_FLAG=1
@@ -133,7 +133,7 @@ fi
 
 if [[ $INSTALL_HELM_CHART_FLAG == 1 ]]
 then
-    helm upgrade --install kube-prometheus-stack prometheus-community/kube-prometheus-stack --version 59.1.0 --values ./kube-prometheus-stack/docker-desktop-values.yaml --namespace monitoring --create-namespace
+    helm upgrade --install kube-prometheus-stack prometheus-community/kube-prometheus-stack --version 59.1.0 --values ./kube-prometheus-stack/shared-values.yaml --namespace monitoring --create-namespace
 fi
 
 # # (Optional) Forward to local port as needed

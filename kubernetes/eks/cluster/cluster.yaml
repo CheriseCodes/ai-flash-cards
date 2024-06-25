@@ -2,16 +2,30 @@ apiVersion: eksctl.io/v1alpha5
 kind: ClusterConfig
 
 metadata:
-  name: ai-flash-cards-managed
+  name: ai-flash-cards
   region: ca-central-1
+
+iam:
+  withOIDC: true
 
 nodeGroups:
   - name: node-group
-    instanceType: t3.medium
+    instanceType: t3.small
+    maxPodsPerNode: 110
     desiredCapacity: 1
     minSize: 1
     maxSize: 1
     ssh:
-      allow: true                     
-      publicKeyPath: ~/.ssh/key-pair.pem 
+      publicKeyName: EC2_KP_NAME
 
+cloudWatch:
+  clusterLogging:
+    enableTypes: ["audit", "authenticator"]
+    logRetentionInDays: 7
+
+addons:
+  - name: vpc-cni # Get more IPs (for pods) per node
+    version: latest
+
+secretsEncryption:
+  keyARN: arn:aws:kms:REGION:ACCOUNT_ID:key/SECRETS_KMS_ID

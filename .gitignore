@@ -16,6 +16,8 @@ test_import.txt
 ai-code-review.yml
 .nginx/
 reverse_proxy/
+*.bak
+
 # production
 build
 dist

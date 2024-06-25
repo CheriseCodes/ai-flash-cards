@@ -1,9 +1,10 @@
+#!/bin/bash
 # Create an EKS cluster
 cluster_name=ai-flash-cards
 AWS_ACCOUNT_ID=$1
 AWS_REGION=$2
-# Min instance size is t3.medium
-eksctl create cluster --name $cluster_name --region $AWS_REGION --nodegroup-name node-group --node-type t3.large --nodes 1 --nodes-min 1 --nodes-max 1 --managed
+# Min instance size is t3.large
+eksctl create cluster -f ../eks/cluster/cluster.yaml
 
 # Install AWS Load Balancer Controller add-on
 # create new IAM OIDC provider
@@ -41,7 +42,6 @@ kubectl apply -f v2_7_2_full.yaml
 curl -Lo v2_7_2_ingclass.yaml https://github.com/kubernetes-sigs/aws-load-balancer-controller/releases/download/v2.7.2/v2_7_2_ingclass.yaml
 kubectl apply -f v2_7_2_ingclass.yaml
 
-
 # Start ArgoCD config
 # TODO: Check if argocd cli is installed, if not install it
 
@@ -52,9 +52,9 @@ kubectl apply -n argocd -f https://raw.githubusercontent.com/argoproj/argo-cd/st
 # create loadbalancer to expose the argocd server
 kubectl patch svc argocd-server -n argocd -p '{"spec": {"type": "LoadBalancer"}}'
 
+# TODO: Check that svc and pods are ready before forwarding the port
 # enable access through https://localhost:8080
-# TODO: Make output go to the background so script can continue
-kubectl port-forward svc/argocd-server -n argocd 8080:443
+kubectl port-forward svc/argocd-server -n argocd 8080:443 /dev/null &
 
 # set namespace to argocd for using argocd cli
 kubectl config set-context --current --namespace=argocd

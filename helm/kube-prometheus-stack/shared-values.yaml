@@ -1,0 +1,6 @@
+prometheus:
+  prometheusSpec:
+    serviceMonitorSelectorNilUsesHelmValues: false
+    podMonitorSelectorNilUsesHelmValues: false
+    scrapeTimeout: "90s"
+    scrapeInterval: "90s"

@@ -17,6 +17,7 @@ ai-code-review.yml
 .nginx/
 reverse_proxy/
 *.bak
+.env
 
 # production
 build

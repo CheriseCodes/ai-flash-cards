@@ -33,6 +33,7 @@ const renderApp = () => {
       <Auth0Provider
       domain="dev-akcpb5t2powmgxer.us.auth0.com"
       clientId="ePyflRQeGysD5yi5tgrCY5UtDM6nZa5T"
+      cacheLocation="localstorage"
       authorizationParams={{
         redirect_uri: window.location.origin,
         audience: "http://localhost:8000",

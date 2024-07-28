@@ -3,20 +3,19 @@ import { Dispatch, SetStateAction } from "react";
 import { v4 as uuidv4 } from "uuid";
 import { serviceConfig } from "./config";
 
-const getNewCardText = async (word: string, languageMode: string, languageLevel: string, userId: string, cardId: string, timeStamp: number) => {
-
+const getNewCardText = async (word: string, languageMode: string, languageLevel: string, userId: string, cardId: string, timeStamp: number, accessToken: string) => {
   console.log("start getNewCardText");
   try {
-    const authToken = document.cookie
-      .split("; ")
-      .find((row) => row.startsWith("afc_app="))
-      ?.split("=")[1];
+    if (!accessToken) {
+      console.log("User not authenticated")
+      return {}
+    }
     const response = await fetch(
       `${serviceConfig.BACKEND_ENDPOINT}${serviceConfig.BACKEND_PATH}/generations/sentences?word=${word}&lang_mode=${languageMode}&lang_level=${languageLevel}&userId=${userId}&cardId=${cardId}&timeStamp=${timeStamp}`,
       {
         headers: {
           "Content-Type": "application/json",
-          "Authorization": `Bearer ${authToken}`,
+          "Authorization": `Bearer ${accessToken}`,
         },
       },
     );
@@ -40,14 +39,13 @@ const getNewCardText = async (word: string, languageMode: string, languageLevel:
   
 }
 
-const getNewCardImage = async (dispatch: Dispatch<AnyAction>, cardData: FlashCard, languageMode: string, languageLevel: string, userId: string, cardId: string, word: string) => {
+const getNewCardImage = async (dispatch: Dispatch<AnyAction>, cardData: FlashCard, languageMode: string, languageLevel: string, userId: string, cardId: string, word: string, accessToken: string) => {
     console.log("start getNewCardImage...");
     try {
-      // const authToken = document.cookie
-      // .split("; ")
-      // .find((row) => row.startsWith("afc_app="))
-      // ?.split("=")[1];
-      const authToken = "fake"
+      if (!accessToken) {
+        console.log("User not authenticated")
+        return {}
+      }
       cardData.generatingImage = true;
       dispatch({ type: "update-card", cardData: cardData, cardId: cardId });
       const imageResponse = await fetch(
@@ -55,7 +53,7 @@ const getNewCardImage = async (dispatch: Dispatch<AnyAction>, cardData: FlashCar
         {
           headers: {
             "Content-Type": "application/json",
-            "Authorization": `Bearer ${authToken}`
+            "Authorization": `Bearer ${accessToken}`
           },
         },
       );
@@ -67,7 +65,7 @@ const getNewCardImage = async (dispatch: Dispatch<AnyAction>, cardData: FlashCar
           method: "POST",
           headers: {
             "Content-Type": "application/json",
-            "Authorization": `Bearer ${authToken}`
+            "Authorization": `Bearer ${accessToken}`
           },
           body: JSON.stringify({
             imgUrl: imageJson.data[0].url,
@@ -89,9 +87,9 @@ const getNewCardImage = async (dispatch: Dispatch<AnyAction>, cardData: FlashCar
     }
 }
 
-const getNewCardData = async (dispatch: Dispatch<AnyAction>, word: string, languageMode: string, languageLevel: string, userId: string, cardId: string, timeStamp: number) => {
+const getNewCardData = async (dispatch: Dispatch<AnyAction>, word: string, languageMode: string, languageLevel: string, userId: string, cardId: string, timeStamp: number, accessToken: string ) => {
   console.log("start getNewCardData")
-  let cardData = await getNewCardText(word, languageMode, languageLevel, userId, cardId, timeStamp);
+  let cardData = await getNewCardText(word, languageMode, languageLevel, userId, cardId, timeStamp, accessToken);
   console.log("getNewCardData cardData", cardData);
   if (typeof(cardData.sampleSentence) == 'undefined') {
     return {}
@@ -102,7 +100,7 @@ const getNewCardData = async (dispatch: Dispatch<AnyAction>, word: string, langu
     cardId: cardId,
     cardData: cardData,
     });
-  cardData = await getNewCardImage(dispatch, cardData, languageMode, languageLevel, userId, cardId, word);
+  cardData = await getNewCardImage(dispatch, cardData, languageMode, languageLevel, userId, cardId, word, accessToken);
     console.log("Final state of getNewCardData", cardData)
     dispatch({
     type: "update-card",
@@ -120,6 +118,7 @@ export const generateNewCard = async (
   languageLevel: string,
   setErrors: Dispatch<SetStateAction<Array<ErrorMessage>>>,
   userId: string,
+  accessToken: string
 ) => {
     try {
       if (word) {
@@ -134,7 +133,7 @@ export const generateNewCard = async (
             generatingImage: false,
           },
         });
-        const cardData = await getNewCardData(dispatch, word, languageMode, languageLevel, userId,cardId, timeStamp);
+        const cardData = await getNewCardData(dispatch, word, languageMode, languageLevel, userId,cardId, timeStamp, accessToken);
         console.log("generateNewCard cardData", cardData)
         
         if (typeof(cardData.sampleSentence) == 'undefined') {
@@ -162,12 +161,13 @@ export const generateNextCard = async (
   cardData: FlashCard,
   setErrors: Dispatch<SetStateAction<Array<ErrorMessage>>>,
   userId: string,
+  accessToken: string,
 ) => {
     const cardId = cardData.id;
     const timeStamp = Date.now();
     try {
       dispatch({ type: "set-generating-text", cardId: cardId, isGenerating: true });
-      const cardData = await getNewCardData(dispatch, word, languageMode, languageLevel, userId, cardId, timeStamp)
+      const cardData = await getNewCardData(dispatch, word, languageMode, languageLevel, userId, cardId, timeStamp, accessToken)
       // delete card if sample sentence was not successfully generated
       if (typeof(cardData.sampleSentence) == 'undefined') {
         dispatch({

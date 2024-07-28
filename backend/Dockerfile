@@ -1,18 +1,12 @@
-# syntax=docker/dockerfile:1
-
 # Comments are provided throughout this file to help you get started.
 # If you need more help, visit the Dockerfile reference guide at
 # https://docs.docker.com/engine/reference/builder/
 
-ARG NODE_VERSION=22
-# Set stage the image is built for
-ARG APP_ENV="kubernetes.production"
+ARG NODE_VERSION=20
 
 ################################################################################
 # Use node image for base image for all stages.
 FROM node:${NODE_VERSION}-slim as base
-ARG NODE_VERSION
-ARG APP_ENV
 
 # Set working directory for all build stages.
 WORKDIR /usr/src/app
@@ -45,16 +39,12 @@ RUN --mount=type=bind,source=package.json,target=package.json \
 # Copy the rest of the source files into the image.
 COPY . .
 # Run the build script.
-ENV NODE_ENV="production"
 RUN npm run build
 
 ################################################################################
 # Create a new stage to test the application with minimal runtime dependencies
 # where the necessary files are copied from the build stage.
 FROM build as test
-
-ENV NODE_ENV test
-ENV  APP_ENV $APP_ENV
 
 RUN --mount=type=bind,source=package.json,target=package.json \
     --mount=type=bind,source=package-lock.json,target=package-lock.json \
@@ -70,9 +60,6 @@ RUN npm run test
 # where the necessary files are copied from the build stage.
 FROM build as final
 
-ARG NODE_VERSION
-ARG APP_ENV
-
 # Run the application as a non-root user.
 USER node
 
@@ -84,10 +71,6 @@ COPY . .
 # the built application from the build stage into the image.
 COPY --from=deps /usr/src/app/node_modules ./node_modules
 COPY --from=build /usr/src/app/built ./built
-
-# Set environmet variables
-ENV NODE_ENV="production"
-ENV APP_ENV=$APP_ENV
 
 # Expose the port that the application listens on.
 EXPOSE 8000

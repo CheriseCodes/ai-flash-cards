@@ -2,7 +2,6 @@ import express, { Application } from "express";
 import bodyParser from "body-parser";
 import OpenAI from "openai";
 import cors from "cors";
-import bcrypt from "bcrypt";
 import { auth } from 'express-oauth2-jwt-bearer';
 
 import { open, rm } from "node:fs/promises";
@@ -26,7 +25,6 @@ import { dynamoDbClient, s3Client } from "../src/aws-clients";
 
 import appConfig from "./config";
 import * as sh from "./server-helpers";
-import * as ah from "./auth-helpers";
 import { ChatCompletion } from "openai/resources/index.mjs";
 
 export const app: Application = express();
@@ -34,34 +32,13 @@ app.use(cors());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 
-// const sessionConfig = {
-//   secret: 'your-secret-key',
-//   resave: false,
-//   saveUninitialized: true,
-//   cookie: {
-//     httpOnly: true,
-//     secure: process.env.NODE_ENV === 'prod',
-//   }
-// };
-// app.use(cookieParser());
-// app.use(session(sessionConfig));
-// app.use(csrf());
-
-// TODO: Add checkScopes middleware for each protected endpoint
-// REF: https://auth0.com/docs/quickstart/backend/nodejs/01-authorization#protect-api-endpoints
-// const { requiredScopes } = require('express-oauth2-jwt-bearer');
-
-// const checkScopes = requiredScopes('read:messages');
-
 export const jwtCheck = auth({
   audience: 'http://localhost:8000',
   issuerBaseURL: 'https://dev-akcpb5t2powmgxer.us.auth0.com/',
   tokenSigningAlg: 'RS256',
 });
 
-const maxAge = 3 * 24 * 60 * 60;
-
-export const openai = process.env.APP_ENV.includes("test") ? new OpenAI({apiKey: "sk-test"}) : new OpenAI({apiKey: process.env.OPENAI_API_KEY})
+export const openai = new OpenAI({apiKey: process.env.OPENAI_API_KEY})
 
 const openAIChatCompletion = async (model, temperature, messages) => {
   const response: ChatCompletion = await openai.chat.completions.create({
@@ -72,7 +49,7 @@ const openAIChatCompletion = async (model, temperature, messages) => {
   return response
 }
 
-const authMiddleware = (process.env.APP_ENV.includes("production") || process.env.APP_ENV.includes("staging")) ? jwtCheck : (req, res, next) => { console.log('Auth middleware executed'); next();};
+const authMiddleware = (process.env.APP_ENV.includes("test") || process.env.APP_ENV.includes("development")) ? (req, res, next) => { console.log('Auth middleware executed'); next();} : jwtCheck;
 
 const putItemFlashCardTable = async (userId, timeStamp, cardId, response, messages) => {
   const awsInput: PutItemCommandInput = {
@@ -297,7 +274,7 @@ app.post("/image", authMiddleware, async (req, res) => {
     const localFileName = `./private/images/${imgName}.png`;
     const remoteFileName = `users/${userId}/images/${imgName}.png`;
 
-    if (process.env.NODE_ENV != 'test') { // don't run in test environment
+    if (process.env.APP_ENV != 'test') { // don't run in test environment
       https.get(imgUrl, async (res) => {
         const fdWrite = await open(localFileName, "w");
         const writeStream = res.pipe(fdWrite.createWriteStream());
@@ -443,96 +420,4 @@ app.put("/flashcard", async (req, res) => {
   // delete old image
   // upload new image
   // update dynamodb item with new image
-});
-
-app.post("/signup", async (req, res) => {
-  const username: string = req.body.username;
-  const password: string = req.body.password;
-  // Check if user exists in the DB first
-  const input = { // GetItemInput
-    TableName: "UserTable", // required
-    Key: { // Key // required
-      UserId: { // AttributeValue Union: only one key present
-        S: username,
-      },
-    },
-    ConsistentRead: true,
-  };
-  const command = new GetItemCommand(input);
-  const response = await dynamoDbClient.send(command);
-  // user already exists, don't let them create a new user
-  if (response.Item) {
-    res.status(400).send(`User ${username} already exists`);
-    return;
-  }
-  const token = ah.generateAccessToken({ username: username });
-  // Store the user and credentials in the DB
-  // Maybe: salt = crypto.randomBytes(16);
-  // Maybe: crypto.pbkdf2(req.body.password, salt, 310000, 32, 'sha256')
-  const hashRes = await bcrypt.hash(password, 10)
-  const awsInput: PutItemCommandInput = {
-    Item: {
-      UserId: { S: username },
-      AccessToken: {S: token},
-      // Salt: {S: salt},
-      Password: {S: hashRes},
-      Role: {S: "learner"},
-    },
-    TableName: "UserTable",
-  };
-  const awsCommand = new PutItemCommand(awsInput);
-  await dynamoDbClient.send(awsCommand);
-  res.setHeader("Set-Cookie", `fc_jwt=${token}; Max-Age=${maxAge*1000}`);
-  res.status(201).json({Token: token});
-});
-
-// TODO: return csrf token
-// TODO: return session token
-// TODO: Add security headers HttpOnly, SameSite (optional), Secure (for HTTPS)
-app.post("/login", async (req, res) => {
-  const username: string = req.body.username;
-  const password: string = req.body.password;
-  // Check if user exists in the DB first
-  const input = { // GetItemInput
-    TableName: "UserTable", // required
-    Key: { // Key // required
-      UserId: { // AttributeValue Union: only one key present
-        S: username,
-      },
-    },
-    ConsistentRead: true,
-  };
-  const command = new GetItemCommand(input);
-  const response = await dynamoDbClient.send(command);
-  // user already exists, don't let them create a new user
-  if (response.Item === undefined) {
-    res.status(400).send(`Incorect username or password`);
-    return;
-  }
-  // confirm the password
-  // Maybe:
-  // crypto.pbkdf2(password, response.Item.Salt.S, 310000, 32, 'sha256', function(err, hashedPassword) {
-  //   if (err) { return cb(err); }
-  //   if (!crypto.timingSafeEqual(response.Item.HashedPassword, hashedPassword)) {
-  //       return cb(null, false, { message: 'Incorrect username or password.' });
-  //   }
-  const compareRes = await bcrypt.compare(password, response.Item.Password.S);
-  if (compareRes) { // login succesful
-    const token = ah.generateAccessToken({ username: username });
-    res.setHeader("Set-Cookie", `fc_jwt=${token}; Max-Age=${maxAge*1000}`);
-    res.status(200).send(`${username} logged in successfully`);
-    return;
-  } else {
-    res.status(400).send(`Incorect username or password`);
-    return;
-  }
-});
-
-app.post("/logout", async (req, res) => {
-  try {
-    res.setHeader("Set-Cookie", `fc_jwt=""; Max-Age=${1}`);
-    res.sendStatus(200)
-  } catch (err) {
-    res.sendStatus(500)
-  }
 });

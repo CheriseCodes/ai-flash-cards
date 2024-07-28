@@ -1,4 +1,4 @@
-import { languageConfig } from "./config";
+import languageConfig from '../config/languages.json';
 
 const currentStateSummary = (state: any) => {
   console.log(`# of cards is ${state.cards.length}`)

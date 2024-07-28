@@ -1,7 +1,7 @@
 import { AnyAction } from "@reduxjs/toolkit";
 import { Dispatch, SetStateAction } from "react";
 import { v4 as uuidv4 } from "uuid";
-import { serviceConfig } from "./config";
+import serviceConfig from '../config/service.json';
 
 const getNewCardText = async (word: string, languageMode: string, languageLevel: string, userId: string, cardId: string, timeStamp: number, accessToken: string) => {
   console.log("start getNewCardText");

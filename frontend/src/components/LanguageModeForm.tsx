@@ -1,5 +1,5 @@
 import React from "react";
-import { languageConfig } from "../config";
+import languageConfig from '../../config/languages.json';
 
 import LanguageModeFormInput from "./LanguageModeFormInput";
 

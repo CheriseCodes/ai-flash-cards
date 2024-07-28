@@ -1,6 +1,6 @@
 import React from "react";
 import { useSelector } from "react-redux";
-import { languageConfig } from "../config";
+import languageConfig from '../../config/languages.json';
 import LanguageLevelFormInput from "./LanguageLevelFormInput";
 
 const LanguageLevelForm = () => {

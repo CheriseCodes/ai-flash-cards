@@ -274,7 +274,7 @@ app.post("/image", authMiddleware, async (req, res) => {
     const localFileName = `./private/images/${imgName}.png`;
     const remoteFileName = `users/${userId}/images/${imgName}.png`;
 
-    if (process.env.APP_ENV != 'test') { // don't run in test environment
+    if (!process.env.APP_ENV.includes('test')) { // don't run in test environment
       https.get(imgUrl, async (res) => {
         const fdWrite = await open(localFileName, "w");
         const writeStream = res.pipe(fdWrite.createWriteStream());

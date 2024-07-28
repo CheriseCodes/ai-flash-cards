@@ -1,0 +1,13 @@
+# WARNING: For development purposes only, the production version is ran in Kubernetes (EKS)
+name: ai-flash-cards
+services:
+  frontend:
+    build: ./frontend
+    ports:
+      - "80:80"
+  backend:
+    build: ./backend
+    ports:
+      - "8000:8000"
+    env_file:
+      - ./backend/.env

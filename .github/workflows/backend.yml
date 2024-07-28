@@ -11,9 +11,6 @@ on:
       - "backend/__test__/**"
       - "backend/types/**"
 env:
-  BUCKET_NAME: "bucket-name"
-  CLOUDFRONT_URL: "cloudfront-url"
-  AWS_PROFILE: "aws-profile"
   NODE_ENV: "test"
   APP_ENV: "local.test"
 
@@ -28,7 +25,7 @@ jobs:
 
     strategy:
       matrix:
-        node-version: [22.x]
+        node-version: [20.x]
         # See supported Node.js release schedule at https://nodejs.org/en/about/previous-releases/
     steps:
     - uses: oven-sh/setup-bun@v1

@@ -8,9 +8,6 @@ FROM node:${NODE_VERSION}-slim as build
 # Set the working directory in the container
 WORKDIR /app
 
-# Set stage the image is built for
-ARG APP_ENV="kubernetes.production"
-
 # Copy package.json and package-lock.json to the working directory
 COPY package*.json ./
 
@@ -19,9 +16,6 @@ RUN npm install
 
 # Copy the entire application code to the container
 COPY . .
-
-# Set backend url
-RUN printf "VITE_APP_ENV="${APP_ENV}"" > .env
 
 # Build the React app for production
 RUN npm run build

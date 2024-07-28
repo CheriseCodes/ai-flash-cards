@@ -3,6 +3,7 @@ import { useSelector, useDispatch } from "react-redux";
 import PropTypes from "prop-types";
 import { generateNewCard } from "../utils";
 import { Button } from "react-bootstrap";
+import { useAuth0 } from "@auth0/auth0-react";
 
 const WordInput = ({ setErrors, userId }: { setErrors: Dispatch<SetStateAction<Array<ErrorMessage>>>, userId: string }) => {
   const languageLevel = useSelector((state: LanguageState) => state.languageLevel);
@@ -12,8 +13,9 @@ const WordInput = ({ setErrors, userId }: { setErrors: Dispatch<SetStateAction<A
   const selectedCards = useSelector((state: CardState) => state.selectedCards);
   const dispatch = useDispatch();
   const textAreaRef = useRef<HTMLInputElement>(null);
+  const {  isAuthenticated, getAccessTokenSilently } = useAuth0();
 
-  const handleSubmit = (e: any) => {
+  const handleSubmit = async (e: any) => {
     e.preventDefault();
     if (textAreaRef.current != null) {
       const wordList = textAreaRef.current.value;
@@ -23,6 +25,14 @@ const WordInput = ({ setErrors, userId }: { setErrors: Dispatch<SetStateAction<A
       );
       setSpinner(true)
       try {
+        let accessToken = "";
+        if (isAuthenticated) {
+          try {
+            accessToken = await getAccessTokenSilently();
+          } catch {
+            console.log("getAccessTokenSilently failed")
+          }
+        }
         generateNewCard(
           dispatch,
           word,
@@ -30,6 +40,7 @@ const WordInput = ({ setErrors, userId }: { setErrors: Dispatch<SetStateAction<A
           languageLevel,
           setErrors,
           userId,
+          accessToken
         );
       } catch (e) {
         console.error(e)
@@ -66,7 +77,6 @@ const WordInput = ({ setErrors, userId }: { setErrors: Dispatch<SetStateAction<A
         <Button variant="primary" onClick={handleDownload}>
           Download
         </Button>
-        {/* {spinner && <LoadingSpinner purpose={"Generating cards"} />} */}
       </form>
     </div>
   );

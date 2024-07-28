@@ -4,7 +4,7 @@ import { configureStore } from '@reduxjs/toolkit'
 import { Provider } from 'react-redux'
 // As a basic setup, import your same slice reducers
 import reducer from '../src/reducer'
-import { languageConfig } from '../src/config'
+import  languageConfig  from "../config/languages.json";
 
 export function renderWithProviders(
   ui,

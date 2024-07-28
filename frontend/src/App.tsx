@@ -9,14 +9,16 @@ import ErrorBanner from "./components/ErrorBanner";
 import { v4 as uuidv4 } from "uuid";
 import LoginButton from "./components/LoginButton";
 import Profile from "./components/Profile";
+import { useAuth0 } from "@auth0/auth0-react";
 
-import { serviceConfig } from "./config";
+import serviceConfig from '../config/service.json';
 
 console.log(`Backend set to ${serviceConfig.BACKEND_ENDPOINT}${serviceConfig.BACKEND_PATH}`)
 
 const App = () => {
   const cards = useSelector((state: CardState) => state.cards);
   const [errors, setErrors] = useState<ErrorMessage[]>([]);
+  const {  getAccessTokenSilently, isAuthenticated } = useAuth0();
   const userId = "default";
 
   const handleSubmit = (e: any) => {
@@ -26,18 +28,17 @@ const App = () => {
 
   const fetchAllFlashcards = async () => {
     try {
-      const authToken = document.cookie
-      .split("; ")
-      .find((row) => row.startsWith("afc_app="))
-      ?.split("=")[1];
-      if (authToken) {
-        console.log("token:", authToken)
+      let accessToken = ""
+      if (isAuthenticated) {
+        accessToken = await getAccessTokenSilently();
+      }
+      if (accessToken) {
         const response = await fetch(
           `${serviceConfig.BACKEND_ENDPOINT}${serviceConfig.BACKEND_PATH}/flashcards?userId=${userId}`,
           {
             headers: {
               "Content-Type": "application/json",
-              "Authorization": `Bearer ${authToken}`
+              "Authorization": `Bearer ${accessToken}`
             },
           },
         );
@@ -56,10 +57,7 @@ const App = () => {
   // fetch flashcards for current user on first load
   useEffect(() => {
     fetchAllFlashcards()
-  },[document.cookie
-    .split("; ")
-    .find((row) => row.startsWith("afc_app="))
-    ?.split("=")[1]])
+  },[])
 
   return (
     <div className="App">
@@ -67,7 +65,7 @@ const App = () => {
         <h1 className="title">AI Generated Flashcards</h1>
       </div>
       <WordInput setErrors={setErrors} userId={userId} />
-      <LoginButton />
+      {!isAuthenticated && <LoginButton />}
       <Profile />
       <LanguageModeForm />
       <LanguageLevelForm />

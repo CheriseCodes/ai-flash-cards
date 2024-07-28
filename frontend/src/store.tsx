@@ -1,5 +1,5 @@
 import reducer from "./reducer";
-import { languageConfig } from "./config";
+import languageConfig from '../config/languages.json';
 import { configureStore } from "@reduxjs/toolkit";
 import storage from "redux-persist/lib/storage";
 import {

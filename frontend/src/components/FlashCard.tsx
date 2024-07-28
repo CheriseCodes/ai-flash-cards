@@ -4,12 +4,14 @@ import PropTypes from "prop-types";
 import { generateNextCard  } from "../utils";
 import LoadingSpinner from "./LoadingSpinner";
 import { CloseButton } from "react-bootstrap";
+import { useAuth0 } from "@auth0/auth0-react";
 
 const FlashCard = ({ cardData, setErrors, userId }: { cardData: FlashCard, setErrors: Dispatch<SetStateAction<Array<ErrorMessage>>>, userId: string}) => {
   const [enableEdit, setEnableEdit] = useState(false);
   const [selected, setSelected] = useState(false);
   const [imageError, setImageError] = useState(false);
   const [reloadCount, setReloadCount] = useState(0);
+  const {  getAccessTokenSilently, isAuthenticated } = useAuth0();
 
   const wordRef = useRef<HTMLInputElement>(null);
   const wordTranslatedRef = useRef<HTMLInputElement>(null);
@@ -23,6 +25,14 @@ const FlashCard = ({ cardData, setErrors, userId }: { cardData: FlashCard, setEr
 
   const handleRegenerateCard = async () => {
     if (wordRef.current != null) {
+      let accessToken = "";
+      if (isAuthenticated) {
+      try {
+        accessToken = await getAccessTokenSilently();
+      } catch {
+        console.log("getAccessTokenSilently failed")
+      }
+    }
       const currWord = wordRef.current.value;
       generateNextCard(
         dispatch,
@@ -32,6 +42,7 @@ const FlashCard = ({ cardData, setErrors, userId }: { cardData: FlashCard, setEr
         cardData,
         setErrors,
         userId,
+        accessToken
       );
     }
     

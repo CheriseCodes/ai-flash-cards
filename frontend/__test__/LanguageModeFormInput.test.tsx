@@ -6,7 +6,7 @@ import { renderWithProviders } from './test-utils';
 import LanguageModeFormInput from '../src/components/LanguageModeFormInput';
 import { it, expect } from '@jest/globals';
 
-import { languageConfig } from "../src/config";
+import  languageConfig  from "../config/languages.json";
 
 it("should have correct listed language", () => {
     const { container } = renderWithProviders(<LanguageModeFormInput languageModeID={languageConfig.languageModes.KOREAN}></LanguageModeFormInput>, {preloadedState : {

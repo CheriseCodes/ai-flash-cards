@@ -1,6 +1,6 @@
 import React from "react";
 import PropTypes from "prop-types";
-import { languageConfig } from "../config";
+import languageConfig from '../../config/languages.json';
 
 import { useSelector, useDispatch } from "react-redux";
 

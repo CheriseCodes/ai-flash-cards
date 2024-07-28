@@ -3,7 +3,7 @@
  */
 import React from 'react';
 import { renderWithProviders } from './test-utils';
-import { languageConfig } from '../src/config';
+import  languageConfig  from "../config/languages.json";
 import WordInput from '../src/components/WordInput';
 import { it, expect } from '@jest/globals';
 

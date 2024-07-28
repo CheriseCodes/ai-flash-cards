@@ -1,8 +1,0 @@
-# TODO: For single EC2 deployment
-services:
-  frontend:
-    build:
-      context: .
-    container_name: frontend
-    ports:
-      - "3000:80"

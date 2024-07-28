@@ -52,6 +52,7 @@ RUN --mount=type=bind,source=package.json,target=package.json \
     npm ci --include=dev
 USER node
 COPY . .
+ENV NODE_ENV=test
 # RUN npm run start &
 RUN npm run test
 
@@ -71,7 +72,7 @@ COPY . .
 # the built application from the build stage into the image.
 COPY --from=deps /usr/src/app/node_modules ./node_modules
 COPY --from=build /usr/src/app/built ./built
-
+USER node
 # Expose the port that the application listens on.
 EXPOSE 8000
 

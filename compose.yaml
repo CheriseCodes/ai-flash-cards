@@ -1,0 +1,6 @@
+name: ai-flash-cards
+services:
+  frontend:
+    build: ./frontend
+    ports:
+      - "80:80"

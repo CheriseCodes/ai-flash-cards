@@ -11,6 +11,7 @@ on:
       - "backend/__test__/**"
       - "backend/types/**"
 env:
+  CLOUDFRONT_URL: "cloudfront-url"
   NODE_ENV: "test"
   APP_ENV: "local.test"
 

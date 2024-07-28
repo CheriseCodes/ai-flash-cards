@@ -38,7 +38,7 @@ export const jwtCheck = auth({
   tokenSigningAlg: 'RS256',
 });
 
-export const openai = new OpenAI({apiKey: process.env.OPENAI_API_KEY})
+export const openai = new OpenAI({apiKey: process.env.OPENAI_API_KEY || "sk-testing" })
 
 const openAIChatCompletion = async (model, temperature, messages) => {
   const response: ChatCompletion = await openai.chat.completions.create({

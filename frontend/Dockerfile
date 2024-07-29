@@ -14,6 +14,8 @@ COPY package*.json ./
 # Install dependencies
 RUN npm install
 
+ENV NODE_ENV=production
+
 # Copy the entire application code to the container
 COPY . .
 

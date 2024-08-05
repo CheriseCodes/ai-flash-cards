@@ -49,7 +49,7 @@ const openAIChatCompletion = async (model, temperature, messages) => {
   return response
 }
 
-const authMiddleware = (process.env.APP_ENV.includes("test") || process.env.APP_ENV.includes("development")) ? (req, res, next) => { console.log('Auth middleware executed'); next();} : jwtCheck;
+const authMiddleware = (process.env.NODE_ENV.includes("test") || process.env.APP_ENV.includes("test") || process.env.APP_ENV.includes("development")) ? (req, res, next) => { console.log('Auth middleware executed'); next();} : jwtCheck;
 
 const putItemFlashCardTable = async (userId, timeStamp, cardId, response, messages) => {
   const awsInput: PutItemCommandInput = {
@@ -274,7 +274,7 @@ app.post("/image", authMiddleware, async (req, res) => {
     const localFileName = `./private/images/${imgName}.png`;
     const remoteFileName = `users/${userId}/images/${imgName}.png`;
 
-    if (!process.env.APP_ENV.includes('test')) { // don't run in test environment
+    if (!process.env.NODE_ENV.includes('test')) { // don't run in test environment
       https.get(imgUrl, async (res) => {
         const fdWrite = await open(localFileName, "w");
         const writeStream = res.pipe(fdWrite.createWriteStream());

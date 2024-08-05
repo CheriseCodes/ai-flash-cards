@@ -3,7 +3,7 @@ ARG NODE_VERSION=22
 
 ################################################################################
 # Use node image for base image for all stages.
-FROM node:${NODE_VERSION}-slim as build
+FROM node:${NODE_VERSION}-slim AS build
 
 # Set the working directory in the container
 WORKDIR /app
@@ -14,15 +14,18 @@ COPY package*.json ./
 # Install dependencies
 RUN npm install
 
+ENV NODE_ENV=production
+
 # Copy the entire application code to the container
 COPY . .
 
 # Build the React app for production
 RUN npm run build
 
-FROM build as test
+FROM build AS test
 
-ENV NODE_ENV test
+ENV NODE_ENV=test
+
 RUN --mount=type=bind,source=package.json,target=package.json \
     --mount=type=bind,source=package-lock.json,target=package-lock.json \
     --mount=type=cache,target=/root/.npm \
@@ -31,8 +34,8 @@ USER node
 COPY . .
 RUN npm run test
 
-# Use Nginx as the production server
-FROM nginx:alpine as final
+# Use Nginx AS the production server
+FROM nginx:alpine AS final
 
 # Set environment variables
 ENV NODE_ENV=production

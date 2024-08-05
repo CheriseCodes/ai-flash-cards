@@ -1,13 +1,7 @@
 #!/bin/bash
-INGRESS_HOST=$1
+# NOTE: This is meant to be used with local clusters created with Docker not EKS
 
-if [[ -z $INGRESS_HOST ]]
-then
-    echo "[ERROR] Ingress hostname undefined. Please pass it as the first parameter."
-    exit 1
-else
-    echo "[INFO] Creating AI Flashcards app at https://$INGRESS_HOST"
-fi
+INGRESS_HOST=$1
 
 helm upgrade --install ingress-nginx ingress-nginx \
     --repo https://kubernetes.github.io/ingress-nginx \
@@ -33,17 +27,5 @@ else
 	echo "[WARNING] Won't create TLS secrets because $INGRESS_KEY_FILE and $INGRESS_CRT_FILE files exist"
 fi
 
-helm upgrade  --install ai-flash-cards ./ai-flash-cards --timeout 3600s  --namespace ai-flash-cards --create-namespace --values ./ai-flash-cards/docker-desktop-values.yaml
-
-# (Optional) Install Prometheus
-helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
-helm repo update
-
-# Using version 59.1.0 because it uses the same Grafana version as AWS
-helm upgrade --install kube-prometheus-stack prometheus-community/kube-prometheus-stack --version 59.1.0 --values ./kube-prometheus-stack/shared-values.yaml --namespace monitoring --create-namespace
-
-# # (Optional) Forward to local port as needed
-# kubectl port-forward -n ingress-nginx service/ingress-nginx-controller 8080:80
-# kubectl port-forward -n monitoring service/kube-prometheus-stack-grafana 3000:80
-# kubectl port-forward -n monitoring service/prometheus-operated  9090:9090
-# kubectl port-forward -n monitoring service/kube-prometheus-stack-prometheus-node-exporter  9100:9100
+# Forward to local port as needed
+# (Optional) kubectl port-forward --namespace=ingress-nginx service/ingress-nginx-controller 8080:80

@@ -21,6 +21,7 @@ spec:
       releaseName: ai-flash-cards
       valueFiles:
         - eks-values.yaml
+        # - docker-desktop-values.yaml
       parameters:
         - name: frontend.image.registry
           value: ECR_REGISTRY

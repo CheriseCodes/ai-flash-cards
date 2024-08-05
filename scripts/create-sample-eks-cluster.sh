@@ -40,5 +40,10 @@ sh ./common/0-create-eks-cluster.sh $EKS_MANIFEST_PATH $AWS_ACCOUNT_ID $AWS_REGI
 CLUSTER_NAME=$(cat $EKS_MANIFEST_PATH | yq .metadata.name)
 
 sh ./common/1-install-aws-lbc-with-helm.sh $CLUSTER_NAME $AWS_ACCOUNT_ID
+# sh ./common/1-install-aws-lbc-with-manifests.sh $CLUSTER_NAME $AWS_ACCOUNT_ID $AWS_REGION
+
 sh ./common/2-install-ai-flash-cards-with-helm.sh 
+# sh ./common/2-install-ai-flash-cards-with-argocd-and-helm.sh 
+# sh ./common/2-install-ai-flash-cards-with-manifests.sh "eks"
+
 sh ./common/3-install-kube-prometheus-stack.sh 

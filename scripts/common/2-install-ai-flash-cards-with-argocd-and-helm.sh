@@ -12,4 +12,4 @@ argocd app create -f ../argocd/application.yaml
 argocd app sync ai-flash-cards
 
 # # (Optional) Forward to local port as needed
-# kubectl port-forward -n argocd servive/argocd-server -n argocd 8080:443
+# kubectl port-forward -n argocd service/argocd-server -n argocd 8080:443

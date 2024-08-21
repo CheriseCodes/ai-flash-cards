@@ -11,7 +11,7 @@ const getNewCardText = async (word: string, languageMode: string, languageLevel:
       return {}
     }
     const response = await fetch(
-      `${serviceConfig.BACKEND_ENDPOINT}${serviceConfig.BACKEND_PATH}/generations/sentences?word=${word}&lang_mode=${languageMode}&lang_level=${languageLevel}&userId=${userId}&cardId=${cardId}&timeStamp=${timeStamp}`,
+      `${serviceConfig.BACKEND_ENDPOINT}${serviceConfig.BACKEND_PATH}/sentences?word=${word}&lang_mode=${languageMode}&lang_level=${languageLevel}&userId=${userId}&cardId=${cardId}&timeStamp=${timeStamp}`,
       {
         headers: {
           "Content-Type": "application/json",
@@ -49,7 +49,7 @@ const getNewCardImage = async (dispatch: Dispatch<AnyAction>, cardData: FlashCar
       cardData.generatingImage = true;
       dispatch({ type: "update-card", cardData: cardData, cardId: cardId });
       const imageResponse = await fetch(
-        `${serviceConfig.BACKEND_ENDPOINT}${serviceConfig.BACKEND_PATH}/generations/images?sentence=${cardData.translatedSampleSentence}&lang_mode=${languageMode}&word=${word}&cardId=${cardData.id}&userId=${userId}`,
+        `${serviceConfig.BACKEND_ENDPOINT}${serviceConfig.BACKEND_PATH}/images?sentence=${cardData.translatedSampleSentence}&lang_mode=${languageMode}&word=${word}&cardId=${cardData.id}&userId=${userId}`,
         {
           headers: {
             "Content-Type": "application/json",

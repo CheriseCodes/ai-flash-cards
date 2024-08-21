@@ -7,6 +7,8 @@ import { app } from "../src/server";
 import { dynamoDbClient, s3Client } from "../src/clients/aws";
 import { GetItemCommand, DeleteItemCommand } from "@aws-sdk/client-dynamodb";
 import request from "supertest";
+// import { LocalstackContainer } from "@testcontainers/localstack"
+// import { CreateBucketCommand, HeadBucketCommand, S3Client } from "@aws-sdk/client-s3";
 
 const ddbMock = mockClient(dynamoDbClient);
 const s3Mock = mockClient(s3Client);
@@ -21,6 +23,30 @@ describe("GET /flashcards", () => {
     s3Mock.restore();
     mock.restoreAll();
   });
+  // test("should create a S3 bucket", async () => {
+  //   const container = await new LocalstackContainer().start();
+  
+  //   const client = new S3Client({
+  //     endpoint: container.getConnectionUri(),
+  //     forcePathStyle: true,
+  //     region: "us-east-1",
+  //     credentials: {
+  //       secretAccessKey: "test",
+  //       accessKeyId: "test",
+  //     },
+  //   });
+  //   const input = {
+  //     Bucket: "testcontainers",
+  //   };
+  //   const command = new CreateBucketCommand(input);
+  
+  //   const createBucketResponse = await client.send(command);
+  //   assert.strictEqual(createBucketResponse.$metadata.httpStatusCode, 200);
+  //   const headBucketResponse = await client.send(new HeadBucketCommand(input));
+  //   assert.strictEqual(headBucketResponse.$metadata.httpStatusCode, 200);
+  
+  //   await container.stop();
+  // });
   test("existent user should have non-empty cards response", async () => {
     const queryResult = {
       Items: [
@@ -58,7 +84,7 @@ describe("GET /flashcards", () => {
   });
 });
 
-describe("DELETE /flashcard", () => {
+describe("DELETE /flashcards", () => {
   beforeEach(() => {
     ddbMock.reset();
     s3Mock.reset();
@@ -77,7 +103,7 @@ describe("DELETE /flashcard", () => {
     s3Mock.onAnyCommand().resolves({});
     const cardId = "abc123";
     const response = await request(app)
-      .delete(`/flashcard`)
+      .delete(`/flashcards`)
       .set("Content-Type", "application/json")
       .set("Authorization", "Bearer abc123")
       .send({
@@ -88,7 +114,7 @@ describe("DELETE /flashcard", () => {
   });
 });
 
-describe("GET /generations/images", () => {
+describe("GET /images", () => {
   beforeEach(() => {
     ddbMock.reset();
     s3Mock.reset();
@@ -119,7 +145,7 @@ describe("GET /generations/images", () => {
     ddbMock.onAnyCommand().resolves({});
     const response = await request(app)
       .get(
-        `/generations/images?sentence=${sentence}&lang_mode=${langMode}&word=${word}&cardId=${cardId}&userId=${userId}&timeStamp=123`,
+        `/images?sentence=${sentence}&lang_mode=${langMode}&word=${word}&cardId=${cardId}&userId=${userId}&timeStamp=123`,
       )
       .set("Content-Type", "application/json")
       .set("Authorization", "Bearer abc123");
@@ -137,7 +163,7 @@ describe("GET /generations/images", () => {
     });
     const response = await request(app)
       .get(
-        `/generations/images?sentence=${sentence}&lang_mode=${langMode}&word=${word}&cardId=${cardId}`,
+        `/images?sentence=${sentence}&lang_mode=${langMode}&word=${word}&cardId=${cardId}`,
       )
       .set("Content-Type", "application/json")
       .set("Authorization", "Bearer abc123");
@@ -148,7 +174,7 @@ describe("GET /generations/images", () => {
   });
 });
 
-describe("POST /image", () => {
+describe("POST /images", () => {
   beforeEach(() => {
     ddbMock.reset();
     s3Mock.reset();
@@ -168,7 +194,7 @@ describe("POST /image", () => {
     s3Mock.onAnyCommand().resolves({});
     ddbMock.onAnyCommand().resolves({});
     const response = await request(app)
-      .post(`/image`)
+      .post(`/images`)
       .set("Content-Type", "application/json")
       .set("Authorization", "Bearer abc123")
       .send({
@@ -183,7 +209,7 @@ describe("POST /image", () => {
   });
 });
 
-describe("POST /generations/sentences", () => {
+describe("POST /sentences", () => {
   beforeEach(() => {
     ddbMock.reset();
     s3Mock.reset();
@@ -227,7 +253,7 @@ describe("POST /generations/sentences", () => {
     });
     const response = await request(app)
       .get(
-        `/generations/sentences?word=${word}&lang_mode=${languageMode}&lang_level=${languageLevel}&userId=${userId}&cardId=${cardId}&timeStamp=123`,
+        `/sentences?word=${word}&lang_mode=${languageMode}&lang_level=${languageLevel}&userId=${userId}&cardId=${cardId}&timeStamp=123`,
       )
       .set("Content-Type", "application/json")
       .set("Authorization", "Bearer abc123");
@@ -244,7 +270,7 @@ describe("POST /generations/sentences", () => {
     const languageLevel = "YKI1";
     const response = await request(app)
       .get(
-        `/generations/sentences?word=${word}&lang_mode=${languageMode}&lang_level=${languageLevel}&userId=${userId}&cardId=${cardId}&timeStamp=123`,
+        `/sentences?word=${word}&lang_mode=${languageMode}&lang_level=${languageLevel}&userId=${userId}&cardId=${cardId}&timeStamp=123`,
       )
       .set("Content-Type", "application/json")
       .set("Authorization", "Bearer abc123");
@@ -261,7 +287,7 @@ describe("POST /generations/sentences", () => {
     const languageLevel = "G2";
     const response = await request(app)
       .get(
-        `/generations/sentences?word=${word}&lang_mode=${languageMode}&lang_level=${languageLevel}&userId=${userId}&cardId=${cardId}&timeStamp=123`,
+        `/sentences?word=${word}&lang_mode=${languageMode}&lang_level=${languageLevel}&userId=${userId}&cardId=${cardId}&timeStamp=123`,
       )
       .set("Content-Type", "application/json")
       .set("Authorization", "Bearer abc123");
@@ -303,7 +329,7 @@ describe("POST /generations/sentences", () => {
     });
     const response = await request(app)
       .get(
-        `/generations/sentences?word=${word}&lang_mode=${languageMode}&lang_level=${languageLevel}&userId=${userId}&cardId=${cardId}&timeStamp=123`,
+        `/sentences?word=${word}&lang_mode=${languageMode}&lang_level=${languageLevel}&userId=${userId}&cardId=${cardId}&timeStamp=123`,
       )
       .set("Content-Type", "application/json")
       .set("Authorization", "Bearer abc123");

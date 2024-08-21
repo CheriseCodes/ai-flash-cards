@@ -1,27 +1,17 @@
 import express, { Application } from "express";
 import bodyParser from "body-parser";
-import OpenAI from "openai";
 import cors from "cors";
-import { auth } from 'express-oauth2-jwt-bearer';
 
 import { open, rm } from "node:fs/promises";
 import https from "https";
 
-import { PutObjectCommand, DeleteObjectCommand, DeleteObjectCommandInput, ObjectCannedACL } from "@aws-sdk/client-s3";
+import { dynamoDbClient, s3Client } from "./clients/aws";
+import { openai } from "./clients/openai";
+import { jwtCheck } from "./clients/auth0";
 
-import {
-  GetItemCommand,
-  QueryCommand,
-  PutItemCommand,
-  DeleteItemCommand,
-  UpdateItemCommand,
-  PutItemCommandInput,
-  UpdateItemCommandInput,
-  QueryCommandInput,
-  DeleteItemCommandInput,
-} from "@aws-sdk/client-dynamodb";
+import { dynamoDb, s3 } from "./classes/aws";
 
-import { dynamoDbClient, s3Client } from "../src/aws-clients";
+import { ObjectCannedACL } from "@aws-sdk/client-s3";
 
 import appConfig from "./config";
 import * as sh from "./server-helpers";
@@ -32,13 +22,8 @@ app.use(cors());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 
-export const jwtCheck = auth({
-  audience: 'http://localhost:8000',
-  issuerBaseURL: 'https://dev-akcpb5t2powmgxer.us.auth0.com/',
-  tokenSigningAlg: 'RS256',
-});
-
-export const openai = new OpenAI({apiKey: process.env.OPENAI_API_KEY || "sk-testing" })
+const s3Singleton: s3 = new s3(s3Client);
+const dynamoDbSingleton: dynamoDb = new dynamoDb(dynamoDbClient)
 
 const openAIChatCompletion = async (model, temperature, messages) => {
   const response: ChatCompletion = await openai.chat.completions.create({
@@ -49,10 +34,10 @@ const openAIChatCompletion = async (model, temperature, messages) => {
   return response
 }
 
-const authMiddleware = (process.env.NODE_ENV.includes("test") || process.env.APP_ENV.includes("test") || process.env.APP_ENV.includes("development")) ? (req, res, next) => { console.log('Auth middleware executed'); next();} : jwtCheck;
+const authMiddleware = jwtCheck;
 
 const putItemFlashCardTable = async (userId, timeStamp, cardId, response, messages) => {
-  const awsInput: PutItemCommandInput = {
+   await dynamoDbSingleton.putItem({
     Item: {
       UserId: { S: userId },
       TimeStamp: { S: new String(timeStamp).toString() },
@@ -67,9 +52,7 @@ const putItemFlashCardTable = async (userId, timeStamp, cardId, response, messag
       TotalTokens: { N: new String(response.usage.total_tokens).toString() },
     },
     TableName: "FlashCardGenAITable",
-  };
-  const awsCommand = new PutItemCommand(awsInput);
-  await dynamoDbClient.send(awsCommand);
+  })
 }
 
 app.get("/service/readyz", (req, res) => res.status(200).json({ readyz: {status: "ok" }}));
@@ -219,7 +202,7 @@ app.get("/generations/images", authMiddleware, async (req, res) => {
     });
     if (response?.created) {
       res.status(200).send(response);
-      const input: UpdateItemCommandInput = {
+      await dynamoDbSingleton.updateItem({
         Key: { FlashCardId: { S: cardId } },
         TableName: "FlashCardGenAITable",
         UpdateExpression:
@@ -231,9 +214,7 @@ app.get("/generations/images", authMiddleware, async (req, res) => {
           ":imgl": { S: response.data[0].url },
         },
         ReturnValues: "ALL_NEW",
-      };
-      const command = new UpdateItemCommand(input);
-      await dynamoDbClient.send(command);
+      });
     }
   } catch (err) {
     console.error(err);
@@ -286,7 +267,7 @@ app.post("/image", authMiddleware, async (req, res) => {
           stream.on("close", () => {
             rm(localFileName);
           });
-          const input = {
+          await s3Singleton.putObject({
             // PutObjectRequest
             Body: stream,
             Bucket: process.env.BUCKET_NAME, // required
@@ -294,12 +275,10 @@ app.post("/image", authMiddleware, async (req, res) => {
             ACL: ObjectCannedACL.public_read,
             ContentType: "image/png",
             CacheControl: "public, max-age=31536000",
-          };
-          const command = new PutObjectCommand(input);
-          await s3Client.send(command);
+          });
           stream.close();
           // TODO: Update DynamoDB Table with correct image link
-          const ddbInput: UpdateItemCommandInput = {
+          await dynamoDbSingleton.updateItem({
             Key: { FlashCardId: { S: cardId } },
             TableName: "FlashCardGenAITable",
             UpdateExpression:
@@ -308,9 +287,7 @@ app.post("/image", authMiddleware, async (req, res) => {
               ":imgl": { S: remoteFileName },
             },
             ReturnValues: "ALL_NEW",
-          };
-          const ddbCommand = new UpdateItemCommand(ddbInput);
-          await dynamoDbClient.send(ddbCommand);
+          });
         });
       });
     }
@@ -335,7 +312,7 @@ app.get("/flashcards", authMiddleware, async (req, res) => {
       return
     }
     const userId: string = req.query.userId[0];
-    const input: QueryCommandInput = {
+    const awsResponse = await dynamoDbSingleton.query({
       TableName: "FlashCardGenAITable",
       IndexName: "UserId",
       Select: "SPECIFIC_ATTRIBUTES",
@@ -343,9 +320,7 @@ app.get("/flashcards", authMiddleware, async (req, res) => {
       ExpressionAttributeValues: { ":u": { S: userId } },
       ProjectionExpression: "#T, FlashCardId, Content, ImageLink",
       ExpressionAttributeNames: { "#T": "TimeStamp" },
-    };
-    const command = new QueryCommand(input);
-    const awsResponse = await dynamoDbClient.send(command);
+    });
     res.status(200).send({"cards": awsResponse.Items});
   } catch (err) {
     console.error(err);
@@ -367,7 +342,7 @@ app.delete("/flashcard", authMiddleware, async (req, res) => {
     }
     const userId = req.body.userId;
     const cardId = req.body.cardId;
-    const input = { // GetItemInput
+    const response = await dynamoDbSingleton.getItem({ // GetItemInput
       TableName: "FlashCardGenAITable", // required
       Key: { // Key // required
         FlashCardId: { // AttributeValue Union: only one key present
@@ -375,33 +350,27 @@ app.delete("/flashcard", authMiddleware, async (req, res) => {
         },
       },
       ConsistentRead: true,
-    };
-    const command = new GetItemCommand(input);
-    const response = await dynamoDbClient.send(command);
+    });
     if (userId != response.Item.UserId.S) {
       res.status(400).json({message: `${userId} is unauthorzed to delete flashcard`});
       return;
     }
     // delete image
-    const s3Input: DeleteObjectCommandInput = {
-      Bucket: process.env.BUCKET_NAME,
-      Key: response.Item.ImageLink.S,
-    }
-    const s3Command = new DeleteObjectCommand(s3Input);
     try {
-      await s3Client.send(s3Command);
+      await s3Singleton.deleteObject({
+        Bucket: process.env.BUCKET_NAME,
+        Key: response.Item.ImageLink.S,
+      };
     } catch (err) {
       console.error(err);
     }
     // delete dynamodb item with text
-    let ddbInput: DeleteItemCommandInput = {
+    await dynamoDbSingleton.deleteItem({
       TableName: "FlashCardGenAITable",
       Key: {
         FlashCardId: {S : cardId},
       },
-    }
-    let ddbCommand = new DeleteItemCommand(ddbInput);
-    await dynamoDbClient.send(ddbCommand);
+    });
     res.status(200).send({cardId: cardId});
   } catch (err) {
     console.error(err);

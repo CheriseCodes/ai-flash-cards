@@ -1,8 +1,10 @@
 import { describe, test, beforeEach, afterEach, mock } from "node:test";
 import assert from "node:assert";
 import { mockClient } from "aws-sdk-client-mock";
-import { openai, app } from "../src/server";
-import { dynamoDbClient, s3Client } from "../src/aws-clients";
+import { openai } from "../src/clients/openai";
+import { app } from "../src/server";
+
+import { dynamoDbClient, s3Client } from "../src/clients/aws";
 import { GetItemCommand, DeleteItemCommand } from "@aws-sdk/client-dynamodb";
 import request from "supertest";
 

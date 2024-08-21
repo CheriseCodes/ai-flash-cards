@@ -36,7 +36,7 @@ export const handlers = [
             ]
         })
     }),
-    http.post(`${backendDomain}/upload/image`,({}) => {
+    http.post(`${backendDomain}/images`,({}) => {
         return HttpResponse.json(
             { url: "https://picsum.photos/256" }
         )

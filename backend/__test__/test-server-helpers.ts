@@ -4,7 +4,7 @@ import {
   validateLang,
   validateLangLevel,
   validateWord,
-} from "../src/server-helpers";
+} from "../src/helpers/server-helpers";
 
 describe("validateWord input validation", () => {
   it("invalid French word should return false", () => {

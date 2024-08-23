@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
 import { ChatCompletion } from "openai/resources/index.mjs";
-import * as sh from "../server-helpers";
+import * as sh from "../helpers/server-helpers";
 import { dynamoDb } from "../classes/aws";
 import { openai } from "../clients/openai";
 import { dynamoDbClient } from "../clients/aws";

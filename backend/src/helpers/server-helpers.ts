@@ -1,4 +1,4 @@
-import appConfig from "./config";
+import appConfig from "../config";
 
 const validateWord = (word, langMode) => {
   if (langMode == appConfig.languageModes.FRENCH) {

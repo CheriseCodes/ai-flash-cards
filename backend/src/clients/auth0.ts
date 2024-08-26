@@ -6,7 +6,7 @@ let authSetup = auth({
     tokenSigningAlg: 'RS256',
 });
 
-if (process.env.NODE_ENV.includes("test") || process.env.APP_ENV.includes("test") || process.env.APP_ENV.includes("development")) {
+if (process.env.NODE_ENV && process.env.APP_ENV && (process.env.NODE_ENV.includes("test") || process.env.APP_ENV.includes("test") || process.env.APP_ENV.includes("development"))) {
     authSetup = (req, res, next) => { console.log('Auth middleware executed'); next();} 
 } 
 

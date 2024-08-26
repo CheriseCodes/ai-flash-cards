@@ -25,8 +25,8 @@ export const deleteFlashcard =  async (req: Request, res: Response) => {
     if (reqError) {
       res.status(reqError.status).send(reqError.body);
     }
-    const userId = req.body.userId;
-    const cardId = req.body.cardId;
+    const userId: string = req.body.userId;
+    const cardId: string = req.body.cardId;
     const response: GenericServerResponse = await handleDeleteFlashcard({ userId: userId, cardId: cardId }, dynamoDbClientInstance, s3ClientInstance);
     res.status(response.status).send(response.body);
 }

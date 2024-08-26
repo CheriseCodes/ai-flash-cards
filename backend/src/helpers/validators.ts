@@ -126,12 +126,12 @@ export const validateGetSentence = (req: Request): GenericServerResponse => {
     ? req.query.word
     : [req.query.word];
     const targetLanguage = req.query.lang_mode;
-    let targetLevel = req.query.lang_level;
+    const targetLevel = req.query.lang_level;
     if (!validateLang(targetLanguage)) {
         return {status: 400, body: {status: 400, message: `Unsupported language: ${targetLanguage}`}}
       }
       let invalidWords = "";
-      for (let word of wordsToSearch) {
+      for (const word of wordsToSearch) {
         if (!(validateWord(word, targetLanguage))) {
           invalidWords = invalidWords + ` ${word}`;
         }

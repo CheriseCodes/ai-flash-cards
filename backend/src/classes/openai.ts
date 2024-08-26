@@ -8,7 +8,7 @@ export class OpenAIClient extends GenAIClient {
     }
     async generateText(prompts: string[]): Promise<ChatCompletion> {
         const messages = []
-        for (let prompt of prompts) {
+        for (const prompt of prompts) {
             messages.push({
                 role: "user",
                 content: prompt,

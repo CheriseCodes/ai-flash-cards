@@ -44,13 +44,13 @@ export const handleGetSentence =  async (input: handleGetSentenceInput, dynamoDb
   try {
     const wordsToSearch = input.wordsToSearch;
     const targetLanguage = input.targetLanguage;
-    let targetLevel = input.targetLanguage;
+    const targetLevel = input.targetLanguage;
     const userId = input.userId;
     const cardId = input.cardId;
     const timeStamp = input.timeStamp;
-    let prompts = [] 
+    const prompts = [] 
     let prompt = ""
-    for (let wordToSearch of wordsToSearch) {
+    for (const wordToSearch of wordsToSearch) {
       prompt = constructPrompt(targetLevel,targetLanguage,wordToSearch);
       prompts.push(prompt)
     }

@@ -9,7 +9,7 @@ import { handleGetSentence } from '../handlers/sentences-handlers';
         ? req.query.word.toString()
         : [req.query.word.toString()];
       const targetLanguage = req.query.lang_mode.toString();
-      let targetLevel = req.query.lang_level.toString();
+      const targetLevel = req.query.lang_level.toString();
       const userId = req.query.userId.toString();
       const cardId = req.query.cardId.toString();
       const timeStamp = req.query.timeStamp.toString();

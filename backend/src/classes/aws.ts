@@ -12,6 +12,7 @@ import {
   QueryCommandInput,
   DeleteItemCommandInput,
 } from "@aws-sdk/client-dynamodb";
+import { mockClient, AwsClientStub } from "aws-sdk-client-mock";
 
 export class dynamoDb {
   client: DynamoDBClient;
@@ -33,6 +34,9 @@ export class dynamoDb {
   async deleteItem(input: DeleteItemCommandInput): Promise<DeleteItemCommandOutput> {
     return await this.client.send(new DeleteItemCommand(input))
   }
+  getMock(): AwsClientStub<DynamoDBClient> {
+    return mockClient(this.client);
+  }
 }
 
 export class s3 {
@@ -45,5 +49,8 @@ export class s3 {
   }
   async deleteObject(input: DeleteObjectCommandInput): Promise<DeleteObjectCommandOutput> {
     return await this.client.send(new DeleteObjectCommand(input));
+  }
+  getMock(): AwsClientStub<S3Client> {
+    return mockClient(this.client);
   }
 }

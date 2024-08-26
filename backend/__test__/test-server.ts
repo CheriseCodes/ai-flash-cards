@@ -25,7 +25,7 @@ describe("GET /flashcards", () => {
   });
   // test("should create a S3 bucket", async () => {
   //   const container = await new LocalstackContainer().start();
-  
+
   //   const client = new S3Client({
   //     endpoint: container.getConnectionUri(),
   //     forcePathStyle: true,
@@ -39,12 +39,12 @@ describe("GET /flashcards", () => {
   //     Bucket: "testcontainers",
   //   };
   //   const command = new CreateBucketCommand(input);
-  
+
   //   const createBucketResponse = await client.send(command);
   //   assert.strictEqual(createBucketResponse.$metadata.httpStatusCode, 200);
   //   const headBucketResponse = await client.send(new HeadBucketCommand(input));
   //   assert.strictEqual(headBucketResponse.$metadata.httpStatusCode, 200);
-  
+
   //   await container.stop();
   // });
   test("existent user should have non-empty cards response", async () => {

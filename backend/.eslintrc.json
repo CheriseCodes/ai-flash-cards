@@ -3,8 +3,11 @@
         "browser": true,
         "es2021": true
     },
+    "parser": "@typescript-eslint/parser",
     "extends": [
-        "eslint:recommended"
+        "eslint:recommended",
+        "plugin:@typescript-eslint/eslint-recommended",
+        "plugin:@typescript-eslint/recommended"
     ],
     "parserOptions": {
         "ecmaVersion": "latest",
@@ -14,11 +17,14 @@
         }
     },
     "plugins": [
+        "@typescript-eslint",
         "prettier"
     ],
-    "rules": {
-        "prettier/prettier": "error"
-    },
-    "ignorePatterns": ["**/node_modules/**", "built"]
+    "ignorePatterns": ["**/node_modules/**"],
+    "settings": {
+        "react": {
+            "version": "detect"
+          }
+    }
 }
 

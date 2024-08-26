@@ -6,13 +6,18 @@ import { GenericServerResponse } from '../../types/global';
  
 export const getFlashcardsByUser =  async (req: Request, res: Response) => {
   // check for undefined values
+  console.log("entered getFlashcards")
   const reqError: GenericServerResponse = validateGetFlashcardsByUserRequest(req)
   if (reqError) {
     res.status(reqError.status).send(reqError.body);
+    return
   }
+  console.log("passed input verification")
   const userId: string = req.query.userId[0];
   const response: GenericServerResponse = await handleGetFlashcardsByUser({userId: userId}, dynamoDbClient);
+  console.log("received response")
   res.status(response.status).send(response.body);
+  
 }
 
 export const deleteFlashcard =  async (req: Request, res: Response) => {
@@ -20,6 +25,7 @@ export const deleteFlashcard =  async (req: Request, res: Response) => {
     const reqError: GenericServerResponse = validateDeleteFlashcardRequest(req)
     if (reqError) {
       res.status(reqError.status).send(reqError.body);
+      return
     }
     const userId: string = req.body.userId;
     const cardId: string = req.body.cardId;

@@ -1,17 +1,17 @@
 import { describe, test, beforeEach, afterEach, mock } from "node:test";
 import assert from "node:assert";
-import { mockClient } from "aws-sdk-client-mock";
-import { openai } from "../src/clients/openai";
 import { app } from "../src/server";
+import { s3Client, dynamoDbClient } from "../src/clients/aws";
+import { openai } from "../src/clients/openai";
 
-import { dynamoDbClient, s3Client } from "../src/clients/aws";
 import { GetItemCommand, DeleteItemCommand } from "@aws-sdk/client-dynamodb";
 import request from "supertest";
 // import { LocalstackContainer } from "@testcontainers/localstack"
 // import { CreateBucketCommand, HeadBucketCommand, S3Client } from "@aws-sdk/client-s3";
 
-const ddbMock = mockClient(dynamoDbClient);
-const s3Mock = mockClient(s3Client);
+const ddbMock = dynamoDbClient.getMock();
+const s3Mock = s3Client.getMock()
+const openaiMock = openai.client;
 describe("GET /flashcards", () => {
   beforeEach(() => {
     ddbMock.reset();
@@ -125,7 +125,7 @@ describe("GET /images", () => {
     s3Mock.restore();
     mock.restoreAll();
   });
-  test("Allowed word should return a valid image", async () => {
+  test("Allowed word should return sample image", async () => {
     const word = "trouver";
     const langMode = "French";
     const sentence = "Je ne trouve pas mes lunettes.";
@@ -139,7 +139,7 @@ describe("GET /images", () => {
         },
       ],
     };
-    mock.method(openai.images, "generate", () => {
+    mock.method(openaiMock.images, "generate", () => {
       return expectedResult;
     });
     ddbMock.onAnyCommand().resolves({});
@@ -151,14 +151,14 @@ describe("GET /images", () => {
       .set("Authorization", "Bearer abc123");
     assert.deepStrictEqual(response.body, expectedResult);
   });
-  test("Unallowed word should return a error image", async () => {
+  test("Unallowed word should return a error message", async () => {
     const word = "rentrée";
     const langMode = "French";
     const sentence = "Courage, c'est la rentrée!";
     // const userId = "default";
     const cardId = "93960a65-ce5e-4d4d-ba2a-8d9e8eeb57d9";
     ddbMock.onAnyCommand().resolves({});
-    mock.method(openai.images, "generate", () => {
+    mock.method(openaiMock.images, "generate", () => {
       return {};
     });
     const response = await request(app)
@@ -209,7 +209,7 @@ describe("POST /images", () => {
   });
 });
 
-describe("POST /sentences", () => {
+describe("GET /sentences", () => {
   beforeEach(() => {
     ddbMock.reset();
     s3Mock.reset();
@@ -226,7 +226,7 @@ describe("POST /sentences", () => {
     const cardId = "93960a65-ce5e-4d4d-ba2a-8d9e8eeb57d9";
     const languageMode = "French";
     const languageLevel = "A1";
-    mock.method(openai.chat.completions, "create", () => {
+    mock.method(openaiMock.chat.completions, "create", () => {
       return {
         id: 123,
         created: 123,
@@ -256,7 +256,8 @@ describe("POST /sentences", () => {
         `/sentences?word=${word}&lang_mode=${languageMode}&lang_level=${languageLevel}&userId=${userId}&cardId=${cardId}&timeStamp=123`,
       )
       .set("Content-Type", "application/json")
-      .set("Authorization", "Bearer abc123");
+      .set("Authorization", "Bearer abc123")
+      .send();
     assert.deepStrictEqual(response.body, {
       status: 400,
       message: "Invalid words: hello",
@@ -308,7 +309,7 @@ describe("POST /sentences", () => {
       translatedSampleSentence: "English translation of the example sentence",
       wordTranslated: `English translation of ${word}`,
     };
-    mock.method(openai.chat.completions, "create", () => {
+    mock.method(openaiMock.chat.completions, "create", () => {
       return {
         id: 123,
         created: 123,
@@ -327,12 +328,14 @@ describe("POST /sentences", () => {
         ],
       };
     });
+    ddbMock.onAnyCommand().resolves({});
     const response = await request(app)
       .get(
         `/sentences?word=${word}&lang_mode=${languageMode}&lang_level=${languageLevel}&userId=${userId}&cardId=${cardId}&timeStamp=123`,
       )
       .set("Content-Type", "application/json")
       .set("Authorization", "Bearer abc123");
+    assert.notStrictEqual(response.body, undefined);
     assert.notStrictEqual(response.body.content, "");
     const parsedContent = JSON.parse(response.body.content);
     assert.deepStrictEqual(parsedContent, expectedResult);

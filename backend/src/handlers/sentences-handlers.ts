@@ -1,4 +1,4 @@
-import { dynamoDb, s3 } from '../classes/aws';
+import { dynamoDb } from '../classes/aws';
 import { GenAIClient } from "../classes/abstract";
 import { GenericServerResponse } from '../../types/global';
 import appConfig from "../config";
@@ -72,10 +72,11 @@ export const handleGetSentence =  async (input: handleGetSentenceInput, dynamoDb
         },
         TableName: "FlashCardGenAITable",
       })
-      return {status: 200, body: {content: response}};
+      return {status: 200, body: {content: response.choices[0].message.content}};
     }
   } catch (err) {
     console.error(err);
     return {status: 500, body: {error: err}}
   }
+  return {status: 500, body: {error: "Failed to generate sentence"}}
 }

@@ -7,5 +7,5 @@ export abstract class GenAIClient {
         this.client = client
     }
     abstract generateText(prompts: string[]): Promise<ChatCompletion>;
-    abstract generateImage(prompt: string): Promise<string>;
+    abstract generateImage(prompt: string): Promise<OpenAI.Images.ImagesResponse>;
 }

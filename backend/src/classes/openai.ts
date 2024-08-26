@@ -23,16 +23,14 @@ export class OpenAIClient extends GenAIClient {
             return response
           }
     }
-    async generateImage(prompt: string): Promise<string> {
+    async generateImage(prompt: string): Promise<OpenAI.Images.ImagesResponse> {
         const response = await this.client.images.generate({
             prompt: prompt,
             n: 1,
             size: "256x256",
           });
           if (response?.created) {
-            return response.data[0].url;
-          } else {
-            return ""
+            return response;
           }
     }
 }

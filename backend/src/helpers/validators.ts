@@ -69,7 +69,7 @@ export const validatePostImage = (req: Request): GenericServerResponse => {
           }
 }
 
-const validateWord = (word, langMode) => {
+export const validateWord = (word, langMode) => {
     if (langMode == appConfig.languageModes.FRENCH) {
       return appConfig.allowedFrenchWords.includes(word);
     } else if (langMode == appConfig.languageModes.SPANISH) {
@@ -81,11 +81,11 @@ const validateWord = (word, langMode) => {
     }
   };
   
-  const validateLang = (langMode) => {
+export const validateLang = (langMode) => {
     return ["French", "Spanish", "Korean"].includes(langMode);
   };
   
-  const validateLangLevel = (langMode, langLevel) => {
+export const validateLangLevel = (langMode, langLevel) => {
     if (
       langMode == appConfig.languageModes.FRENCH ||
       langMode == appConfig.languageModes.SPANISH

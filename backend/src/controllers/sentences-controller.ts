@@ -3,8 +3,15 @@ import { openai } from "../clients/openai";
 import { dynamoDbClient } from "../clients/aws";
 import { GenericServerResponse } from '../../types/global';
 import { handleGetSentence } from '../handlers/sentences-handlers';
+import { validateGetSentence } from '../helpers/validators';
+// import { isUndefined } from "../helpers/utils";
 
  export const getSentence = async (req: Request, res: Response) => {
+      const reqError: GenericServerResponse = validateGetSentence(req)
+      if (reqError) {
+        res.status(reqError.status).send(reqError.body);
+        return
+      }
       const wordsToSearch = Array.isArray(req.query.word)
         ? req.query.word.toString()
         : [req.query.word.toString()];

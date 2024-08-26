@@ -68,3 +68,79 @@ export const validatePostImage = (req: Request): GenericServerResponse => {
             return {status: 400, body: {error: `Flash card ID is undefined`}}
           }
 }
+
+const validateWord = (word, langMode) => {
+    if (langMode == appConfig.languageModes.FRENCH) {
+      return appConfig.allowedFrenchWords.includes(word);
+    } else if (langMode == appConfig.languageModes.SPANISH) {
+      return appConfig.allowedSpanishWords.includes(word);
+    } else if (langMode == appConfig.languageModes.KOREAN) {
+      return appConfig.allowedKoreanWords.includes(word);
+    } else {
+      return false;
+    }
+  };
+  
+  const validateLang = (langMode) => {
+    return ["French", "Spanish", "Korean"].includes(langMode);
+  };
+  
+  const validateLangLevel = (langMode, langLevel) => {
+    if (
+      langMode == appConfig.languageModes.FRENCH ||
+      langMode == appConfig.languageModes.SPANISH
+    ) {
+      return ["A1", "A2", "B1", "B2", "C1", "C2"].includes(langLevel);
+    } else if (langMode == appConfig.languageModes.KOREAN) {
+      return [
+        "TOPIK1",
+        "TOPIK2",
+        "TOPIK3",
+        "TOPIK4",
+        "TOPIK5",
+        "TOPIK6",
+      ].includes(langLevel);
+    } else {
+      return false;
+    }
+  };
+
+export const validateGetSentence = (req: Request): GenericServerResponse => {
+    // check for undefined values
+    if (isUndefined(req.query.word) || isUndefined(req.query.word[0])) {
+    return {status: 400, body: {error: `Word to generate is undefined`}}
+    }
+    if (isUndefined(req.query.lang_mode)) {
+    return {status: 400, body: {error: `Target language is undefined`}}
+    }
+    if (isUndefined(req.query.userId)) {
+    return {status: 400, body: {error: `User ID is undefined`}}
+    }
+    if (isUndefined(req.query.cardId)) {
+    return {status: 400, body: {error: `Flash card ID is undefined`}}
+    }
+    if (isUndefined(req.query.timeStamp)) {
+    return {status: 400, body: {error: `Flash card timestamp is undefined`}}
+    }
+    const wordsToSearch = Array.isArray(req.query.word)
+    ? req.query.word
+    : [req.query.word];
+    const targetLanguage = req.query.lang_mode;
+    let targetLevel = req.query.lang_level;
+    if (!validateLang(targetLanguage)) {
+        return {status: 400, body: {status: 400, message: `Unsupported language: ${targetLanguage}`}}
+      }
+      let invalidWords = "";
+      for (let word of wordsToSearch) {
+        if (!(validateWord(word, targetLanguage))) {
+          invalidWords = invalidWords + ` ${word}`;
+        }
+      }
+      if (invalidWords !== "") {
+        return {status: 400, body: {status: 400, message: `Invalid words:${invalidWords}`}}
+      }
+      
+      if (!(validateLangLevel(targetLanguage, targetLevel))) {
+        return {status: 400, body: {status: 400, message: `Invalid language level: ${targetLevel}`}}
+      }
+}

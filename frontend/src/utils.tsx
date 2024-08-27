@@ -60,7 +60,7 @@ const getNewCardImage = async (dispatch: Dispatch<AnyAction>, cardData: FlashCar
       const imageJson = await imageResponse.json();
       // 3rd fetch to persist the image in s3 then update references with persisted url
       const uploadResponse = await fetch(
-        `${serviceConfig.BACKEND_ENDPOINT}${serviceConfig.BACKEND_PATH}/image`,
+        `${serviceConfig.BACKEND_ENDPOINT}${serviceConfig.BACKEND_PATH}/images`,
         {
           method: "POST",
           headers: {

@@ -3,6 +3,8 @@ import { GenericServerResponse } from '../../types/global';
 import { GenAIClient } from "../classes/abstract";
 import { ObjectCannedACL } from "@aws-sdk/client-s3";
 import { createUrlReadStream } from "../helpers/utils";
+import { Upload } from "@aws-sdk/lib-storage";
+import { read } from 'fs';
 
 interface handleGetImageInput {
   sentence: string;
@@ -56,15 +58,28 @@ export const handlePostImage = async (input: handlePostImageInput, dynamoDbClien
     const domainName = process.env.CLOUDFRONT_URL;
     try {
       const readable = createUrlReadStream(imgUrl)
-      await s3Client.putObject({
-          // PutObjectRequest
-          Body: readable,
-          Bucket: process.env.BUCKET_NAME, // required
-          Key: remoteFileName, // required
-          ACL: ObjectCannedACL.public_read,
-          ContentType: "image/png",
-          CacheControl: "public, max-age=31536000",
+      const parallelUploads3 = new Upload({
+        client: s3Client.client,
+        params: { Bucket: process.env.BUCKET_NAME,
+          Key: remoteFileName,
+          Body: readable},
+          queueSize: 3,
       });
+    
+      parallelUploads3.on("httpUploadProgress", (progress) => {
+        console.log(progress);
+      });
+    
+      await parallelUploads3.done();
+      // await s3Client.putObject({
+      //     // PutObjectRequest
+      //     Body: readable,
+      //     Bucket: process.env.BUCKET_NAME, // required
+      //     Key: remoteFileName, // required
+      //     ACL: ObjectCannedACL.public_read,
+      //     ContentType: "image/png",
+      //     CacheControl: "public, max-age=31536000",
+      // });
       // TODO: Update DynamoDB Table with correct image link
       await dynamoDbClient.updateItem({
         Key: { FlashCardId: { S: cardId } },

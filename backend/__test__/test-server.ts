@@ -6,8 +6,6 @@ import { openai } from "../src/clients/openai";
 
 import { GetItemCommand, DeleteItemCommand } from "@aws-sdk/client-dynamodb";
 import request from "supertest";
-// import { LocalstackContainer } from "@testcontainers/localstack"
-// import { CreateBucketCommand, HeadBucketCommand, S3Client } from "@aws-sdk/client-s3";
 
 const ddbMock = dynamoDbClient.getMock();
 const s3Mock = s3Client.getMock()
@@ -23,30 +21,6 @@ describe("GET /flashcards", () => {
     s3Mock.restore();
     mock.restoreAll();
   });
-  // test("should create a S3 bucket", async () => {
-  //   const container = await new LocalstackContainer().start();
-
-  //   const client = new S3Client({
-  //     endpoint: container.getConnectionUri(),
-  //     forcePathStyle: true,
-  //     region: "us-east-1",
-  //     credentials: {
-  //       secretAccessKey: "test",
-  //       accessKeyId: "test",
-  //     },
-  //   });
-  //   const input = {
-  //     Bucket: "testcontainers",
-  //   };
-  //   const command = new CreateBucketCommand(input);
-
-  //   const createBucketResponse = await client.send(command);
-  //   assert.strictEqual(createBucketResponse.$metadata.httpStatusCode, 200);
-  //   const headBucketResponse = await client.send(new HeadBucketCommand(input));
-  //   assert.strictEqual(headBucketResponse.$metadata.httpStatusCode, 200);
-
-  //   await container.stop();
-  // });
   test("existent user should have non-empty cards response", async () => {
     const queryResult = {
       Items: [

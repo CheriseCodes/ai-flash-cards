@@ -77,19 +77,19 @@ backend:
   config:
     name: backend-config
     data:
-      awsDefaultRegion: ""
-      bucketName: ""
-      cloudfrontUrl: ""
+      awsDefaultRegion: "" # TODO: Fill in
+      bucketName: "" # TODO: Fill in
+      cloudfrontUrl: "" # TODO: Fill in
       nodeEnv: production
-      appEnv: kubernetes.development
+      appEnv: kubernetes
   secret:
     name: api-secret
     type: Opaque
     data:
-      awsAccessKeyId: ""
-      awsSecretAccessKey: ""
-      awsSessionToken: ""
-      openaiApiKey: ""
+      awsAccessKeyId: "" # TODO: (Optional) Fill in 
+      awsSecretAccessKey: "" # TODO: (Optional) Fill in
+      awsSessionToken: "" # TODO:(Optional) Fill in
+      openaiApiKey: "" # TODO: Fill in
   resources: {}
   volumeMounts: []
   volumes: []

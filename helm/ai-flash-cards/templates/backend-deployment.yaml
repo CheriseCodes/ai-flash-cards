@@ -26,13 +26,6 @@ spec:
         {{- end }}
         app: backend
     spec:
-      {{- with .Values.backend.imagePullSecrets }}
-      imagePullSecrets:
-        {{- toYaml . | nindent 8 }}
-      {{- end }}
-      serviceAccountName: {{ include "ai-flash-cards.serviceAccountName" . }}
-      securityContext:
-        {{- toYaml .Values.backend.podSecurityContext | nindent 8 }}
       containers:
         - name: {{ .Chart.Name }}-backend
           securityContext:
@@ -52,25 +45,3 @@ spec:
             {{- toYaml .Values.backend.livenessProbe | nindent 12 }}
           readinessProbe:
             {{- toYaml .Values.backend.readinessProbe | nindent 12 }}
-          resources:
-            {{- toYaml .Values.backend.resources | nindent 12 }}
-          {{- with .Values.backend.volumeMounts }}
-          volumeMounts:
-            {{- toYaml . | nindent 12 }}
-          {{- end }}
-      {{- with .Values.backend.volumes }}
-      volumes:
-        {{- toYaml . | nindent 8 }}
-      {{- end }}
-      {{- with .Values.backend.nodeSelector }}
-      nodeSelector:
-        {{- toYaml . | nindent 8 }}
-      {{- end }}
-      {{- with .Values.backend.affinity }}
-      affinity:
-        {{- toYaml . | nindent 8 }}
-      {{- end }}
-      {{- with .Values.backend.tolerations }}
-      tolerations:
-        {{- toYaml . | nindent 8 }}
-      {{- end }}

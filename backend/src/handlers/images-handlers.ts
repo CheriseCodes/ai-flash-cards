@@ -71,15 +71,6 @@ export const handlePostImage = async (input: handlePostImageInput, dynamoDbClien
       });
     
       await parallelUploads3.done();
-      // await s3Client.putObject({
-      //     // PutObjectRequest
-      //     Body: readable,
-      //     Bucket: process.env.BUCKET_NAME, // required
-      //     Key: remoteFileName, // required
-      //     ACL: ObjectCannedACL.public_read,
-      //     ContentType: "image/png",
-      //     CacheControl: "public, max-age=31536000",
-      // });
       // TODO: Update DynamoDB Table with correct image link
       await dynamoDbClient.updateItem({
         Key: { FlashCardId: { S: cardId } },

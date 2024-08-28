@@ -47,7 +47,6 @@ export const handleGetImage = async (input: handleGetImageInput, dynamoDbClient:
 interface handlePostImageInput {
   cardId: string;
   imgUrl: string;
-  // localFileName: string;
   remoteFileName: string;
 }
 export const handlePostImage = async (input: handlePostImageInput, dynamoDbClient: dynamoDb, s3Client: s3) => {
@@ -65,7 +64,6 @@ export const handlePostImage = async (input: handlePostImageInput, dynamoDbClien
           Body: readable},
           queueSize: 3,
       });
-    
       parallelUploads3.on("httpUploadProgress", (progress) => {
         console.log(progress);
       });

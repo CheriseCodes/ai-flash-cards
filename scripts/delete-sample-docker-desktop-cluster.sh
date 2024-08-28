@@ -15,3 +15,7 @@ kubectl wait --namespace ingress-nginx \
 
 # Delete TLS secret
 kubectl delete secret nginx-ingress-cert
+
+# Delete namespaces
+kubectl delete ns ai-flash-cards
+kubectl delete ns monitoring  

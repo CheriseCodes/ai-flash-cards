@@ -1,5 +1,5 @@
 {
-    "BACKEND_ENDPOINT": "http://localhost:8000",
-    "BACKEND_PATH": ""
+    "BACKEND_ENDPOINT": "https://demo.localdev.me",
+    "BACKEND_PATH": "/backend"
 }
   

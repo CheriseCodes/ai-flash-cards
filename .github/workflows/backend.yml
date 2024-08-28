@@ -12,7 +12,7 @@ on:
       - "backend/types/**"
 env:
   NODE_ENV: "test"
-  APP_ENV: "local.test"
+  APP_ENV: "local"
 
 defaults:
   run:

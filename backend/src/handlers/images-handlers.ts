@@ -1,10 +1,8 @@
 import { dynamoDb, s3 } from '../classes/aws';
 import { GenericServerResponse } from '../../types/global';
 import { GenAIClient } from "../classes/abstract";
-import { ObjectCannedACL } from "@aws-sdk/client-s3";
 import { createUrlReadStream } from "../helpers/utils";
 import { Upload } from "@aws-sdk/lib-storage";
-import { read } from 'fs';
 
 interface handleGetImageInput {
   sentence: string;

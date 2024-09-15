@@ -7,8 +7,7 @@ const Profile = () => {
   let profileData = (<div></div>);
   useEffect(() => {
     const getUserMetadata = async () => {
-      if (process.env.VITE_APP_ENV) {
-        if (process.env.VITE_APP_ENV.includes("production")) {
+      if (process.env.NODE_ENV !== "test") {
           if (isAuthenticated) {
           try {
             
@@ -17,7 +16,6 @@ const Profile = () => {
           } catch {
             console.log(`getAccessTokenSilently failed`)
           }
-        }
         }
     }
 }}, [])

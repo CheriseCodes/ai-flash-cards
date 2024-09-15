@@ -32,7 +32,6 @@ jobs:
       with:
         bun-version: latest
     - run: |
-        echo "VITE_APP_ENV=\"docker.test\"" > .env
         bun install --frozen-lockfile
         bun run build
         bun run test

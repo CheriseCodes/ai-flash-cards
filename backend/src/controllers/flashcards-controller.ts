@@ -5,11 +5,14 @@ import { handleDeleteFlashcard, handleGetFlashcardsByUser } from '../handlers/fl
 import { GenericServerResponse } from '../../types/global';
  
 export const getFlashcardsByUser =  async (req: Request, res: Response) => {
+  // TODO: start time
   // check for undefined values
   console.log("entered getFlashcards")
   const reqError: GenericServerResponse = validateGetFlashcardsByUserRequest(req)
   if (reqError) {
     res.status(reqError.status).send(reqError.body);
+    // TODO: end time 
+    // TODO: put metric method=GET route=/flashcards status=reqError.status latency=end-start
     return
   }
   console.log("passed input verification")
@@ -17,7 +20,8 @@ export const getFlashcardsByUser =  async (req: Request, res: Response) => {
   const response: GenericServerResponse = await handleGetFlashcardsByUser({userId: userId}, dynamoDbClient);
   console.log("received response")
   res.status(response.status).send(response.body);
-  
+  // TODO: end time
+  // TODO: put metric method=GET route=/flashcards status=response.status latency=end-start
 }
 
 export const deleteFlashcard =  async (req: Request, res: Response) => {

@@ -2,7 +2,7 @@
 # If you need more help, visit the Dockerfile reference guide at
 # https://docs.docker.com/engine/reference/builder/
 
-ARG NODE_VERSION=20
+ARG NODE_VERSION=20.2
 
 ################################################################################
 # Use node image for base image for all stages.
@@ -71,7 +71,6 @@ COPY package.json .
 # the built application from the build stage into the image.
 COPY --from=deps /usr/src/app/node_modules ./node_modules
 COPY --from=build /usr/src/app/built ./built
-USER node
 # Expose the port that the application listens on.
 EXPOSE 8000
 

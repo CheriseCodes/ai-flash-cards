@@ -10,6 +10,8 @@ kubectl wait --namespace ingress-nginx \
   --selector=app.kubernetes.io/component=controller \
   --timeout=120s
 
+INGRESS_KEY_FILE=nginx-ingress.key
+INGRESS_CRT_FILE=nginx-ingress.crt
 # Set up TLS
 # Create self-signed certificate
 if [[ ! -f "$INGRESS_KEY_FILE" ]] && [[ ! -f "$INGRESS_CRT_FILE" ]]

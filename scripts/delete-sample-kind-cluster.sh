@@ -19,3 +19,4 @@ kubectl delete secret nginx-ingress-cert
 # Delete namespaces
 kubectl delete ns ai-flash-cards
 kubectl delete ns monitoring  
+kind delete cluster -n ai-flash-cards-cluster

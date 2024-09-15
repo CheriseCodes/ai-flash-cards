@@ -43,7 +43,7 @@ frontend:
     minReplicas: 1
     maxReplicas: 100
     targetCPUUtilizationPercentage: 80
-  replicaCount: 2
+  replicaCount: 4
   podAnnotations: {}
   podLabels: {}
   podSecurityContext: {}
@@ -101,7 +101,7 @@ backend:
     minReplicas: 1
     maxReplicas: 100
     targetCPUUtilizationPercentage: 80
-  replicaCount: 2
+  replicaCount: 4
   podAnnotations: {}
   podLabels: {}
   podSecurityContext: {}

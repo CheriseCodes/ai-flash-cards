@@ -20,7 +20,7 @@ const isValidUrl = (url: string, allowedDomains: string[]): boolean => {
 }
 
 export const createUrlReadStream = (url: string): Readable => {
-    const allowedDomains = ['trusted-domain.com', 'another-trusted-domain.com'];
+    const allowedDomains = ['cdn.openai.com', 'openaiusercontent.com', 'files.oaiusercontent.com', 'picsum.photos'];
     if (!isValidUrl(url, allowedDomains)) {
         throw new Error('Invalid URL');
     }

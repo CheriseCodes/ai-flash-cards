@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
 import { dynamoDbClient, s3Client } from "../clients/aws";
-import { openai } from "../clients/openai";
+import { openai } from '../clients/openai';
 import { validateGetImage, validatePostImage } from '../helpers/validators';
 import { GenericServerResponse } from '../../types/global';
 import { handleGetImage, handlePostImage } from '../handlers/images-handlers';

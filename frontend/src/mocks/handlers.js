@@ -1,6 +1,6 @@
-import { HttpResponse, http } from "msw"
+import { HttpResponse, http } from 'msw'
 
-import serviceConfig from "../../config/service.json";
+import serviceConfig from '../../config/service.json';
 
 const backendDomain = `${serviceConfig.BACKEND_ENDPOINT}${serviceConfig.BACKEND_PATH}`
 

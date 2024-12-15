@@ -6,7 +6,7 @@
   "homepage": ".",
   "dependencies": {
     "@auth0/auth0-react": "^2.2.4",
-    "@reduxjs/toolkit": "^1.9.7",
+    "@reduxjs/toolkit": "^2.5.0",
     "@types/react": "^18.3.3",
     "@types/react-dom": "^18.3.0",
     "@vitejs/plugin-react": "^4.3.1",

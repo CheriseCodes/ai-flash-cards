@@ -7,9 +7,7 @@ on:
   pull_request:
     branches: [ "main", "fullstack-release", "backend-release" ]
     paths:
-      - "backend/src/**"
-      - "backend/__test__/**"
-      - "backend/types/**"
+      - "backend/**"
 env:
   NODE_ENV: "test"
   APP_ENV: "local"

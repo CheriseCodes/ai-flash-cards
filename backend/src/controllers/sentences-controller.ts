@@ -4,7 +4,6 @@ import { dynamoDbClient } from "../clients/aws";
 import { GenericServerResponse } from '../../types/global';
 import { handleGetSentence } from '../handlers/sentences-handlers';
 import { validateGetSentence } from '../helpers/validators';
-// import { isUndefined } from "../helpers/utils";
 
  export const getSentence = async (req: Request, res: Response) => {
       const reqError: GenericServerResponse = validateGetSentence(req)

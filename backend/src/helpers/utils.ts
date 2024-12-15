@@ -1,5 +1,5 @@
 import { Readable } from 'stream';
-import https from "node:https";
+import https from 'node:https';
 import { URL } from 'url';
 
 export const isUndefined = (item: any): boolean => {

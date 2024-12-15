@@ -7,8 +7,7 @@ on:
   pull_request:
     branches: [ "main", "fullstack-release", "frontend-release" ]
     paths:
-      - "frontend/src/**"
-      - "frontend/__test__/**"
+      - "frontend/**"
 
 env:
   NODE_ENV: "test"

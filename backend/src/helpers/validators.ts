@@ -1,5 +1,5 @@
 import { Request } from 'express';
-import { isUndefined } from "./utils";
+import { isUndefined } from './utils';
 import appConfig from "../config";
 import { GenericServerResponse } from '../../types/global';
 

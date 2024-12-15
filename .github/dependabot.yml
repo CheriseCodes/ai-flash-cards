@@ -5,11 +5,19 @@
 
 version: 2
 updates:
-  - package-ecosystem: "docker" # See documentation for possible values
-    directory: "/backend/" # Location of package manifests
+  - package-ecosystem: "docker" 
+    directory: "/backend/" 
     schedule:
       interval: "daily"
-  - package-ecosystem: "docker" # See documentation for possible values
-    directory: "/frontend/" # Location of package manifests
+  - package-ecosystem: "docker" 
+    directory: "/frontend/" 
+    schedule:
+      interval: "daily"
+  - package-ecosystem: "npm" 
+    directory: "/backend/" 
+    schedule:
+      interval: "daily"
+  - package-ecosystem: "npm" 
+    directory: "/frontend/" 
     schedule:
       interval: "daily"

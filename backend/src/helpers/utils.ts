@@ -1,5 +1,6 @@
 import { Readable } from 'stream';
 import https from "node:https";
+import { URL } from 'url';
 
 export const isUndefined = (item: any): boolean => {
     return typeof(item) === "undefined"
@@ -9,7 +10,21 @@ export const unixTimestamp = () => {
     return Math.floor(Date.now() / 1000)
 }
 
+const isValidUrl = (url: string, allowedDomains: string[]): boolean => {
+    try {
+        const parsedUrl = new URL(url);
+        return allowedDomains.includes(parsedUrl.hostname);
+    } catch (err) {
+        return false;
+    }
+}
+
 export const createUrlReadStream = (url: string): Readable => {
+    const allowedDomains = ['cdn.openai.com', 'openaiusercontent.com', 'files.oaiusercontent.com', 'picsum.photos'];
+    if (!isValidUrl(url, allowedDomains)) {
+        throw new Error('Invalid URL');
+    }
+
     const readable = new Readable({
       read() {}, // No-op
     })

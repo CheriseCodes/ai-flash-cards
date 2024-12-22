@@ -37,8 +37,12 @@ app.use("/*", function(req, res, next) {
   console.log(register.metrics());
   next();
 });
-app.get("/service/readyz", (req: Request, res: Response) => res.status(200).json({ readyz: {status: "ok" }}));
-app.get("/service/livez", (req: Request, res: Response) => res.status(200).json({ livez: {status: "ok" }}));
+app.get("/service/readyz", async (req: Request, res: Response) => {
+  res.status(200).send({ readyz: {status: "ok" }})
+});
+app.get("/service/livez", async (req: Request, res: Response) => {
+  res.status(200).send({ livez: {status: "ok" }})
+});
 app.get("/callback", async (req: Request, res: Response) => {
   res.send({"data": "callback"});
 });

@@ -10,7 +10,7 @@ import flashCardsRoute from './routes/flashcards-route';
 import imagesRoute from './routes/images-route';
 import sentencesRoute from './routes/sentences-route';
 
-export const app: Application<Record<string, any>> = express();
+export const app: Application = express();
 app.use(cors({
   origin: '*',
 }));

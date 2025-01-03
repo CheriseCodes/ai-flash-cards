@@ -2,7 +2,7 @@ import express, { Application } from "express";
 import { Request, Response } from 'express';
 import bodyParser from "body-parser";
 import cors from "cors";
-import { register, http_request_counter } from "./clients/prometheus";
+import { register, http_request_counter } from './clients/prometheus';
 
 import { jwtCheck } from "./clients/auth0";
 

@@ -57,17 +57,14 @@ jobs:
           build-args: APP_ENV=kubernetes,NODE_ENV=production
           push: true
           tags: cherisecodes/ai-flash-cards-frontend:latest
-      - name: Docker Scout
-        id: docker-scout
-        uses: docker/scout-action@v1
+      - name: Trivy image scan
+        uses: aquasecurity/trivy-action@0.28.0
         with:
-          command: cves,recommendations,compare
-          to-latest: true
-          ignore-base: true
-          ignore-unchanged: true
-          only-fixed: true
-          organization: cherisecodes
-          image: cherisecodes/ai-flash-cards-frontend:latest
+          image-ref: 'docker.io/cherisecodes/ai-flash-cards-frontend:latest'
+          format: 'table'
+          ignore-unfixed: true
+          vuln-type: 'os,library'
+          severity: 'CRITICAL,HIGH'
   build-push-ecr-eks:
     runs-on: ubuntu-latest
     environment: production

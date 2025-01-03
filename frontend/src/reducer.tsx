@@ -27,7 +27,7 @@ const reducer = (state: any, action: any) => {
           return item;
         }),
       }
-      console.log("update-card state:");
+      console.log('update-card state:');
       currentStateSummary(newState)
       return newState;
     }

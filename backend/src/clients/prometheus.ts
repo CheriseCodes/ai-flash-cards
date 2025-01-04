@@ -15,11 +15,11 @@ export const http_request_counter = new client.Counter({
     labelNames: ['method', 'route', 'statusCode']
 });
 
-const restResponseTimeHistogram = new client.Histogram({
-    name: 'rest_response_time_duration_seconds',
-    help: 'REST API response time in seconds',
-    labelNames: ['method', 'route', 'status_code']
-});
+// const restResponseTimeHistogram = new client.Histogram({
+//     name: 'rest_response_time_duration_seconds',
+//     help: 'REST API response time in seconds',
+//     labelNames: ['method', 'route', 'status_code']
+// });
 
 register.registerMetric(http_request_counter);
 

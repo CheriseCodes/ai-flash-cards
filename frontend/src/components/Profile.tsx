@@ -18,7 +18,9 @@ const Profile = () => {
           }
         }
     }
-}}, [])
+    
+}
+getUserMetadata()}, [])
 
   if (user) {
     profileData = (

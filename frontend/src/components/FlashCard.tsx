@@ -10,7 +10,7 @@ const FlashCard = ({ cardData, setErrors, userId }: { cardData: FlashCard, setEr
   const [enableEdit, setEnableEdit] = useState(false);
   const [selected, setSelected] = useState(false);
   const [imageError, setImageError] = useState(false);
-  const [reloadCount, setReloadCount] = useState(0);
+  // const [reloadCount, setReloadCount] = useState(0);
   const {  getAccessTokenSilently, isAuthenticated } = useAuth0();
 
   const wordRef = useRef<HTMLInputElement>(null);
@@ -85,42 +85,42 @@ const FlashCard = ({ cardData, setErrors, userId }: { cardData: FlashCard, setEr
     setSelected((curr) => !curr);
   };
 
-  // TODO: remove reload
-  const reloadImage = (e: any) => {
-    if (reloadCount > 3) {
-      console.log("Hit max reloads:", reloadCount)
-      e.target.src = "https://m.media-amazon.com/images/I/418Jmnejj8L.jpg";
-      e.target.hidden = false;
-      setReloadCount(0);
-    } else if (reloadCount > 2) {
-        const windowReloads = localStorage.getItem("globalreloads");
-        if (windowReloads == null) {
-          const newValue: number = 1;
-          localStorage.setItem("globalreloads", newValue.toString());
-          window.location.reload();
-        } else {
-          console.log("Hit max reloads:", reloadCount)
-          e.target.src = "https://m.media-amazon.com/images/I/418Jmnejj8L.jpg";
-          e.target.hidden = false;
-          localStorage.removeItem("globalreloads");
-          setReloadCount(0);
-        }
-        // don't reload if hit max reloads of 30
-        // setReloadCount((curr) => curr + 1);
+  // // TODO: remove reload
+  // const reloadImage = (e: any) => {
+  //   if (reloadCount > 3) {
+  //     console.log("Hit max reloads:", reloadCount)
+  //     e.target.src = "https://m.media-amazon.com/images/I/418Jmnejj8L.jpg";
+  //     e.target.hidden = false;
+  //     setReloadCount(0);
+  //   } else if (reloadCount > 2) {
+  //       const windowReloads = localStorage.getItem("globalreloads");
+  //       if (windowReloads == null) {
+  //         const newValue: number = 1;
+  //         localStorage.setItem("globalreloads", newValue.toString());
+  //         window.location.reload();
+  //       } else {
+  //         console.log("Hit max reloads:", reloadCount)
+  //         e.target.src = "https://m.media-amazon.com/images/I/418Jmnejj8L.jpg";
+  //         e.target.hidden = false;
+  //         localStorage.removeItem("globalreloads");
+  //         setReloadCount(0);
+  //       }
+  //       // don't reload if hit max reloads of 30
+  //       // setReloadCount((curr) => curr + 1);
         
-    } else {
-      setReloadCount((curr) => curr + 1);
-      if (e.target.src.includes("?nocache")) {
-        e.target.src = e.target.src.replace(/\?nocache=[0-9]/,"")
-      } else {
-        e.target.src = e.target.src + `?nocache=${reloadCount}`
-      }
-      e.target.hidden = true;
-      if (!imageError) {
-        setImageError((curr) => !curr);
-      }
-    }
-  }
+  //   } else {
+  //     setReloadCount((curr) => curr + 1);
+  //     if (e.target.src.includes("?nocache")) {
+  //       e.target.src = e.target.src.replace(/\?nocache=[0-9]/,"")
+  //     } else {
+  //       e.target.src = e.target.src + `?nocache=${reloadCount}`
+  //     }
+  //     e.target.hidden = true;
+  //     if (!imageError) {
+  //       setImageError((curr) => !curr);
+  //     }
+  //   }
+  // }
 
   const loadedImage = (e: any) => {
     e.target.hidden = false;

@@ -6,7 +6,7 @@
   "dependencies": {
     "@aws-sdk/client-dynamodb": "^3.620.0",
     "@aws-sdk/client-s3": "^3.717.0",
-    "@aws-sdk/credential-providers": "^3.716.0",
+    "@aws-sdk/credential-providers": "^3.726.1",
     "@aws-sdk/lib-storage": "^3.722.0",
     "@aws-sdk/s3-request-presigner": "^3.726.1",
     "@aws-sdk/util-format-url": "^3.714.0",

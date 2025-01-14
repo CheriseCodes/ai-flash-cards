@@ -1,0 +1,2 @@
+# TODO: Check if `npm run lint` is empty. If not, fail the action (exit non-zero)
+

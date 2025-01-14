@@ -2,6 +2,8 @@ import { GenAIClient } from "./abstract";
 import { ChatCompletion } from "openai/resources/index.mjs";
 import OpenAI from "openai";
 
+const l = "nineteen"
+
 export class OpenAIClient extends GenAIClient {
     constructor(client: OpenAI) {
         super(client)

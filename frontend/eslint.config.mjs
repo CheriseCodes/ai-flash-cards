@@ -2,6 +2,7 @@ import eslint from '@eslint/js';
 import typescriptPlugin from '@typescript-eslint/eslint-plugin';
 import parser from '@typescript-eslint/parser';
 import prettierPlugin from 'eslint-plugin-prettier';
+import reactPlugin from "eslint-plugin-react";
 
 export default [
   {
@@ -20,6 +21,7 @@ export default [
       },
     },
     plugins: {
+      react: reactPlugin,
       '@typescript-eslint': typescriptPlugin,
       prettier: prettierPlugin,
     },

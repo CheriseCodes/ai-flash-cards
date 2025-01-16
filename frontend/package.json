@@ -29,8 +29,8 @@
     "start": "vite",
     "dev": "vite",
     "preview": "vite preview",
-    "lint:fix": "eslint . --fix",
-    "lint": "eslint .",
+    "lint:fix": "eslint . --fix --quiet",
+    "lint": "eslint . --quiet",
     "build": "tsc && vite build",
     "build:dev": "tsc -w",
     "test": "jest"

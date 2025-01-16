@@ -26,8 +26,19 @@ jobs:
         node-version: [22.x]
         # See supported Node.js release schedule at https://nodejs.org/en/about/previous-releases/
     steps:
-    - uses: actions/checkout@v3
-    - run: |
+    - name: Checkout
+      uses: actions/checkout@v4
+    - name: Build
+      run: |
         npm ci
         npm run build
+    - name: Lint
+      run: |
+        res=$(npm run lint)
+        if [ ! -z "$res" ]
+        then
+          exit 1
+        fi
+    - name: Test
+      run: |
         npm run test

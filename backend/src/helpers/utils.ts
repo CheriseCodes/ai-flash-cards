@@ -14,7 +14,7 @@ const isValidUrl = (url: string, allowedDomains: string[]): boolean => {
     try {
         const parsedUrl = new URL(url);
         return allowedDomains.includes(parsedUrl.hostname);
-    } catch (err) {
+    } catch {
         return false;
     }
 }

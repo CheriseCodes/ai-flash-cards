@@ -6,6 +6,7 @@
   "homepage": ".",
   "dependencies": {
     "@auth0/auth0-react": "^2.2.4",
+    "@eslint/js": "^9.17.0",
     "@reduxjs/toolkit": "^2.5.0",
     "@types/react": "^18.3.3",
     "@types/react-dom": "^18.3.0",
@@ -28,8 +29,8 @@
     "start": "vite",
     "dev": "vite",
     "preview": "vite preview",
-    "lint:fix": "eslint . --fix --ext .js,.jsx,.ts,.tsx",
-    "lint": "eslint . --ext .js,.jsx,.ts,.tsx",
+    "lint:fix": "eslint . --fix --quiet",
+    "lint": "eslint . --quiet",
     "build": "tsc && vite build",
     "build:dev": "tsc -w",
     "test": "jest"

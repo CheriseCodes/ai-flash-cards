@@ -3,7 +3,7 @@ import react from '@vitejs/plugin-react'
 import viteTsconfigPaths from 'vite-tsconfig-paths'
 import { viteStaticCopy } from 'vite-plugin-static-copy'
 
-export default defineConfig(({command, mode}) => {
+export default defineConfig(({ mode }) => {
     const env = loadEnv(mode, process.cwd(), "VITE_APP");
     const envWithProcessPrefix = {
       "process.env": `${JSON.stringify(env)}`,

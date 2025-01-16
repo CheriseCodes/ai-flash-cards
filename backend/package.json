@@ -29,8 +29,8 @@
     "build": "tsc",
     "build:dev": "tsc -w",
     "start:dev": "nodemon ./built/src/main.js",
-    "lint:fix": "eslint . --fix",
-    "lint": "eslint .",
+    "lint:fix": "eslint . --fix --quiet",
+    "lint": "eslint . --quiet",
     "test": "node --test",
     "test:server": "node --test ./built/__test__/test-server.js",
     "test:server-helpers": "node --test ./built/__test__/test-server-helpers.js"

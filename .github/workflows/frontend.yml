@@ -5,7 +5,7 @@ name: Frontend React CI
 
 on:
   pull_request:
-    branches: [ "main", "fullstack-release", "frontend-release" ]
+    branches: ["main"]
     paths:
       - "frontend/**"
 

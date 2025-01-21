@@ -11,7 +11,7 @@
     "@aws-sdk/s3-request-presigner": "^3.726.1",
     "@aws-sdk/util-format-url": "^3.714.0",
     "@eslint/js": "^9.17.0",
-    "@smithy/hash-node": "^3.0.11",
+    "@smithy/hash-node": "^4.0.1",
     "@smithy/protocol-http": "^4.1.8",
     "@smithy/url-parser": "^3.0.11",
     "body-parser": "^1.20.2",

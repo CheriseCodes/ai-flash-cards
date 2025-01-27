@@ -13,7 +13,7 @@
     "@eslint/js": "^9.17.0",
     "@smithy/hash-node": "^4.0.1",
     "@smithy/protocol-http": "^4.1.8",
-    "@smithy/url-parser": "^3.0.11",
+    "@smithy/url-parser": "^4.0.1",
     "body-parser": "^1.20.2",
     "connect-dynamodb": "^3.0.5",
     "cors": "^2.8.5",

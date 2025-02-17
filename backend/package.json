@@ -7,7 +7,7 @@
     "@aws-sdk/client-dynamodb": "^3.726.1",
     "@aws-sdk/client-s3": "^3.731.1",
     "@aws-sdk/credential-providers": "^3.726.1",
-    "@aws-sdk/lib-storage": "^3.731.1",
+    "@aws-sdk/lib-storage": "^3.749.0",
     "@aws-sdk/s3-request-presigner": "^3.726.1",
     "@aws-sdk/util-format-url": "^3.714.0",
     "@eslint/js": "^9.17.0",

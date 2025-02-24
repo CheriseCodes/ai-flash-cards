@@ -12,7 +12,7 @@
     "@aws-sdk/util-format-url": "^3.714.0",
     "@eslint/js": "^9.21.0",
     "@smithy/hash-node": "^4.0.1",
-    "@smithy/protocol-http": "^4.1.8",
+    "@smithy/protocol-http": "^5.0.1",
     "@smithy/url-parser": "^4.0.1",
     "body-parser": "^1.20.2",
     "connect-dynamodb": "^3.0.5",
